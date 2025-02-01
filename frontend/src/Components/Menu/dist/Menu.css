@@ -1,0 +1,3 @@
+.menuWrapper:active, .menuWrapper.active:active {
+  -webkit-tap-highlight-color: transparent;
+}

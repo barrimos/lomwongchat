@@ -1,0 +1,719 @@
+$boardBoxColors: (
+    // (hue, saturation, lightness1, lightness2, lightness3, lightness4)
+    //                   board box   icon box    span        h5
+    noc: (219, 100%, 85%, 60%, 35%, 50%),
+    nou: (345, 100%, 85%, 60%, 35%, 50%),
+    uso: (43, 100%, 85%, 60%, 35%, 40%),
+    rpt: (90, 100%, 75%, 50%, 35%, 30%),
+    dpi: (0, 0%, 80%, 40%, 35%, 30%),
+    ssn: (260, 100%, 85%, 60%, 35%, 40%),
+);
+
+
+#logoutDashboard{
+    background-color: hsl(345, 100%, 50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    color: white;
+}
+
+#mainDashboard{
+    width: 100%;
+    .modalManageWrapper{
+        width: 100%;
+        height: 100svh;
+        display: block;
+        position: fixed;
+        z-index: 9;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .modal{
+        .searchModalManage{
+            padding: 10px;
+            width: 100%;
+            margin: 10px 0;
+            border-radius: 5px;
+            &::-webkit-input-placeholder{
+                color: hsl(0, 0%, 76%);
+            }
+        }
+        &.manageModal{
+            width: 80%;
+            height: 80vh;
+            overflow: scroll;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        &.issueModalLists{
+            &.notIssue{
+                min-height: calc(100% - 120px);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .issueWrapper{
+                position: relative;
+                cursor: pointer;
+                .requestClose{
+                    position: absolute;
+                    top: 5px;
+                    left: 25px;
+                    font-size: .7em;
+                }
+                .linkDispute{
+                    border-radius: 5px;
+                    box-shadow: 0 1px 5px -1px hsla(0, 0%, 50%, .6);
+                    background-color: hsl(0, 0%, 99%);
+                    display: block;
+                    padding: 20px 10px;
+                    .issueName{
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        font-size: 1.4em;
+                        font-weight: 600;
+                        color: hsl(0, 0%, 25%);
+                    }
+                }
+                .closeIssueBtn{
+                    position: absolute;
+                    top: 0;
+                    right: 15px;
+                    display: none;
+                    width: 20px;
+                    height: 20px;
+                    &:hover{
+                        background-color: white;
+                        border-radius: 50%;
+                        color: red;
+                    }
+                    &.mobileSupport{
+                        display: block;
+                    }
+                }
+                &:hover{
+                    .linkDispute{
+                        background-color: hsl(0, 0%, 93%);
+                    }
+                    .closeIssueBtn{
+                        display: block;
+                    }
+                }
+            }
+        }
+        &.ticketsDashboard{
+            .radioFilterTicketsWrapper{
+                position: relative;
+                margin: 5px;
+                width: 100px;
+                .radioFilterTickets{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    opacity: 0;
+                    cursor: pointer;
+                }
+                .labelForRadioFilterTickets{
+                    width: 100%;
+                    font-size: .8em;
+                    font-weight: 400;
+                    border-radius: 5px;
+                    text-align: center;
+                    padding: 3px;
+                    color: white;
+                    margin-bottom: 0;
+                    &[for=openTickets]{
+                        background-color: hsl(120, 30%, 58%);
+                        &.active{
+                            background-color: hsl(120, 100%, 44%);
+                        }
+                    }
+                    &[for=closedTickets]{
+                        background-color: hsl(0, 30%, 58%);
+                        &.active{
+                            background-color: red;
+                        }
+                    }
+                    &[for=queueTickets]{
+                        background-color: gray;
+                        &.active{
+                            background-color: rgb(54, 54, 54);
+                        }
+                    }
+                }
+            }
+            #clearFilterTickets{
+                margin: 5px;
+                width: 100px;
+                font-size: .8em;
+                font-weight: 400;
+                background-color: hsl(0, 0%, 85%);
+                border-radius: 5px;
+                padding: 3px;
+            }
+    
+            .ticketItem{
+                margin: 10px 0;
+                .ticketSN{
+                    margin: 10px 0;
+                    @media screen and(max-width: 576px) {
+                        display: inline-grid;
+                    }
+                    .ticketStatus{
+                        margin-right: 10px;
+                        &.queue{
+                            color: hsl(234, 80%, 60%);
+                        }
+                        &.open{
+                            color: var(--green);
+                        }
+                        &.closed{
+                            color: var(--red);
+                        }
+                    }
+                }
+                .manageTicket{
+                    padding: 3px 5px;
+                    color: white;
+                    border-radius: 5px;
+                    font-size: .75em;
+                    width: 48px;
+                    &#openTicketBtn{
+                        background-color: hsl(120, 94%, 37%);
+                    }
+                    &#closeTicketBtn{
+                        background-color: hsl(0, 80%, 60%);
+                    }
+                    &#deleteTicketBtn{
+                        background-color: black;
+                    }
+                    &+.manageTicket{
+                        margin-left: 10px;
+                    }
+                }
+                table{
+                    border-collapse: collapse;
+                    thead{
+                        font-weight: 500;
+                        tr{
+                            background-color: hsl(0, 0%, 90%);
+                        }
+                    }
+                    tbody{
+                        tr{
+                            background-color: hsl(0, 0%, 99%);
+                        }
+                    }
+                    td{
+                        border: none;
+                        text-align: center;
+                        font-size: .8em;
+                        padding: 10px 15px;
+                    }
+                }
+            }
+        }
+        &.sessionModalLists{
+            .menuTabWrapper{
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                .sessionCmdBtn{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: hsl(0, 0%, 36%);
+                    font-size: 1.2em;
+                    width: 100%;
+                    height: 30px;
+                    @media screen and(min-width: 576px) {
+                        width: 90px;
+                    }
+                    &:hover{
+                        background-color: hsl(0, 0%, 85%);
+                    }
+                    &+.sessionCmdBtn{
+                        position: relative;
+                        margin-left: 5px;
+                        &::after{
+                            display: block;
+                            position: absolute;
+                            clear: both;
+                            left: -2.5px;
+                            top: 0;
+                            bottom: 0;
+                            margin: auto 0;
+                            content: '';
+                            width: 1px;
+                            height: 60%;
+                            background-color: hsl(0, 0%, 67%);
+                        }
+                    }
+                    .labelSessionCmdBtn{
+                        margin-left: 10px;
+                        font-size: .75em;
+                        margin-bottom: 0;
+                    }
+                }
+            }
+            .sessionTableItemsWrapper{
+                font-size: .8em;
+                width: 100%;
+                tr{
+                    td{
+                        line-height: 10px;
+                    }
+                    th, td{
+                        border: none;
+                        padding: 10px;
+                    }
+                }
+                thead{
+                    tr{
+                        background-color: hsl(256, 100%, 75%);
+                        color: hsl(255, 100%, 15%);
+                        th{
+                            .sortSessionBtn{
+                                margin-left: 5px;
+                            }
+                            &:first-child{
+                                border-top-left-radius: 10px;
+                            }
+                            &:last-child{
+                                border-top-right-radius: 10px;
+                            }
+                        }
+                    }
+                }
+                tbody{
+                    tr.itemSession{
+                        &:nth-child(2n){
+                            background-color: hsl(0, 0%, 90%);
+                        }
+                        td.sidUsername{
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                            .loggedin, .loggedoff{
+                                font-size: .7em;
+                                margin-right: 5px;
+                            }
+                            .loggedin{
+                                color: hsl(128, 100%, 48%);
+                            }
+                            .loggedoff{
+                                color: hsl(0, 0%, 80%);
+                            }
+                        }
+                        td.sidUuid{
+                            // width: 100%;
+                            // max-width: fit-content;
+                            white-space: nowrap;
+                        }
+                        td.sidId{
+                            // width: 100%;
+                            // width: fit-content;
+                            white-space: nowrap;
+                        }
+                        td.sidAgent{
+                            // width: 100%;
+                            width: fit-content;
+                        }
+                        td.sidIp{
+                            // width: 100%;
+                            // max-width: 20%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .empty{
+        width: 100%;
+        height: calc(100% - 150px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background-color: hsl(0, 0%, 95%);
+        color: hsl(0, 0%, 75%);
+        font-weight: 600;
+        font-size: 1.5em;
+    }
+
+    .boardBox{
+        min-height: 80px;
+        max-height: 120px;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+        &:active{
+            filter: brightness(.8);
+            -webkit-tap-highlight-color: transparent;
+        }
+        &.pointer{
+            cursor: pointer;
+        }
+        &.maxHeight{
+            height: 100%;
+            max-height: none;
+        }
+        .iconBox{
+            display: block;
+            min-width: 50px;
+            min-height: 50px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            i{
+                font-size: 2em;
+            }
+        }
+        h5{
+            font-size: .9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .expandClick{
+            color: hsl(0, 0%, 25%);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: .7em;
+        }
+        span{
+            font-size: 2em;
+            font-weight: 900;
+        }
+        &.defaultColor{
+            background-color: hsl(220, 100%, 91%);
+            .iconBox{
+                background-color: hsl(220, 100%, 65%);
+                i{
+                    color: white;
+                }
+            }
+            h5{
+                color: hsl(219, 100%, 35%);
+            }
+            span{
+                color: hsl(219, 100%, 50%);
+            }
+        }
+    }
+    @each $name, $values in $boardBoxColors {
+        .#{$name} {
+          // ใช้เฉดกลางสำหรับพื้นหลัง
+          background-color: hsl(nth($values, 1), nth($values, 2), nth($values, 3)); 
+      
+          .iconBox {
+            // ใช้เฉดเข้มสำหรับ iconBox
+            background-color: hsl(nth($values, 1), nth($values, 2), nth($values, 4));
+            i {
+              color: white;
+            }
+          }
+      
+          h5 {
+            // ใช้เฉดอ่อนมากสำหรับ h5
+            color: hsl(nth($values, 1), nth($values, 2), nth($values, 6));
+          }
+      
+          span {
+            // ใช้เฉดเข้มมากสำหรับ span
+            color: hsl(nth($values, 1), nth($values, 2), nth($values, 5));
+          }
+        }
+      }
+
+    #paginationUserDashboard{
+        margin: 10px auto;
+        #prevPage, #nextPage{
+            width: 50px;
+            height: 30px;
+            background-color: hsl(0, 0%, 98%);
+        }
+        .pagination{
+            min-width: 200px;
+            max-width: 280px;
+            @media screen and (max-width: 400px){
+                width: 200px;
+            }
+            @media screen and (min-width: 400px) and (max-width: 767px){
+                width: 280px;
+            }
+            @media screen and (min-width: 767px) and (max-width: 991px){
+                width: 200px;
+            }
+            @media screen and (min-width: 992px){
+                width: 280px;
+            }
+            .paginationNum{
+                width: 30px;
+                height: 30px;
+                margin: 0 5px;
+                cursor: pointer;
+                background-color: hsl(0, 0%, 92%);
+                &.active{
+                    background-color: hsl(0, 0%, 98%);
+                }
+                &.spreadDot{
+                    @media screen and (max-width: 400px){
+                        display: none;
+                    }
+                    @media screen and (min-width: 767px){
+                        display: none;
+                    }
+                    @media screen and (min-width: 400px) and (max-width: 767px){
+                        display: flex;
+                    }
+                    @media screen and (min-width: 992px){
+                        display: flex;
+                    }
+                }
+            }
+        }
+        #prevPage, #nextPage, .paginationNum{
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+    #searchUser{
+        font-size: .9em;
+        border-radius: 5px;
+        height: 30px;
+        &:focus{
+            outline: none;
+        }
+    }
+    #channelSelect{
+        font-size: .9em;
+        border-radius: 5px;
+        width: 120px;
+        height: 30px;
+    }
+    #listsPerPage{
+        display: flex;
+        margin-right: 10px;
+        span{
+            width: 100%;
+            color: hsl(0, 0%, 36%);
+            font-size: .8em;
+            margin-left: 10px;
+        }
+    }
+    .tabsWrapper{
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        .tabItemWrapper{
+            position: relative;
+            min-width: 40px;
+            width: calc(25% - 6px);
+            user-select: none;
+            flex: 1 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: hsl(0, 0%, 95%);
+            padding: 3px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            cursor: pointer;
+            &:hover{
+                background-color: hsl(0, 0%, 81%);
+            }
+            &.active{
+                background-color: hsl(0, 0%, 94%);
+                box-shadow: 0 -2px 4px -1px hsla(0, 0%, 50%, .3);
+            }
+            &+.tabItemWrapper{
+                margin-left: 3px;
+            }
+            &:nth-child(5n){
+                margin-left: 0;
+            }
+            &:nth-child(n + 5){
+                margin-top: 3px;
+            }
+            .tabItem{
+                display: block;
+                padding: 5px 0;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                font-size: .7em;
+                color: hsl(0, 0%, 17%);
+                font-weight: 600;
+                margin-left: 10px;
+                &[data-noti="true"]{
+                    &::before{
+                        display: block;
+                        content: '';
+                        position: absolute;
+                        clear: both;
+                        width: 8px;
+                        height: 8px;
+                        background-color: red;
+                        border-radius: 50%;
+                        top: 0;
+                        bottom: 0;
+                        right: 9px;
+                        margin: auto;
+                    }
+                }
+            }
+            &:hover{
+                .clearDmListBtn{
+                    display: flex;
+                    z-index: 2;
+                }
+                .tabItem[data-noti="true"]{
+                    &::before{
+                        display: none;
+                    }
+                }
+            }
+            .clearDmListBtn{
+                background-color: transparent;
+                border-radius: 50%;
+                display: none;
+                justify-content: center;
+                align-items: center;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+                &:hover{
+                    background-color: white;
+                    display: flex;
+                    z-index: 2;
+                }
+            }
+        }
+    }
+    .tableWrapper{
+        border-radius: 10px;
+        overflow-x: auto;
+        #tbOp{
+            display: table;
+            min-width: max-content;
+            font-size: .9em;
+            th{
+                background-color: hsl(199, 54%, 63%);
+                color: hsl(200, 100%, 24%);
+                .ascdesBtn{
+                    margin-left: 5px;
+                }
+            }
+            th, td{
+                border: none;
+            }
+            tr{
+                &:nth-child(odd), &:nth-child(odd) td{
+                    background-color: hsl(0, 0%, 97%);
+                }
+                &:nth-child(even), &:nth-child(even) td{
+                    background-color: hsl(0, 0%, 95%);
+                }
+            }
+            td{
+                &.stick{
+                    position: sticky;
+                    left: 0;
+                    z-index: 1;
+                }
+                padding: 15px;
+                .statusName{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    height: auto;
+                    color: white;
+                    border-radius: 5px;
+                    font-weight: 500;
+                    letter-spacing: 1.2px;
+                    &.normal{
+                        background-color: var(--green);
+                    }
+                    &.warning{
+                        background-color: orange;
+                    }
+                    &.banned{
+                        background-color: red;
+                    }
+                }
+                @media screen and (max-width: 576px) {
+                    padding: 10px 15px;
+                    font-size: .8em;
+                }
+            }
+            .actionBtns{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .actionStatusBtn{
+                    margin: 0 10px;
+                }
+            }
+        }
+    }
+}
+
+.actionStatusBtn{
+    font-size: 1.4em;
+    color: hsl(0, 0%, 85%);
+    &.normal{
+        &.active{
+            color: var(--green);
+        }
+    }
+    &.warning{
+        &.active{
+            color: orange;
+        }
+    }
+    &.banned{
+        &.active{
+            color: red;
+        }
+    }
+    &.dm{
+        color: blue;
+        position: relative;
+        &[data-dm="true"]{
+            &::after{
+                content: '';
+                display: block;
+                position: absolute;
+                clear: both;
+                top: 3px;
+                right: -5px;
+                font-size: .5em;
+                background-color: red;
+                color: white;
+                border-radius: 50%;
+                width: 10px;
+                height: 10px;
+            }
+        }
+    }
+    &.feels{
+        font-size: 1.1em;
+        color: blue;
+    }
+}

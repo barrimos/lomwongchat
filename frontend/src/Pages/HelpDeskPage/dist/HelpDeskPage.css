@@ -1,0 +1,131 @@
+body::-webkit-scrollbar {
+  display: none;
+}
+
+.linkBackChat {
+  width: 150px;
+  font-size: 1.5em;
+}
+.linkBackChat i {
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: #ffa600;
+}
+.linkBackChat span {
+  margin-left: 10px;
+}
+@media screen and (min-width: 768px) {
+  .linkBackChat {
+    font-size: 1em;
+  }
+}
+
+#inpSearchTicket {
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+  max-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+}
+
+.filterTicketsWrapper {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+.filterTicketsWrapper .inpFilterTickets {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  opacity: 0;
+}
+.filterTicketsWrapper .clearFilterSearch {
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  color: white;
+  border-radius: 5px;
+  background-color: #e21d1d;
+}
+.filterTicketsWrapper .labelFilterTickets {
+  font-size: 0.8em;
+  margin-bottom: 0;
+  text-align: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f7f7f7;
+  color: gray;
+}
+.filterTicketsWrapper .labelFilterTickets.active {
+  background-color: #5bff4d;
+  color: #005721;
+  font-weight: 600;
+}
+
+.ticketsList {
+  border-radius: 5px;
+}
+.ticketsList .ticketItem {
+  height: auto;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 10px;
+  margin: 5px 0;
+  font-size: 0.9em;
+  position: relative;
+  background-color: #f2f2f2;
+}
+.ticketsList .ticketItem .collapsibleSwitch {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ticketsList .ticketItem .collapsibleSwitch .reportStatus {
+  margin-right: 10px;
+  font-size: 0.8em;
+}
+.ticketsList .ticketItem .collapsibleSwitch .reportStatus.open {
+  color: var(--green);
+}
+.ticketsList .ticketItem .collapsibleSwitch .reportStatus.closed {
+  color: red;
+}
+.ticketsList .ticketItem .collapsibleSwitch i {
+  font-size: 1.5em;
+}
+.ticketsList .ticketItem .contentTicket {
+  overflow: hidden;
+  height: 0;
+  transition: ease-in-out 0.3s;
+  background-color: white;
+}
+.ticketsList .ticketItem .contentTicket .contentData {
+  padding: 5px;
+}
+.ticketsList .ticketItem.active .contentTicket {
+  overflow-y: scroll;
+}
+.ticketsList .ticketItem:hover {
+  background-color: #e6e6e6;
+}
+.ticketsList .empty {
+  width: 100%;
+  height: calc(100vh - 160px);
+  color: #cccccc;
+  font-size: 2em;
+  font-weight: 600;
+  background-color: #fafafa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

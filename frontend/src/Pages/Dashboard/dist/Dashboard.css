@@ -1,0 +1,742 @@
+#logoutDashboard {
+  background-color: #ff0040;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  color: white;
+}
+
+#mainDashboard {
+  width: 100%;
+}
+#mainDashboard .modalManageWrapper {
+  width: 100%;
+  height: 100svh;
+  display: block;
+  position: fixed;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#mainDashboard .modal .searchModalManage {
+  padding: 10px;
+  width: 100%;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+#mainDashboard .modal .searchModalManage::-webkit-input-placeholder {
+  color: #c2c2c2;
+}
+#mainDashboard .modal.manageModal {
+  width: 80%;
+  height: 80vh;
+  overflow: scroll;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#mainDashboard .modal.issueModalLists.notIssue {
+  min-height: calc(100% - 120px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper {
+  position: relative;
+  cursor: pointer;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .requestClose {
+  position: absolute;
+  top: 5px;
+  left: 25px;
+  font-size: 0.7em;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .linkDispute {
+  border-radius: 5px;
+  box-shadow: 0 1px 5px -1px rgba(128, 128, 128, 0.6);
+  background-color: #fcfcfc;
+  display: block;
+  padding: 20px 10px;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .linkDispute .issueName {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 1.4em;
+  font-weight: 600;
+  color: #404040;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .closeIssueBtn {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .closeIssueBtn:hover {
+  background-color: white;
+  border-radius: 50%;
+  color: red;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper .closeIssueBtn.mobileSupport {
+  display: block;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper:hover .linkDispute {
+  background-color: #ededed;
+}
+#mainDashboard .modal.issueModalLists .issueWrapper:hover .closeIssueBtn {
+  display: block;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper {
+  position: relative;
+  margin: 5px;
+  width: 100px;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .radioFilterTickets {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets {
+  width: 100%;
+  font-size: 0.8em;
+  font-weight: 400;
+  border-radius: 5px;
+  text-align: center;
+  padding: 3px;
+  color: white;
+  margin-bottom: 0;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=openTickets] {
+  background-color: #74b474;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=openTickets].active {
+  background-color: #00e000;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=closedTickets] {
+  background-color: #b47474;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=closedTickets].active {
+  background-color: red;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=queueTickets] {
+  background-color: gray;
+}
+#mainDashboard .modal.ticketsDashboard .radioFilterTicketsWrapper .labelForRadioFilterTickets[for=queueTickets].active {
+  background-color: #363636;
+}
+#mainDashboard .modal.ticketsDashboard #clearFilterTickets {
+  margin: 5px;
+  width: 100px;
+  font-size: 0.8em;
+  font-weight: 400;
+  background-color: #d9d9d9;
+  border-radius: 5px;
+  padding: 3px;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem {
+  margin: 10px 0;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN {
+  margin: 10px 0;
+}
+@media screen and (max-width: 576px) {
+  #mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN {
+    display: inline-grid;
+  }
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN .ticketStatus {
+  margin-right: 10px;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN .ticketStatus.queue {
+  color: #4758eb;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN .ticketStatus.open {
+  color: var(--green);
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .ticketSN .ticketStatus.closed {
+  color: var(--red);
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .manageTicket {
+  padding: 3px 5px;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.75em;
+  width: 48px;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .manageTicket#openTicketBtn {
+  background-color: #06b706;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .manageTicket#closeTicketBtn {
+  background-color: #eb4747;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .manageTicket#deleteTicketBtn {
+  background-color: black;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem .manageTicket + .manageTicket {
+  margin-left: 10px;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem table {
+  border-collapse: collapse;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem table thead {
+  font-weight: 500;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem table thead tr {
+  background-color: #e6e6e6;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem table tbody tr {
+  background-color: #fcfcfc;
+}
+#mainDashboard .modal.ticketsDashboard .ticketItem table td {
+  border: none;
+  text-align: center;
+  font-size: 0.8em;
+  padding: 10px 15px;
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #5c5c5c;
+  font-size: 1.2em;
+  width: 100%;
+  height: 30px;
+}
+@media screen and (min-width: 576px) {
+  #mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn {
+    width: 90px;
+  }
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn:hover {
+  background-color: #d9d9d9;
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn + .sessionCmdBtn {
+  position: relative;
+  margin-left: 5px;
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn + .sessionCmdBtn::after {
+  display: block;
+  position: absolute;
+  clear: both;
+  left: -2.5px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  content: "";
+  width: 1px;
+  height: 60%;
+  background-color: #ababab;
+}
+#mainDashboard .modal.sessionModalLists .menuTabWrapper .sessionCmdBtn .labelSessionCmdBtn {
+  margin-left: 10px;
+  font-size: 0.75em;
+  margin-bottom: 0;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper {
+  font-size: 0.8em;
+  width: 100%;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tr td {
+  line-height: 10px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tr th, #mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tr td {
+  border: none;
+  padding: 10px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper thead tr {
+  background-color: #a280ff;
+  color: #13004d;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper thead tr th .sortSessionBtn {
+  margin-left: 5px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper thead tr th:first-child {
+  border-top-left-radius: 10px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper thead tr th:last-child {
+  border-top-right-radius: 10px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession:nth-child(2n) {
+  background-color: #e6e6e6;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUsername {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUsername .loggedin, #mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUsername .loggedoff {
+  font-size: 0.7em;
+  margin-right: 5px;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUsername .loggedin {
+  color: #00f521;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUsername .loggedoff {
+  color: #cccccc;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidUuid {
+  white-space: nowrap;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidId {
+  white-space: nowrap;
+}
+#mainDashboard .modal.sessionModalLists .sessionTableItemsWrapper tbody tr.itemSession td.sidAgent {
+  width: fit-content;
+}
+#mainDashboard .empty {
+  width: 100%;
+  height: calc(100% - 150px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #f2f2f2;
+  color: #bfbfbf;
+  font-weight: 600;
+  font-size: 1.5em;
+}
+#mainDashboard .boardBox {
+  min-height: 80px;
+  max-height: 120px;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+#mainDashboard .boardBox:active {
+  filter: brightness(0.8);
+  -webkit-tap-highlight-color: transparent;
+}
+#mainDashboard .boardBox.pointer {
+  cursor: pointer;
+}
+#mainDashboard .boardBox.maxHeight {
+  height: 100%;
+  max-height: none;
+}
+#mainDashboard .boardBox .iconBox {
+  display: block;
+  min-width: 50px;
+  min-height: 50px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#mainDashboard .boardBox .iconBox i {
+  font-size: 2em;
+}
+#mainDashboard .boardBox h5 {
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-left: 10px;
+}
+#mainDashboard .boardBox .expandClick {
+  color: #404040;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 0.7em;
+}
+#mainDashboard .boardBox span {
+  font-size: 2em;
+  font-weight: 900;
+}
+#mainDashboard .boardBox.defaultColor {
+  background-color: #d1e0ff;
+}
+#mainDashboard .boardBox.defaultColor .iconBox {
+  background-color: #4d88ff;
+}
+#mainDashboard .boardBox.defaultColor .iconBox i {
+  color: white;
+}
+#mainDashboard .boardBox.defaultColor h5 {
+  color: #003eb3;
+}
+#mainDashboard .boardBox.defaultColor span {
+  color: #0059ff;
+}
+#mainDashboard .noc {
+  background-color: #b3cdff;
+}
+#mainDashboard .noc .iconBox {
+  background-color: #337aff;
+}
+#mainDashboard .noc .iconBox i {
+  color: white;
+}
+#mainDashboard .noc h5 {
+  color: #0059ff;
+}
+#mainDashboard .noc span {
+  color: #003eb3;
+}
+#mainDashboard .nou {
+  background-color: #ffb3c6;
+}
+#mainDashboard .nou .iconBox {
+  background-color: #ff3366;
+}
+#mainDashboard .nou .iconBox i {
+  color: white;
+}
+#mainDashboard .nou h5 {
+  color: #ff0040;
+}
+#mainDashboard .nou span {
+  color: #b3002d;
+}
+#mainDashboard .uso {
+  background-color: #ffe9b3;
+}
+#mainDashboard .uso .iconBox {
+  background-color: #ffc533;
+}
+#mainDashboard .uso .iconBox i {
+  color: white;
+}
+#mainDashboard .uso h5 {
+  color: #cc9200;
+}
+#mainDashboard .uso span {
+  color: #b38000;
+}
+#mainDashboard .rpt {
+  background-color: #bfff80;
+}
+#mainDashboard .rpt .iconBox {
+  background-color: #80ff00;
+}
+#mainDashboard .rpt .iconBox i {
+  color: white;
+}
+#mainDashboard .rpt h5 {
+  color: #4d9900;
+}
+#mainDashboard .rpt span {
+  color: #59b300;
+}
+#mainDashboard .dpi {
+  background-color: #cccccc;
+}
+#mainDashboard .dpi .iconBox {
+  background-color: #666666;
+}
+#mainDashboard .dpi .iconBox i {
+  color: white;
+}
+#mainDashboard .dpi h5 {
+  color: #4d4d4d;
+}
+#mainDashboard .dpi span {
+  color: #595959;
+}
+#mainDashboard .ssn {
+  background-color: #ccb3ff;
+}
+#mainDashboard .ssn .iconBox {
+  background-color: #7733ff;
+}
+#mainDashboard .ssn .iconBox i {
+  color: white;
+}
+#mainDashboard .ssn h5 {
+  color: #4400cc;
+}
+#mainDashboard .ssn span {
+  color: #3c00b3;
+}
+#mainDashboard #paginationUserDashboard {
+  margin: 10px auto;
+}
+#mainDashboard #paginationUserDashboard #prevPage, #mainDashboard #paginationUserDashboard #nextPage {
+  width: 50px;
+  height: 30px;
+  background-color: #fafafa;
+}
+#mainDashboard #paginationUserDashboard .pagination {
+  min-width: 200px;
+  max-width: 280px;
+}
+@media screen and (max-width: 400px) {
+  #mainDashboard #paginationUserDashboard .pagination {
+    width: 200px;
+  }
+}
+@media screen and (min-width: 400px) and (max-width: 767px) {
+  #mainDashboard #paginationUserDashboard .pagination {
+    width: 280px;
+  }
+}
+@media screen and (min-width: 767px) and (max-width: 991px) {
+  #mainDashboard #paginationUserDashboard .pagination {
+    width: 200px;
+  }
+}
+@media screen and (min-width: 992px) {
+  #mainDashboard #paginationUserDashboard .pagination {
+    width: 280px;
+  }
+}
+#mainDashboard #paginationUserDashboard .pagination .paginationNum {
+  width: 30px;
+  height: 30px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #ebebeb;
+}
+#mainDashboard #paginationUserDashboard .pagination .paginationNum.active {
+  background-color: #fafafa;
+}
+@media screen and (max-width: 400px) {
+  #mainDashboard #paginationUserDashboard .pagination .paginationNum.spreadDot {
+    display: none;
+  }
+}
+@media screen and (min-width: 767px) {
+  #mainDashboard #paginationUserDashboard .pagination .paginationNum.spreadDot {
+    display: none;
+  }
+}
+@media screen and (min-width: 400px) and (max-width: 767px) {
+  #mainDashboard #paginationUserDashboard .pagination .paginationNum.spreadDot {
+    display: flex;
+  }
+}
+@media screen and (min-width: 992px) {
+  #mainDashboard #paginationUserDashboard .pagination .paginationNum.spreadDot {
+    display: flex;
+  }
+}
+#mainDashboard #paginationUserDashboard #prevPage, #mainDashboard #paginationUserDashboard #nextPage, #mainDashboard #paginationUserDashboard .paginationNum {
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#mainDashboard #searchUser {
+  font-size: 0.9em;
+  border-radius: 5px;
+  height: 30px;
+}
+#mainDashboard #searchUser:focus {
+  outline: none;
+}
+#mainDashboard #channelSelect {
+  font-size: 0.9em;
+  border-radius: 5px;
+  width: 120px;
+  height: 30px;
+}
+#mainDashboard #listsPerPage {
+  display: flex;
+  margin-right: 10px;
+}
+#mainDashboard #listsPerPage span {
+  width: 100%;
+  color: #5c5c5c;
+  font-size: 0.8em;
+  margin-left: 10px;
+}
+#mainDashboard .tabsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper {
+  position: relative;
+  min-width: 40px;
+  width: calc(25% - 6px);
+  user-select: none;
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f2f2f2;
+  padding: 3px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper:hover {
+  background-color: #cfcfcf;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper.active {
+  background-color: #f0f0f0;
+  box-shadow: 0 -2px 4px -1px rgba(128, 128, 128, 0.3);
+}
+#mainDashboard .tabsWrapper .tabItemWrapper + .tabItemWrapper {
+  margin-left: 3px;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper:nth-child(5n) {
+  margin-left: 0;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper:nth-child(n+5) {
+  margin-top: 3px;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper .tabItem {
+  display: block;
+  padding: 5px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.7em;
+  color: #2b2b2b;
+  font-weight: 600;
+  margin-left: 10px;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper .tabItem[data-noti=true]::before {
+  display: block;
+  content: "";
+  position: absolute;
+  clear: both;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  top: 0;
+  bottom: 0;
+  right: 9px;
+  margin: auto;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper:hover .clearDmListBtn {
+  display: flex;
+  z-index: 2;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper:hover .tabItem[data-noti=true]::before {
+  display: none;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper .clearDmListBtn {
+  background-color: transparent;
+  border-radius: 50%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+#mainDashboard .tabsWrapper .tabItemWrapper .clearDmListBtn:hover {
+  background-color: white;
+  display: flex;
+  z-index: 2;
+}
+#mainDashboard .tableWrapper {
+  border-radius: 10px;
+  overflow-x: auto;
+}
+#mainDashboard .tableWrapper #tbOp {
+  display: table;
+  min-width: max-content;
+  font-size: 0.9em;
+}
+#mainDashboard .tableWrapper #tbOp th {
+  background-color: #6eb3d4;
+  color: #00527a;
+}
+#mainDashboard .tableWrapper #tbOp th .ascdesBtn {
+  margin-left: 5px;
+}
+#mainDashboard .tableWrapper #tbOp th, #mainDashboard .tableWrapper #tbOp td {
+  border: none;
+}
+#mainDashboard .tableWrapper #tbOp tr:nth-child(odd), #mainDashboard .tableWrapper #tbOp tr:nth-child(odd) td {
+  background-color: #f7f7f7;
+}
+#mainDashboard .tableWrapper #tbOp tr:nth-child(even), #mainDashboard .tableWrapper #tbOp tr:nth-child(even) td {
+  background-color: #f2f2f2;
+}
+#mainDashboard .tableWrapper #tbOp td {
+  padding: 15px;
+}
+#mainDashboard .tableWrapper #tbOp td.stick {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+#mainDashboard .tableWrapper #tbOp td .statusName {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  color: white;
+  border-radius: 5px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+}
+#mainDashboard .tableWrapper #tbOp td .statusName.normal {
+  background-color: var(--green);
+}
+#mainDashboard .tableWrapper #tbOp td .statusName.warning {
+  background-color: orange;
+}
+#mainDashboard .tableWrapper #tbOp td .statusName.banned {
+  background-color: red;
+}
+@media screen and (max-width: 576px) {
+  #mainDashboard .tableWrapper #tbOp td {
+    padding: 10px 15px;
+    font-size: 0.8em;
+  }
+}
+#mainDashboard .tableWrapper #tbOp .actionBtns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#mainDashboard .tableWrapper #tbOp .actionBtns .actionStatusBtn {
+  margin: 0 10px;
+}
+
+.actionStatusBtn {
+  font-size: 1.4em;
+  color: #d9d9d9;
+}
+.actionStatusBtn.normal.active {
+  color: var(--green);
+}
+.actionStatusBtn.warning.active {
+  color: orange;
+}
+.actionStatusBtn.banned.active {
+  color: red;
+}
+.actionStatusBtn.dm {
+  color: blue;
+  position: relative;
+}
+.actionStatusBtn.dm[data-dm=true]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  clear: both;
+  top: 3px;
+  right: -5px;
+  font-size: 0.5em;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+}
+.actionStatusBtn.feels {
+  font-size: 1.1em;
+  color: blue;
+}

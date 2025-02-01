@@ -1,0 +1,49 @@
+.errorPageWrapper {
+  overflow: hidden;
+}
+.errorPageWrapper .leftError, .errorPageWrapper .rightError {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.errorPageWrapper .rightError {
+  width: 70%;
+}
+.errorPageWrapper .rightError .status.code {
+  font-size: 4em;
+  font-weight: 900;
+  line-height: 20px;
+  color: #000661;
+}
+.errorPageWrapper .rightError .status.error {
+  font-size: 3em;
+  font-weight: 300;
+  color: #3740be;
+}
+.errorPageWrapper .leftError {
+  overflow: hidden;
+  font-size: 32em;
+  font-weight: 900;
+  width: 30%;
+  background-color: #ff1a1a;
+  color: white;
+}
+.errorPageWrapper .leftError h1 {
+  margin-top: -36px;
+}
+
+@media screen and (max-width: 576px) {
+  .errorPageWrapper .leftError {
+    width: 100%;
+    max-height: 120px;
+    font-size: 20em;
+  }
+  .errorPageWrapper .leftError h1 {
+    margin-top: -32px;
+  }
+  .errorPageWrapper .rightError {
+    width: 100%;
+    height: calc(100vh - 120px);
+  }
+}

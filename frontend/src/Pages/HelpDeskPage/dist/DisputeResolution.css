@@ -1,0 +1,219 @@
+.disputeResolution {
+  margin-bottom: 40px;
+}
+
+.headDispute {
+  font-size: 2em;
+  margin: 20px 0;
+}
+
+.headDisputeBtnWrapper {
+  display: flex;
+  align-items: center;
+}
+.headDisputeBtnWrapper .headDisputeBtn {
+  background-color: #f0f0f0;
+  margin: 0 5px;
+}
+.headDisputeBtnWrapper .headDisputeBtn.sizeTextBtn {
+  width: 33px;
+  height: 33px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+.headDisputeBtnWrapper .headDisputeBtn.homeBtn {
+  font-size: 1.2em;
+  padding: 5px;
+  width: 33px;
+  height: 33px;
+  background-color: #372673;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.titleIssue {
+  margin: 20px 0;
+}
+.titleIssue .topic, .titleIssue .detailTopic {
+  margin: 10px 0;
+}
+
+.reqCloseBtn {
+  display: block;
+  padding: 10px;
+  color: white;
+  font-weight: 500;
+  height: 36px;
+  overflow: hidden;
+  white-space: pre;
+}
+.reqCloseBtn[data-request=false] {
+  border-radius: 5px;
+  background-color: #00c700;
+  width: 110px;
+}
+.reqCloseBtn[data-request=true] {
+  animation: squareToCircle 0.3s forwards;
+  background-color: #0067c7;
+}
+@keyframes squareToCircle {
+  0% {
+    width: 110px;
+    /* Initial width */
+    border-radius: 5px;
+    /* Initial border-radius */
+  }
+  50% {
+    border-radius: 5px;
+  }
+  75% {
+    border-radius: 25%;
+  }
+  100% {
+    width: 36px;
+    /* Final width */
+    border-radius: 50%;
+    /* Final border-radius */
+  }
+}
+
+.urlComment, .urlComment:visited {
+  color: blue !important;
+}
+
+.inputCommentDuspute, .disputeComment {
+  font-size: 1.1em;
+  line-height: 25px;
+}
+
+#commentingFormArea .inputCommentWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#commentingFormArea .inputCommentWrapper .inputCommentText {
+  padding: 15px 15px 30px;
+  min-height: 200px;
+  width: 100%;
+  height: 200px;
+  margin-top: 15px;
+  background-color: #ededed;
+}
+#commentingFormArea .inputCommentWrapper .inputCommentText:focus {
+  outline: none;
+}
+#commentingFormArea .inputCommentWrapper .inputCommentCount {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 0.8em;
+  padding: 5px;
+  color: gray;
+}
+#commentingFormArea .attachmentWrapper {
+  width: 33px;
+  overflow: hidden;
+  transition: width ease 0.3s;
+  position: relative;
+}
+#commentingFormArea .attachmentWrapper::-webkit-scrollbar {
+  display: none;
+}
+#commentingFormArea .attachmentWrapper.active {
+  transition: ease 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+@media screen and (max-width: 576px) {
+  #commentingFormArea .attachmentWrapper.active {
+    width: 100%;
+  }
+}
+@media screen and (min-width: 576px) {
+  #commentingFormArea .attachmentWrapper.active {
+    width: 60%;
+  }
+}
+#commentingFormArea .attachmentWrapper #uploadError {
+  position: absolute;
+  width: 100%;
+  padding: 7px;
+  top: 0;
+  left: 0;
+  background-color: #ff1f1f;
+  color: white;
+  text-align: center;
+  z-index: 2;
+}
+#commentingFormArea .attachmentWrapper .toggleAttachmentBtn {
+  border-radius: 5px;
+  min-width: 33px;
+  height: 33px;
+  background-color: #e6e6e6;
+  margin-right: 6px;
+}
+#commentingFormArea .attachmentWrapper .toggleAttachmentBtn + .toggleAttachmentBtn {
+  margin-left: 5px;
+}
+#commentingFormArea .attachmentWrapper .uploadFileWrapper {
+  position: relative;
+  width: calc(100% - 104px);
+  height: 33px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  z-index: 0;
+}
+#commentingFormArea .attachmentWrapper .uploadFileWrapper #labelUploadImage {
+  overflow: hidden;
+  margin-bottom: auto;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  line-height: 32px;
+  color: #2b2b2b;
+  font-size: 0.9em;
+}
+#commentingFormArea .attachmentWrapper .uploadFileWrapper .attachmentInput {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+}
+#commentingFormArea .attachmentWrapper .uploadFileWrapper .attachmentInput.p-6 {
+  padding: 6px;
+}
+#commentingFormArea .attachmentWrapper .clearAttachFileBtn {
+  background-color: #d6d6d6;
+  color: #2b2b2b;
+  width: 60px;
+  height: 30px;
+  border-radius: 5px;
+  margin-left: 5px;
+  display: inline-block;
+}
+#commentingFormArea .attachmentWrapper .clearAttachFileBtn:active {
+  background-color: gray;
+  color: white;
+}
+#commentingFormArea .sendMessageBtn {
+  width: fit-content;
+  padding: 10px 15px;
+  background-color: #260d82;
+  color: white;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+#commentingFormArea .sendMessageBtn span {
+  margin-left: 10px;
+}
+#commentingFormArea .sendMessageBtn:active {
+  background-color: #3f0feb;
+}

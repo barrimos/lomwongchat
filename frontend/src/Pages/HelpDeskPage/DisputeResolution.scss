@@ -1,0 +1,208 @@
+.disputeResolution{
+    margin-bottom: 40px;
+}
+.headDispute{
+    font-size: 2em;
+    margin: 20px 0;
+}
+
+.headDisputeBtnWrapper{
+    display: flex;
+    align-items: center;
+    .headDisputeBtn{
+        background-color: rgb(240, 240, 240);
+        margin: 0 5px;
+        &.sizeTextBtn{
+            width: 33px;
+            height: 33px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        &.homeBtn{
+            font-size: 1.2em;
+            padding: 5px;
+            width: 33px;
+            height: 33px;
+            background-color: hsl(253, 50%, 30%);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+    }
+}
+.titleIssue{
+    margin: 20px 0;
+    .topic, .detailTopic{
+        margin: 10px 0;
+    }
+}
+.reqCloseBtn{
+    display: block;
+    padding: 10px;
+    color: white;
+    font-weight: 500;
+    height: 36px;
+    overflow: hidden;
+    white-space: pre;
+    &[data-request="false"]{
+        border-radius: 5px;
+        background-color: hsl(120, 100%, 39%);
+        width: 110px;
+    }
+    &[data-request="true"] {
+        animation: squareToCircle .3s forwards;
+        background-color: hsl(209, 100%, 39%);
+    }
+    @keyframes squareToCircle {
+        0%{
+            width: 110px; /* Initial width */
+            border-radius: 5px; /* Initial border-radius */
+        }
+        50%{
+            border-radius: 5px;
+        }
+        75%{
+            border-radius: 25%;
+        }
+        100%{
+            width: 36px; /* Final width */
+            border-radius: 50%; /* Final border-radius */
+        }
+    }
+}
+.urlComment, .urlComment:visited{
+    color: blue !important;
+}
+
+.inputCommentDuspute, .disputeComment{
+    font-size: 1.1em;
+    line-height: 25px;
+}
+#commentingFormArea{
+    .inputCommentWrapper{
+        position: relative;
+        width: 100%;
+        height: 100%;
+        .inputCommentText{
+            padding: 15px 15px 30px;
+            min-height: 200px;
+            width: 100%;
+            height: 200px;
+            margin-top: 15px;
+            background-color: hsl(0, 0%, 93%);
+            &:focus{
+                outline: none;
+            }
+        }
+        .inputCommentCount{
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: .8em;
+            padding: 5px;
+            color: hsl(0, 0%, 50%);
+        }
+    }
+    .attachmentWrapper{
+        width: 33px;
+        overflow: hidden;
+        transition: width ease .3s;
+        position: relative;
+        &::-webkit-scrollbar{
+            display: none;
+        }
+        &.active{
+            transition: ease .3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            @media screen and(max-width: 576px) {
+                width: 100%;
+            }
+            @media screen and(min-width: 576px) {
+                width: 60%;
+            }
+        }
+        #uploadError{
+            position: absolute;
+            width: 100%;
+            padding: 7px;
+            top: 0;
+            left: 0;
+            background-color: hsl(0, 100%, 56%);
+            color: white;
+            text-align: center;
+            z-index: 2;
+        }
+        .toggleAttachmentBtn{
+            border-radius: 5px;
+            min-width: 33px;
+            height: 33px;
+            background-color: hsl(0, 0%, 90%);
+            margin-right: 6px;
+            &+.toggleAttachmentBtn{
+                margin-left: 5px;
+            }
+        }
+        .uploadFileWrapper{
+            position: relative;
+            width: calc(100% - 104px);
+            height: 33px;
+            border: 1px solid hsl(0, 0%, 80%);
+            border-radius: 5px;
+            z-index: 0;
+            #labelUploadImage{
+                overflow: hidden;
+                margin-bottom: auto;
+                text-align: left;
+                width: 100%;
+                height: 100%;
+                padding: 0 10px;
+                text-overflow: ellipsis;
+                line-height: 32px;
+                color: hsl(0, 0%, 17%);
+                font-size: .9em;
+            }
+            .attachmentInput{
+                position: absolute;
+                left: 0;
+                top: 0;
+                background-color: hsl(0, 0%, 90%);
+                border-radius: 5px;
+                width: 100%;
+                height: auto;
+                opacity: 0;
+                &.p-6{
+                    padding: 6px;
+                }
+            }
+        }
+        .clearAttachFileBtn{
+            background-color: hsl(0, 0%, 84%);
+            color: hsl(0, 0%, 17%);
+            width: 60px;
+            height: 30px;
+            border-radius: 5px;
+            margin-left: 5px;
+            display: inline-block;
+            &:active{
+                background-color: gray;
+                color: white;
+            }
+        }
+    }
+    .sendMessageBtn{
+        width: fit-content;
+        padding: 10px 15px;
+        background-color: hsl(253, 82%, 28%);
+        color: white;
+        border-radius: 5px;
+        margin-top: 10px;
+        span{
+            margin-left: 10px;
+        }
+        &:active{
+            background-color: hsl(253, 88%, 49%);
+        }
+    }
+}

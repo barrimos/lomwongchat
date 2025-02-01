@@ -1,0 +1,571 @@
+button, input, textarea, select {
+  border: none;
+}
+
+button {
+  background-color: transparent;
+}
+
+#navbar {
+  width: 100%;
+  position: relative;
+}
+#navbar .btn {
+  width: 50px;
+  height: 40px;
+  background-color: #fcfcfc;
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
+}
+#navbar .btn i, #navbar .btn svg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#navbar .btn:active {
+  background-color: #e3e3e3;
+}
+#navbar .btn + .btn {
+  border-left: none;
+}
+#navbar .btn.menuBtn[data-noti=true] {
+  position: relative;
+}
+#navbar .btn.menuBtn[data-noti=true]::after {
+  display: block;
+  position: absolute;
+  clear: both;
+  content: "";
+  top: 10px;
+  right: 15px;
+  width: 9px;
+  height: 9px;
+  margin: auto;
+  background-color: red;
+  border-radius: 50%;
+  border: 1px solid #fcfcfc;
+}
+#navbar .exitBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#navbar .channelSelect {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.8em;
+  background-color: #fcfcfc;
+}
+#navbar .channelSelect:focus {
+  outline: none;
+}
+#navbar #navListWrapper, #navbar .menuWrapper {
+  z-index: 3;
+  background-color: whitesmoke;
+  position: absolute;
+  height: 0;
+  cursor: pointer;
+}
+#navbar #navListWrapper.active, #navbar .menuWrapper.active {
+  box-shadow: 0 8px 9px -6px rgba(20, 25, 57, 0.6);
+}
+#navbar #navListWrapper {
+  width: 180px;
+  overflow-y: scroll;
+  right: 50px;
+  padding: 0 5px;
+  max-height: 300px;
+  transition: height ease 0.3s;
+}
+#navbar #navListWrapper .navLists {
+  font-size: 0.8em;
+  padding: 3px 0;
+  height: 40px;
+}
+#navbar #navListWrapper .navLists div {
+  max-width: 70%;
+  text-overflow: ellipsis;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+#navbar #navListWrapper .empty {
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8em;
+  color: gray;
+}
+#navbar #navListWrapper.active {
+  height: auto;
+}
+#navbar .menuWrapper {
+  right: 0;
+  overflow: hidden;
+  font-size: 0.8em;
+  transition: height ease 0.3s;
+}
+#navbar .menuWrapper.topLayer {
+  z-index: 3;
+}
+#navbar .menuWrapper.overTopLayer {
+  z-index: 4 !important;
+}
+#navbar .menuWrapper .menuList .listMenuItemWrapper {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItemWrapper.active {
+  display: block;
+}
+#navbar .menuWrapper .menuList .listMenuItem {
+  color: #404040;
+  height: 40px;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 290px;
+  padding: 5px;
+  position: relative;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide {
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  width: 290px;
+  height: 100%;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .controlSlideBtn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .controlSlideBtn:active {
+  background-color: #cccccc;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .controlSlideBtn.next {
+  right: 0;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .controlSlideBtn.prev {
+  left: 0;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .item {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItem .slide .item.active {
+  display: block;
+}
+#navbar .menuWrapper .menuList .listMenuItem::-webkit-scrollbar {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItem .item {
+  min-width: calc(290px - 10px);
+}
+#navbar .menuWrapper .menuList .listMenuItem .item.center {
+  text-align: center;
+}
+#navbar .menuWrapper .menuList .listMenuItem input {
+  font-size: 1em;
+}
+#navbar .menuWrapper .menuList .listMenuItem i {
+  display: block;
+  min-width: 40px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#navbar .menuWrapper .menuList .listMenuItem + .listMenuItem {
+  border-top: 1px solid #cccccc;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser {
+  height: auto;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser::-webkit-scrollbar {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper {
+  height: auto;
+  max-height: 150px;
+  overflow-y: scroll;
+  width: 100%;
+  min-height: 100%;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper::-webkit-scrollbar {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper .usersOnlineNavbarItem {
+  display: block;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 5px;
+  position: relative;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper .usersOnlineNavbarItem::-webkit-scrollbar {
+  display: none;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper .usersOnlineNavbarItem + .usersOnlineNavbarItem {
+  border-top: 1px solid #cccccc;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper .usersOnlineNavbarItem[data-noti=true]::after {
+  display: block;
+  content: "";
+  position: absolute;
+  clear: both;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: red;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  right: 0;
+}
+#navbar .menuWrapper .menuList .listMenuItem#navListsUser .listsUsersWrapper .usersOnlineNavbarItem:active {
+  background-color: #d3d3ee;
+}
+#navbar .menuWrapper .menuList .listMenuItem[data-noti=true] .talkToAdmin {
+  position: relative;
+  width: 100%;
+}
+#navbar .menuWrapper .menuList .listMenuItem[data-noti=true] .talkToAdmin::after {
+  display: block;
+  content: "";
+  position: absolute;
+  clear: both;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: red;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  right: 0;
+}
+#navbar #overlay {
+  display: block;
+  clear: both;
+  position: absolute;
+  width: 100%;
+  height: calc(100vh - 90px);
+  background-color: transparent;
+  top: 40px;
+  left: 0;
+  z-index: 1;
+}
+
+.inputWrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.inpValueSearch {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid lightgray;
+  padding-left: 5px;
+  font-size: 0.8em;
+}
+.inpValueSearch::placeholder {
+  color: #b3b3b3;
+}
+
+.submitInp {
+  width: 60px;
+  height: 100%;
+  border: 1px solid lightgray;
+  font-size: 0.8em;
+}
+
+.errorBox {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  background-color: #fff5f5;
+  border-radius: 0 0 5px 5px;
+  color: #ff3333;
+  letter-spacing: 1px;
+  font-weight: 500;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#asideProfile {
+  height: 100%;
+}
+#asideProfile .profileUsername {
+  margin-bottom: 10px;
+}
+#asideProfile .profileUsername h1 {
+  max-width: 60%;
+  font-size: 1.5em;
+  font-weight: 900;
+  padding-top: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+#asideProfile .profileUsername .uuid {
+  font-size: 0.8em;
+  color: #595959;
+}
+#asideProfile .asideProfileMenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #666666;
+}
+#asideProfile .asideProfileMenu .linkTicket {
+  color: blue;
+  cursor: pointer;
+}
+#asideProfile .personalMessageList {
+  height: calc(100vh - 128px);
+  overflow-y: scroll;
+}
+#asideProfile .personalMessageList::-webkit-scrollbar {
+  display: none;
+}
+#asideProfile .personalMessageList .pmListItem {
+  width: 100%;
+  padding: 3px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  cursor: pointer;
+  color: #595959;
+  position: relative;
+}
+#asideProfile .personalMessageList .pmListItem .dmName {
+  padding: 5px 0;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+#asideProfile .personalMessageList .pmListItem .dmName .tentIcon {
+  width: 25px;
+  height: 25px;
+  margin-right: 5px;
+}
+#asideProfile .personalMessageList .pmListItem .deletePMBtn {
+  display: none;
+  color: #bfbfbf;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  z-index: 1;
+}
+#asideProfile .personalMessageList .pmListItem .deletePMBtn:hover {
+  color: #595959;
+}
+#asideProfile .personalMessageList .pmListItem .deletePMBtn[data-is-mobile-supported=true].active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+}
+#asideProfile .personalMessageList .pmListItem .deletePMBtn[data-is-mobile-supported=true].active::before {
+  margin-top: 2px;
+}
+#asideProfile .personalMessageList .pmListItem::after {
+  display: none;
+  position: absolute;
+  clear: both;
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: red;
+  right: 10px;
+}
+@media screen and (min-width: 768px) {
+  #asideProfile .personalMessageList .pmListItem:hover {
+    background-color: #f0f0f0;
+  }
+  #asideProfile .personalMessageList .pmListItem:hover .deletePMBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+  }
+  #asideProfile .personalMessageList .pmListItem:hover .deletePMBtn::before {
+    margin-top: 2px;
+  }
+  #asideProfile .personalMessageList .pmListItem[data-noti=true]::after {
+    display: block;
+  }
+}
+#asideProfile .personalMessageList .empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.85em;
+  color: #666666;
+}
+
+#asideMenu {
+  margin-left: 15px;
+}
+#asideMenu #inpAside {
+  display: flex;
+  height: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+#asideMenu #inpAside .errorBox {
+  font-size: 0.8em;
+}
+#asideMenu .aside-menu {
+  height: 50px;
+  color: #3d3d3d;
+}
+#asideMenu .aside-menu .asideBtn {
+  font-size: 0.8em;
+  color: #666666;
+}
+#asideMenu .aside-menu .logoutBtn {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f76e6e;
+  color: white;
+}
+#asideMenu .aside-menu .logoutBtn:hover {
+  background-color: #ff6666;
+}
+#asideMenu .aside-menu .asideChannels, #asideMenu .aside-menu .asideUsers, #asideMenu .aside-menu .logoutBtn {
+  border-radius: 5px;
+  margin-top: 10px;
+  height: 40px;
+}
+#asideMenu .aside-menu .asideChannels, #asideMenu .aside-menu .asideUsers {
+  font-weight: 600;
+  font-size: 0.8em;
+  width: 80px;
+  background-color: white;
+  position: relative;
+}
+#asideMenu .aside-menu .asideChannels::after, #asideMenu .aside-menu .asideUsers::after {
+  display: block;
+  position: absolute;
+  left: 50%;
+  clear: both;
+  content: "";
+  width: 0;
+  height: 2px;
+  background-color: #595959;
+  transition: width ease 0.2s;
+  transform: translateX(-50%);
+}
+#asideMenu .aside-menu .asideChannels:not(.active):hover, #asideMenu .aside-menu .asideUsers:not(.active):hover {
+  background-color: #ededed;
+}
+#asideMenu .aside-menu .asideChannels.active::after, #asideMenu .aside-menu .asideUsers.active::after {
+  width: 75%;
+}
+@media screen and (min-width: 992px) {
+  #asideMenu .aside-menu .asideChannels, #asideMenu .aside-menu .asideUsers {
+    width: 100px;
+  }
+}
+#asideMenu #groupWrapper {
+  height: calc(100vh - 100px);
+}
+#asideMenu #groupWrapper #groupList {
+  border: 1px solid gray;
+  height: calc(100% - 20px);
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+}
+#asideMenu #groupWrapper #groupList::-webkit-scrollbar {
+  display: none;
+}
+#asideMenu #groupWrapper #groupList .listsChannel, #asideMenu #groupWrapper #groupList .listsUsers, #asideMenu #groupWrapper #groupList .asideChatAdmin {
+  border-bottom: 1px solid lightgray;
+  padding: 10px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  color: gray;
+  cursor: pointer;
+}
+#asideMenu #groupWrapper #groupList .listsChannel:hover, #asideMenu #groupWrapper #groupList .listsUsers:hover, #asideMenu #groupWrapper #groupList .asideChatAdmin:hover {
+  background-color: #e6e6e6;
+  color: #4b4b4b;
+}
+#asideMenu #groupWrapper #groupList .listsChannel .channel {
+  display: flex;
+  align-items: center;
+}
+#asideMenu #groupWrapper #groupList .listsChannel .channel.active {
+  font-weight: 500;
+  color: #4f4f4f;
+}
+#asideMenu #groupWrapper #groupList .listsChannel .channel .bonfireIcon {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px;
+}
+#asideMenu #groupWrapper #groupList .listsUsers.you {
+  border-top: 1px solid lightgray;
+}
+#asideMenu #groupWrapper #groupList .asideChatAdmin {
+  background-color: transparent;
+  border-bottom: none;
+}
+#asideMenu #groupWrapper #groupList .empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  color: #666666;
+}
+
+i.fa.fa-circle-o[data-is-online=true] {
+  font-size: 8px;
+  color: lime;
+}
+i.fa.fa-circle-o[data-is-online=true]:before {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: lime;
+  border-radius: 50%;
+}

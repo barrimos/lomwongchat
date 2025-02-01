@@ -1,0 +1,53 @@
+.commentWrapper {
+  font-size: 0.9em;
+  padding: 10px 20px;
+  background-color: #ededed;
+  word-wrap: break-word;
+}
+.commentWrapper + .commentWrapper {
+  margin-top: 15px;
+}
+.commentWrapper .attachImageWrapper {
+  width: 100%;
+  max-width: 600px;
+  display: block;
+  margin: 0 auto;
+  height: auto;
+  position: relative;
+}
+.commentWrapper .attachImageWrapper .attachImage {
+  width: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.commentWrapper .attachImageWrapper .clickActualSizeBtn {
+  padding: 5px;
+  position: absolute;
+  display: block;
+  bottom: -30px;
+  left: 0;
+  color: #333333;
+  font-size: 0.8em;
+}
+.commentWrapper .sender {
+  color: gray;
+  font-size: 0.9em;
+  margin: 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+.commentWrapper .sender .senderTimestamp {
+  text-align: right;
+}
+.commentWrapper .sender .senderTimestamp .senderName {
+  font-weight: 500;
+  margin-left: auto;
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.commentWrapper .message {
+  margin-top: 10px;
+  line-height: 23px;
+}

@@ -1,0 +1,80 @@
+$wrapperWidth: 50px;
+$wrapperHeight: 30px;
+$switchWidth: $wrapperHeight;
+$switchHeight: $wrapperHeight;
+$checkboxWidth: $wrapperHeight;
+$checkboxHeight: $wrapperHeight;
+
+$light: hsl(0, 0%, 50%);
+$dark: hsl(0, 0%, 60%);
+
+.swithcWrapper{
+    margin: 5px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    .switchLabel{
+        font-size: .8em;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    i, img{
+        margin: 0 5px;
+        color: $light;
+        font-size: 1.2em;
+    }
+    &.light{
+        .switchLabel, i, img{
+            color: $dark;
+        }
+        .switchControl{
+            border: 2px solid $dark;
+            .switchButton{
+                background-color: $dark;
+                border: 2px solid $dark;
+            }
+        }
+    }
+    &.vertical{
+        transform: rotate(90deg);
+        bottom: 50px;
+        left: -30px;
+        label, i{
+            transform: rotate(-90deg);
+        }
+    }
+    .switchControl{
+        width: $wrapperWidth;
+        height: $wrapperHeight;
+        border-radius: calc(#{$wrapperHeight} / 2);
+        border: 2px solid $light;
+        background-color: transparent;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        padding: 0 3px;
+        .switchButton{
+            position: relative;
+            background-color: $light;
+            width: $switchWidth - 9px;
+            height: $switchHeight - 9px;
+            border-radius: 50%;
+            // box-shadow: 0 1px 2px 1px hsla(0, 0%, 53%, 0.8);
+            transition: ease .3s;
+            input[type="checkbox"][name="switchCheckbox"]{
+                position: absolute;
+                height: $checkboxWidth;
+                width: 100%;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                margin: auto;
+                opacity: 0;
+                z-index: 2;
+                cursor: pointer;
+            }
+        }
+    }
+}

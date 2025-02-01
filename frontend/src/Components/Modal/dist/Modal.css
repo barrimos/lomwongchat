@@ -1,0 +1,90 @@
+.modal {
+  z-index: 10;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 10px 10px;
+  margin: auto;
+  border-radius: 10px;
+  background-color: #f2f2f2;
+  box-shadow: 0 4px 8px 0 rgba(48, 48, 48, 0.6);
+  max-width: 90%;
+  min-width: 70%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.modal::-webkit-scrollbar {
+  display: none;
+}
+.modal.dmModal {
+  height: 80%;
+  min-height: 80%;
+}
+.modal.reportModal {
+  max-height: 90%;
+}
+.modal .modalHeadTitle {
+  padding: 10px 0;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #060e56;
+}
+.modal .moveModal {
+  cursor: grab;
+  color: gray;
+}
+.modal .modalHeadSubtitle {
+  display: block;
+  font-size: 0.8em;
+  color: #828282;
+}
+.modal .modalBtnControl {
+  padding: 5px;
+}
+.modal .modalBtnControl + .modalBtnControl {
+  margin-left: 5px;
+}
+.modal[data-draggable=true] .modalHeadTitle {
+  cursor: move;
+}
+.modal[data-draggable=false] .modalHeadTitle i {
+  display: none;
+}
+.modal.topLayer {
+  z-index: 3;
+}
+.modal .reportForm {
+  max-height: 70%;
+}
+.modal .reportForm .reportTextArea {
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 0.9em;
+  width: 100%;
+  max-width: calc(100% - 30px);
+  min-width: 100%;
+  height: calc(100% - 130px);
+  min-height: 100px;
+  box-sizing: border-box;
+}
+.modal .reportForm .reportSubmitBtn, .modal .reportForm .reportCancelBtn {
+  display: block;
+  width: 80px;
+  line-height: 1em;
+  padding: 10px 5px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.modal .reportForm .reportSubmitBtn {
+  background-color: #faba0a;
+  color: white;
+  font-weight: 400;
+}
+.modal .reportForm .reportCancelBtn {
+  color: #707070;
+  background-color: #dedede;
+}

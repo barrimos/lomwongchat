@@ -1,0 +1,97 @@
+@mixin render_prefixes($props, $value){
+    @each $prefixes in ('-webkit-', '-moz-', '-mz-', '-o-', ''){
+        #{$prefixes}#{$props}: #{$value}
+    }
+}
+.modal{
+    z-index: 10;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0 10px 10px;
+    margin: auto;
+    border-radius: 10px;
+    background-color: hsl(0, 0%, 95%);
+    box-shadow: 0 4px 8px 0 hsla(0, 0%, 19%, .6);
+    max-width: 90%;
+    min-width: 70%;
+    @include render_prefixes('user-select', 'none');
+    &::-webkit-scrollbar{
+        display: none;
+    }
+    &.dmModal{
+        height: 80%;
+        min-height: 80%;
+    }
+    &.reportModal{
+        max-height: 90%;
+    }
+    .modalHeadTitle{
+        padding: 10px 0;
+        font-size: 1.3em;
+        font-weight: 600;
+        color: hsl(234, 87%, 18%);
+    }
+    .moveModal{
+        cursor: grab;
+        color: gray;
+    }
+    .modalHeadSubtitle{
+        display: block;
+        font-size: .8em;
+        color: hsl(0, 0%, 51%);
+    }
+    .modalBtnControl{
+        padding: 5px;
+        &+.modalBtnControl{
+            margin-left: 5px;
+        }
+    }
+    &[data-draggable=true]{
+        .modalHeadTitle{
+            cursor: move;
+        }
+    }
+    &[data-draggable=false]{
+        .modalHeadTitle{
+            i{
+                display: none;
+            }
+        }
+    }
+    &.topLayer{
+        z-index: 3;
+    }
+    .reportForm{
+        max-height: 70%;
+        .reportTextArea{
+            margin-top: 10px;
+            padding: 5px;
+            font-size: .9em;
+            width: 100%;
+            max-width: calc(100% - 30px);
+            min-width: 100%;
+            height: calc(100% - 130px);
+            min-height: 100px;
+            box-sizing: border-box;
+        }
+        .reportSubmitBtn, .reportCancelBtn{
+            display: block;
+            width: 80px;
+            line-height: 1em;
+            padding: 10px 5px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .reportSubmitBtn{
+            background-color: hsl(44, 96%, 51%);
+            color: hsl(0, 0%, 100%);
+            font-weight: 400;
+        }
+        .reportCancelBtn{
+            color: hsl(0, 0%, 44%);
+            background-color: hsl(0, 0%, 87%);
+        }
+    }
+}

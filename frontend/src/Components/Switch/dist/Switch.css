@@ -1,0 +1,67 @@
+.swithcWrapper {
+  margin: 5px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.swithcWrapper .switchLabel {
+  font-size: 0.8em;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.swithcWrapper i, .swithcWrapper img {
+  margin: 0 5px;
+  color: gray;
+  font-size: 1.2em;
+}
+.swithcWrapper.light .switchLabel, .swithcWrapper.light i, .swithcWrapper.light img {
+  color: #999999;
+}
+.swithcWrapper.light .switchControl {
+  border: 2px solid #999999;
+}
+.swithcWrapper.light .switchControl .switchButton {
+  background-color: #999999;
+  border: 2px solid #999999;
+}
+.swithcWrapper.vertical {
+  transform: rotate(90deg);
+  bottom: 50px;
+  left: -30px;
+}
+.swithcWrapper.vertical label, .swithcWrapper.vertical i {
+  transform: rotate(-90deg);
+}
+.swithcWrapper .switchControl {
+  width: 50px;
+  height: 30px;
+  border-radius: calc(30px / 2);
+  border: 2px solid gray;
+  background-color: transparent;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+}
+.swithcWrapper .switchControl .switchButton {
+  position: relative;
+  background-color: gray;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  transition: ease 0.3s;
+}
+.swithcWrapper .switchControl .switchButton input[type=checkbox][name=switchCheckbox] {
+  position: absolute;
+  height: 30px;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  opacity: 0;
+  z-index: 2;
+  cursor: pointer;
+}

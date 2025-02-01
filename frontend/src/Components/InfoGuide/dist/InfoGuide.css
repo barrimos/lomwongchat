@@ -1,0 +1,23 @@
+.guideInfoData {
+  background-color: #fffbf5;
+  color: #3f1e03;
+  border-radius: 50%;
+  font-size: 0.7em;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  position: absolute;
+  top: -30px;
+  right: 0;
+  transition: 0.7s ease;
+  transform: scale(0.7);
+  transform-origin: top right;
+  display: block;
+}
+.guideInfoData.active, .guideInfoData:hover {
+  padding: 10px;
+  transform: scale(1);
+  width: fit-content;
+  height: auto;
+  border-radius: 5px;
+}

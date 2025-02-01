@@ -1,0 +1,198 @@
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+#loginPageBody{
+    height: 100svh;
+    background-image: url('../../../img/fire.jpg');
+    background-origin: border-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    object-fit: cover;
+    @media screen and(max-height: 576px) {
+        min-height: fit-content;
+        height: 100svh;
+    }
+    #loginForm{
+        background: linear-gradient(217deg, hsla(258, 84%, 12%, 0.4), hsla(0, 100%, 50%, 0) 70.71%),
+                    linear-gradient(127deg, hsla(278, 100%, 50%, 0.4), hsla(120, 100%, 50%, 0) 70.71%),
+                    linear-gradient(336deg, hsla(4, 94%, 48%, 0.4), hsla(240, 100%, 50%, 0) 70.71%);
+        box-shadow: 0 0 20px -5px hsla(286, 100%, 50%, 0.507);
+        border-radius: 15px;
+        max-width: 350px;
+        margin: 0 15px;
+        #titleForm{
+            margin-bottom: 25px;
+            .titleHead{
+                font-size: 1.7em;
+                font-weight: 500;
+                color: hsl(262, 100%, 94%);
+                text-shadow: 0 0 5px hsla(239, 100%, 17%, 0.7);
+            }
+            .subHead{
+                font-size: 1em;
+                font-weight: 500;
+                color: hsl(263, 100%, 87%);
+            }
+        }
+        .inputWrapper{
+            position: relative;
+            .inp{
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                &:focus{
+                    outline: none;
+                }
+            }
+            #inpUsername, #inpPassword, #labelUsername, #labelPassword{
+                width: 100%;
+            }
+            .icon-eye, .validatedChecked, .passValidatedChecked{
+                position: absolute;
+                top: 0px;
+                bottom: 0;
+                margin: auto 0;
+                padding: 5px;
+                transform: translate(0, -35%);
+                z-index: 1;
+                height: fit-content;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+            &:not(.passValidatedChecked) .icon-eye{
+                right: 5px;
+            }
+            &:has(.passValidatedChecked) .icon-eye{
+                right: 30px;
+            }
+            .validatedChecked, .passValidatedChecked{
+                color: hsl(135, 100%, 42%);
+            }
+            .validatedChecked, .passValidatedChecked{
+                right: 5px;
+            }
+
+
+            // when focus on input translate label up
+            #inpUsername:not(:focus) + #labelUsername,
+            #inpPassword:not(:focus) + #labelPassword{
+                transform: translate(5px, -29px);
+                color: hsl(0, 0%, 70%);
+            }
+            // when input onblur move labe back
+            #inpUsername + #labelUsername,
+            #inpPassword + #labelPassword,
+            #inpUsername:not(:placeholder-shown) + #labelUsername,
+            #inpPassword:not(:placeholder-shown) + #labelPassword{
+                transform: translate(0, -55px);
+                color: hsl(0, 0%, 100%);
+            }
+            label{
+                cursor: text;
+                font-size: .8em;
+                width: 60px;
+                margin-bottom: 0;
+                user-select: none;
+                transition: all .2s ease-in-out;
+            }
+        }
+        
+        .buttonWrapper{
+            .formBtn{
+                width: 100%;
+                padding: 10px;
+                border-radius: 5px;
+                border: none;
+                background-image: linear-gradient(-60deg, transparent 0%, transparent 40%, #fff 40%, #fff 60%, transparent 60%, transparent 100%);
+                background-size: 200%, 100%;
+                background-repeat: no-repeat;
+                background-position-x: 150%;
+                &.btn{
+                    font-weight: 500;
+                    &:hover{
+                        background-position-x: -150%;
+                        transition: background-position-x 500ms;
+                    }
+                }
+                &.loginBtn{
+                    background-color: hsl(46, 100%, 50%);
+                    color: hsl(251, 100%, 31%);
+                    &:active{
+                        background-color: hsl(46, 97%, 27%);
+                    }
+                }
+                &.regisBtn{
+                    background-color: hsl(266, 100%, 87%);
+                    color: rgb(29, 0, 156);
+                    &:active{
+                        background-color: hsl(0, 0%, 100%);
+                    }
+                }
+                &.invalidBtn{
+                    background-color: gray;
+                    color: white;
+                }
+                &.checkingBtn{
+                    background-color: hsl(135, 100%, 42%);
+                    color: black;
+                }
+            }
+        }
+    
+        div:has(#captchaStatus){
+            font-size: .8em;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            color: hsl(0, 0%, 100%);
+            #captchaStatus{
+                color: white;
+                padding: 3px 5px;
+                font-weight: bold;
+                &.incorrect{
+                    background-color: red;
+                }
+                &.correct{
+                    background-color: green;
+                }
+            }
+        }
+        .captchaWrapper{
+            margin: 5px auto;
+            #captchaText{
+                width: calc(100% - 60px);
+            }
+            .accessibilityWrapper{
+                .accessibility{
+                    margin-left: 5px;
+                    width: 25px;
+                    height: 25px;
+                    background-color: white;
+                    border-radius: 5px;
+                    font-family: 'Times New Roman', Times, serif;
+                }
+            }
+        }
+        .captchaWrapper, .accessibilityWrapper{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+}
+.swalInput{
+    width: 100%;
+    padding: 15px;
+    border: 1px solid hsl(0, 0%, 79%);
+    &+.swalInput{
+        margin-top: 10px;
+    }
+    &#swalTitle{
+
+    }
+    &#swalDetail{
+        height: 120px;
+    }
+}

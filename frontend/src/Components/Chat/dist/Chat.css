@@ -1,0 +1,310 @@
+.displayChat {
+  background: linear-gradient(to bottom, #3d0066, #2001ad);
+  width: 100%;
+  display: block;
+  padding: 10px;
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.displayChat#dmDisplay {
+  height: calc(100% - 95px);
+}
+@media screen and (max-width: 767px) {
+  .displayChat#dmDisplay.useReply {
+    height: calc(100svh - 280px);
+  }
+}
+@media screen and (min-width: 767px) {
+  .displayChat#dmDisplay.useReply {
+    height: calc(100svh - 278px);
+  }
+}
+@media screen and (max-width: 767px) {
+  .displayChat:not(#dmDisplay).useReply {
+    height: calc(100svh - 140px) !important;
+  }
+}
+@media screen and (min-width: 767px) {
+  .displayChat:not(#dmDisplay).useReply {
+    height: calc(100svh - 100px) !important;
+  }
+}
+@media screen and (min-width: 767px) {
+  .displayChat:not(#dmDisplay) {
+    height: calc(100svh - 50px) !important;
+  }
+}
+@media screen and (max-width: 767px) {
+  .displayChat:not(#dmDisplay) {
+    height: calc(100svh - 90px) !important;
+  }
+}
+.displayChat .outerBubblesWrapper {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+.displayChat .outerBubblesWrapper::-webkit-scrollbar {
+  display: none;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper {
+  font-size: 0.9em;
+  position: relative;
+  min-width: 100%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper {
+  position: relative;
+  max-width: 60%;
+  margin-top: 10px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper.remUsername {
+  margin-top: 0;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper.other {
+  float: left;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper.you {
+  float: right;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .timestamp {
+  position: absolute;
+  bottom: 0;
+  color: white;
+  font-size: 0.6em;
+  letter-spacing: 1.2px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .timestamp.other {
+  right: -35px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .timestamp.you {
+  left: -35px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .owner {
+  color: white;
+  font-size: 0.7em;
+  top: -20px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .owner.other {
+  text-align: left;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .owner.you {
+  text-align: right;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message {
+  margin-top: 5px;
+  width: 100%;
+  padding: 5px 10px;
+  color: #333333;
+  font-size: 1em;
+  word-break: break-word;
+  white-space: pre-wrap;
+  letter-spacing: 0.5px;
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -mz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message.other {
+  border-radius: 0 10px 10px 10px;
+  background-color: #dcd6ff;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message.you {
+  border-radius: 10px 0 10px 10px;
+  background-color: #85ffb8;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message:active {
+  background-color: #828282;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message .replyBubble {
+  border-bottom: 1px solid #2800b8;
+  padding-bottom: 10px;
+  cursor: pointer;
+  color: #1e94a9;
+  margin-bottom: 7px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper .messageWrapper .message .replyBubble + .msg {
+  margin-top: 10px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper::after {
+  display: block;
+  content: "";
+  clear: both;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper.you #contextMenuWrapper {
+  left: 100%;
+  margin-right: 10px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper.other #contextMenuWrapper {
+  right: 100%;
+  margin-left: 10px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper {
+  position: sticky;
+  height: 0;
+  top: 20px;
+  display: none;
+  flex-wrap: wrap;
+  width: 165px;
+  z-index: 99999;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.active {
+  display: flex;
+}
+@media screen and (max-width: 992px) {
+  .displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper {
+    width: 110px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper {
+    width: 165px;
+  }
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper .contextMenu {
+  z-index: 1;
+  width: 55px;
+  text-align: center;
+  font-size: 0.8em;
+  padding: 10px 3px;
+  color: #d4d4d4;
+  cursor: pointer;
+  background-color: #404040;
+  border: 1px solid #2b2b2b;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper .contextMenu:hover {
+  color: #0400ff;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.you::after, .displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.other::after {
+  display: block;
+  content: "";
+  clear: both;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  bottom: -40px;
+  transform: rotate(45deg);
+  background-color: #404040;
+  border: 1px solid #2b2b2b;
+  z-index: 2;
+  border-top: transparent;
+  border-left: transparent;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.you.absolute {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  left: unset;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.you.absolute.up::after {
+  top: -5px;
+  transform: rotate(225deg);
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.you::after {
+  right: 10px;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.other.absolute {
+  position: absolute;
+  left: 0;
+  top: -20px;
+  right: unset;
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.other.absolute.up::after {
+  top: -5px;
+  transform: rotate(225deg);
+}
+.displayChat .outerBubblesWrapper .bubbleWrapper #contextMenuWrapper.other::after {
+  left: 10px;
+}
+
+#replyForm {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  height: 50px;
+  width: 100%;
+  background-color: #e3e3e3;
+}
+#replyForm .replyFormItem.username {
+  min-width: 50px;
+  max-width: 100px;
+}
+#replyForm .replyFormItem.message {
+  width: 100%;
+  max-width: calc(100% - 80px);
+  padding: 5px 10px;
+  border-radius: 15px;
+  background-color: #f2f2f2;
+}
+#replyForm .replyFormItem.username, #replyForm .replyFormItem.message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#replyForm #closeReplyFormBtn {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 5px;
+}
+#replyForm #closeReplyFormBtn:hover {
+  background-color: #b3b3b3;
+}
+
+.inpMessageWrapper {
+  position: relative;
+  bottom: 0;
+  display: flex;
+  min-width: 100%;
+  height: 50px;
+}
+.inpMessageWrapper .inpMessage {
+  border-left: 1px solid #999999;
+  border-right: 1px solid #999999;
+  border-bottom: 1px solid #999999;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  padding: 5px;
+  outline: none;
+  z-index: 1;
+}
+.inpMessageWrapper .submitMessageBtn {
+  z-index: 1;
+  width: 75px;
+  background-color: #ffc400;
+  color: #ff5e00;
+  font-size: 1.3em;
+}
+.inpMessageWrapper .toBottomBtn {
+  z-index: 0;
+  opacity: 0.9;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 5px;
+  transition: ease-in-out 0.3s;
+  background-color: #cfcfcf;
+}

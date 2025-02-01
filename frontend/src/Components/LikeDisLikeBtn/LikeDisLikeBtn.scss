@@ -1,0 +1,25 @@
+.likeDisLikeWrapper{
+    display: flex;
+    .likeBtnWrapper, .dislikeBtnWrapper{
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+    }
+    .likeDislikeIcon{
+        font-size: 1.2em;
+        &.down{
+            transform: rotateY(180deg);
+        }
+    }
+    .LikeDislikeBtn{
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+}

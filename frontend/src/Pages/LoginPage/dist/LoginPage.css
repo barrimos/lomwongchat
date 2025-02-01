@@ -1,0 +1,186 @@
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+#loginPageBody {
+  height: 100svh;
+  background-image: url("../../../img/fire.jpg");
+  background-origin: border-box;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  object-fit: cover;
+}
+@media screen and (max-height: 576px) {
+  #loginPageBody {
+    min-height: fit-content;
+    height: 100svh;
+  }
+}
+#loginPageBody #loginForm {
+  background: linear-gradient(217deg, rgba(20, 5, 56, 0.4), rgba(255, 0, 0, 0) 70.71%), linear-gradient(127deg, rgba(162, 0, 255, 0.4), rgba(0, 255, 0, 0) 70.71%), linear-gradient(336deg, rgba(237, 23, 7, 0.4), rgba(0, 0, 255, 0) 70.71%);
+  box-shadow: 0 0 20px -5px rgba(196, 0, 255, 0.507);
+  border-radius: 15px;
+  max-width: 350px;
+  margin: 0 15px;
+}
+#loginPageBody #loginForm #titleForm {
+  margin-bottom: 25px;
+}
+#loginPageBody #loginForm #titleForm .titleHead {
+  font-size: 1.7em;
+  font-weight: 500;
+  color: #ece0ff;
+  text-shadow: 0 0 5px rgba(0, 1, 87, 0.7);
+}
+#loginPageBody #loginForm #titleForm .subHead {
+  font-size: 1em;
+  font-weight: 500;
+  color: #d6bdff;
+}
+#loginPageBody #loginForm .inputWrapper {
+  position: relative;
+}
+#loginPageBody #loginForm .inputWrapper .inp {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+}
+#loginPageBody #loginForm .inputWrapper .inp:focus {
+  outline: none;
+}
+#loginPageBody #loginForm .inputWrapper #inpUsername, #loginPageBody #loginForm .inputWrapper #inpPassword, #loginPageBody #loginForm .inputWrapper #labelUsername, #loginPageBody #loginForm .inputWrapper #labelPassword {
+  width: 100%;
+}
+#loginPageBody #loginForm .inputWrapper .icon-eye, #loginPageBody #loginForm .inputWrapper .validatedChecked, #loginPageBody #loginForm .inputWrapper .passValidatedChecked {
+  position: absolute;
+  top: 0px;
+  bottom: 0;
+  margin: auto 0;
+  padding: 5px;
+  transform: translate(0, -35%);
+  z-index: 1;
+  height: fit-content;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#loginPageBody #loginForm .inputWrapper:not(.passValidatedChecked) .icon-eye {
+  right: 5px;
+}
+#loginPageBody #loginForm .inputWrapper:has(.passValidatedChecked) .icon-eye {
+  right: 30px;
+}
+#loginPageBody #loginForm .inputWrapper .validatedChecked, #loginPageBody #loginForm .inputWrapper .passValidatedChecked {
+  color: #00d636;
+}
+#loginPageBody #loginForm .inputWrapper .validatedChecked, #loginPageBody #loginForm .inputWrapper .passValidatedChecked {
+  right: 5px;
+}
+#loginPageBody #loginForm .inputWrapper #inpUsername:not(:focus) + #labelUsername,
+#loginPageBody #loginForm .inputWrapper #inpPassword:not(:focus) + #labelPassword {
+  transform: translate(5px, -29px);
+  color: #b3b3b3;
+}
+#loginPageBody #loginForm .inputWrapper #inpUsername + #labelUsername,
+#loginPageBody #loginForm .inputWrapper #inpPassword + #labelPassword,
+#loginPageBody #loginForm .inputWrapper #inpUsername:not(:placeholder-shown) + #labelUsername,
+#loginPageBody #loginForm .inputWrapper #inpPassword:not(:placeholder-shown) + #labelPassword {
+  transform: translate(0, -55px);
+  color: white;
+}
+#loginPageBody #loginForm .inputWrapper label {
+  cursor: text;
+  font-size: 0.8em;
+  width: 60px;
+  margin-bottom: 0;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-image: linear-gradient(-60deg, transparent 0%, transparent 40%, #fff 40%, #fff 60%, transparent 60%, transparent 100%);
+  background-size: 200%, 100%;
+  background-repeat: no-repeat;
+  background-position-x: 150%;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.btn {
+  font-weight: 500;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.btn:hover {
+  background-position-x: -150%;
+  transition: background-position-x 500ms;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.loginBtn {
+  background-color: #ffc400;
+  color: #1d009e;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.loginBtn:active {
+  background-color: #886802;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.regisBtn {
+  background-color: #d9bdff;
+  color: #1d009c;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.regisBtn:active {
+  background-color: white;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.invalidBtn {
+  background-color: gray;
+  color: white;
+}
+#loginPageBody #loginForm .buttonWrapper .formBtn.checkingBtn {
+  background-color: #00d636;
+  color: black;
+}
+#loginPageBody #loginForm div:has(#captchaStatus) {
+  font-size: 0.8em;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  color: white;
+}
+#loginPageBody #loginForm div:has(#captchaStatus) #captchaStatus {
+  color: white;
+  padding: 3px 5px;
+  font-weight: bold;
+}
+#loginPageBody #loginForm div:has(#captchaStatus) #captchaStatus.incorrect {
+  background-color: red;
+}
+#loginPageBody #loginForm div:has(#captchaStatus) #captchaStatus.correct {
+  background-color: green;
+}
+#loginPageBody #loginForm .captchaWrapper {
+  margin: 5px auto;
+}
+#loginPageBody #loginForm .captchaWrapper #captchaText {
+  width: calc(100% - 60px);
+}
+#loginPageBody #loginForm .captchaWrapper .accessibilityWrapper .accessibility {
+  margin-left: 5px;
+  width: 25px;
+  height: 25px;
+  background-color: white;
+  border-radius: 5px;
+  font-family: "Times New Roman", Times, serif;
+}
+#loginPageBody #loginForm .captchaWrapper, #loginPageBody #loginForm .accessibilityWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.swalInput {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #c9c9c9;
+}
+.swalInput + .swalInput {
+  margin-top: 10px;
+}
+.swalInput#swalDetail {
+  height: 120px;
+}

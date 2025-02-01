@@ -1,0 +1,56 @@
+.commentWrapper{
+    font-size: .9em;
+    padding: 10px 20px;
+    background-color: hsl(0, 0%, 93%);
+    &+.commentWrapper{
+        margin-top: 15px;
+    }
+    word-wrap: break-word;
+    .attachImageWrapper{
+        width: 100%;
+        max-width: 600px;
+        display: block;
+        margin: 0 auto;
+        height: auto;
+        position: relative;
+        .attachImage{
+            width: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+        .clickActualSizeBtn{
+            padding: 5px;
+            position: absolute;
+            display: block;
+            bottom: -30px;
+            left: 0;
+            color: hsl(0, 0%, 20%);
+            font-size: .8em;
+        }
+    }
+    .sender{
+        color: gray;
+        font-size: .9em;
+        margin: 20px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        .senderTimestamp{
+            text-align: right;
+            .senderName{
+                font-weight: 500;
+                margin-left: auto;
+                width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .senderTime{
+                
+            }
+        }
+    }
+    .message{
+        margin-top: 10px;
+        line-height: 23px;
+    }
+}
