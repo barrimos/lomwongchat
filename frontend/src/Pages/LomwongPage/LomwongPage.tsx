@@ -23,7 +23,8 @@ import socketIO from '../../Socket/socket'
 import Loader from '../../Components/Loader/Loader'
 
 const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-const server = `${protocol}${window.location.hostname}:8080`
+const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+const server = `${protocol}${window.location.hostname}${port}`
 const regexAdmin: RegExp = /(?:^|[^a-zA-Z])(admini?n?i?s?t?r?a?t?o?r?)(?:[^a-zA-Z0-9]|$)|(?:\W+)/i
 const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
 
@@ -295,14 +296,14 @@ const LomwongPage = (props: Props): JSX.Element => {
           withCredentials: true
         }
       )
-      socket.emit('logout', yourName, currChannel, uuid)
-      sessionStorage.clear()
-      localStorage.clear()
-      socket.disconnect()
-      navigate('/')
     } catch (err) {
       console.error(err)
     }
+    socket.emit('logout', yourName, currChannel, uuid)
+    sessionStorage.clear()
+    localStorage.clear()
+    socket.disconnect()
+    navigate('/')
   }
 
   const authentication = async (): Promise<void> => {

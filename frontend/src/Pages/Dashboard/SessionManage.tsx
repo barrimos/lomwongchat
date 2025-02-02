@@ -36,7 +36,8 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
   const [sortedAsc, setSortedAsc] = useState<boolean>(true)
 
   const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-  const server = `${protocol}${window.location.hostname}:8080`
+  const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+  const server = `${protocol}${window.location.hostname}${port}`
 
   const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
 

@@ -1,4 +1,4 @@
-const SessionModel = require('../models/session.model')
+const sessionModel = require('../models/session.model')
 const genNonce = require('../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()
@@ -13,9 +13,9 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	try {
 		// initial
 		// check uuid that is stay logged in isn't it
-		state.isStayLoggedIn = await SessionModel.findOne(
+		state.isStayLoggedIn = await sessionModel.findOne(
 			{ uuid: req.cookies.deviceId },
-			{ username: 1, isStayLoggedIn: 1 }
+			{ username: 1, isLoggedIn: 1 }
 		)
 	} catch (err) {
 		console.error(`Error get login state: ${err}`)
@@ -57,7 +57,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 		res.clearCookie('captcha')
 		try {
 			// get attempts
-			const session = await SessionModel.findOne(
+			const session = await sessionModel.findOne(
 				{
 					$or: [
 						{ sessionId: req.sessionID },

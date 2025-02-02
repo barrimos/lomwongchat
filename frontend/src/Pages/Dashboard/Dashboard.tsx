@@ -27,15 +27,9 @@ import SessionManage from './SessionManage'
 import sortTable from '../../utils/sortTable'
 import handlerListsItemPerPage from '../../utils/handlerListsItemPerPage'
 
-import { testSessions } from '../../testSessions.d'
-import { testTicketReports } from '../../testTicketReports.d'
-import { testUsers } from '../../testUsers.d'
-import { testChannels } from '../../testChannels.d'
-import { testChats } from '../../testChats.d'
-import { testJoinChannel } from '../../testJoinChannel.d'
-
 const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-const server = `${protocol}${window.location.hostname}:8080`
+const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+const server = `${protocol}${window.location.hostname}${port}`
 
 const socket = socketIO(server)
 
@@ -48,8 +42,6 @@ const Dashboard = (props: Props) => {
   const { username }: Readonly<Params<string>> = useParams()
   const adminRole: string = '100'
   const [uuid, setUuid] = useState<string>('')
-
-  const now = new Date().toISOString().split('T')
 
   const [allChannelsList, setAllChannelsList] = useState<string[]>([])
   const [allUsers, setAllUsers] = useState<DashboardUsers[]>([])
@@ -187,23 +179,11 @@ const Dashboard = (props: Props) => {
       )
         .then(async res => {
           const { users, channels, sessions, reports } = res.data
-
-          // setAllUsers(testUsers)
           setAllUsers(users)
-
-          // handlerListsItemPerPage(testUsers, usersPerPage, currPage, setUsersListsPerPage)
           handlerListsItemPerPage(users, usersPerPage, currPage, setUsersListsPerPage)
-
-          // setAllChannelsList(testChannels)
           setAllChannelsList(channels)
-
-          // setSessionsList(testSessions)
           setSessionsList(sessions)
-
-          // setTicketsItems(testTicketReports)
           setTicketsItems(reports)
-
-          // const filteredUsers = testUsers.filter((user: { issue: { status: boolean } }) => user.issue.status === true)
           const filteredUsers = users.filter((user: { issue: { status: boolean } }) => user.issue.status === true)
           setIssueReports(filteredUsers)
 

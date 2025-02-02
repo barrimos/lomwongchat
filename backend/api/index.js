@@ -14,8 +14,18 @@ const cors = require('cors')
 const ioconnect = require('./sockets/socket')
 const verify = require('./middlewares/verify')
 
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
+  : ['http://localhost:3000', 'http://127.0.0.1:3000']
+
 const options = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   methods: ['GET', 'POST', 'DELETE'],
   credentials: true,
 }

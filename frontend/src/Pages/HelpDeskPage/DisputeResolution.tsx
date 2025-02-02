@@ -12,7 +12,8 @@ import Swal from 'sweetalert2'
 import Input from '../../Components/Input/Input'
 
 const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-const server = `${protocol}${window.location.hostname}:8080`
+const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+const server = `${protocol}${window.location.hostname}${port}`
 
 const patternUrl: RegExp = new RegExp(/https?:\/\/[a-z0-9A-Z]+\.[a-zA-Z]{2,}(\/[a-z0-9A-Z]+)*(\/)*((\?|\&)([a-z0-9A-Z]+(\={1,}\w+)?))*/g)
 
