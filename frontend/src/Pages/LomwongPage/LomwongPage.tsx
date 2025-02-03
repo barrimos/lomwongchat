@@ -22,8 +22,9 @@ import DMLists from '../../Components/DMLists/DMLists'
 import socketIO from '../../Socket/socket'
 import Loader from '../../Components/Loader/Loader'
 
-const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
+const protocol = isProduction ? 'https://api.' : 'http://'
+const port = isProduction ? '' : ':8080'
 const server = `${protocol}${window.location.hostname}${port}`
 const regexAdmin: RegExp = /(?:^|[^a-zA-Z])(admini?n?i?s?t?r?a?t?o?r?)(?:[^a-zA-Z0-9]|$)|(?:\W+)/i
 const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)

@@ -10,8 +10,9 @@ import withReactContent from 'sweetalert2-react-content'
 import Swal from 'sweetalert2'
 import './dist/LoginPageDashboard.css'
 
-const protocol = process.env.REACT_APP_NODE_ENV === 'production' ? 'https://' : 'http://'
-const port = process.env.REACT_APP_NODE_ENV === 'production' ? '' : ':8080'
+const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
+const protocol = isProduction ? 'https://api.' : 'http://'
+const port = isProduction ? '' : ':8080'
 const server = `${protocol}${window.location.hostname}${port}`
 
 const LoginPageDashboard = () => {

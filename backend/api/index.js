@@ -16,7 +16,7 @@ const verify = require('./middlewares/verify')
 
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
-  : ['http://localhost:3000', 'http://127.0.0.1:3000']
+  : ['http://lomwongchat.vercel.app', 'http://localhost:3000', 'http://127.0.0.1:3000']
 
 const options = {
   origin: function (origin, callback) {
