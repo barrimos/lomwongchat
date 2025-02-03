@@ -302,4 +302,4 @@ handleUserEndpointRouter.delete('/logout', [verify, clearSession], async (req, r
 	}
 })
 
-module.exports = allowCors(handleUserEndpointRouter)
+module.exports = handleUserEndpointRouter

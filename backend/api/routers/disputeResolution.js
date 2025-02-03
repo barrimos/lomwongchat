@@ -264,4 +264,4 @@ disputeResolution.post('/requestCloseIssue/:code/:username/:user?', [checkOwner,
 	}
 })
 
-module.exports = allowCors(disputeResolution)
+module.exports = disputeResolution

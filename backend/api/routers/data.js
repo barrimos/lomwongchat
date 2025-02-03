@@ -280,4 +280,4 @@ handleDataEndpointRouter.all('/:topic/:action', async (req, res) => {
 	}
 })
 
-module.exports = allowCors(handleDataEndpointRouter)
+module.exports = handleDataEndpointRouter

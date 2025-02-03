@@ -78,4 +78,4 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	}
 })
 
-module.exports = allowCors(handleGeneralEndpointRouter)
+module.exports = handleGeneralEndpointRouter
