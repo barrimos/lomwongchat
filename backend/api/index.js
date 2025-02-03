@@ -11,22 +11,22 @@ const disputeResolution = require('./routers/disputeResolution')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
-const ioconnect = require('./sockets/socket')
+const ioconnect = require('../sockets/socket')
 const verify = require('../middlewares/verify')
 
 const options = {
-  origin: '*',
+  origin: 'https://lomwongchat.vercel.app',
   methods: 'GET, POST, DELETE, OPTIONS',
   credentials: true,
 }
 
-app.use(cors(options))
 
 const app = express()
 const server = http.createServer(app)
 
 require('dotenv').config()
 ioconnect(server, options)
+app.use(cors(options))
 app.use(morgan('tiny'))
 app.use(cookieParser())
 app.use(express.json())
