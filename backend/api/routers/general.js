@@ -3,6 +3,7 @@ const genNonce = require('../../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()
 const nodeCrypto = require('node:crypto')
+const allowCors = require('../../utils/allowCors')
 
 handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	const { action } = req.params
@@ -77,4 +78,4 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	}
 })
 
-module.exports = handleGeneralEndpointRouter
+module.exports = allowCors(handleGeneralEndpointRouter)

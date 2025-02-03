@@ -9,6 +9,7 @@ const clientRedis = require('../redis/redisServer')
 const verify = require('../../middlewares/verify')
 const { decrypt } = require('../../middlewares/cipher')
 const checkOwner = require('../../middlewares/checkOwner')
+const allowCors = require('../../utils/allowCors')
 
 const IMG = {
 	'image/jpg': 'jpg',
@@ -263,4 +264,4 @@ disputeResolution.post('/requestCloseIssue/:code/:username/:user?', [checkOwner,
 	}
 })
 
-module.exports = disputeResolution
+module.exports = allowCors(disputeResolution)

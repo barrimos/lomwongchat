@@ -7,6 +7,7 @@ const clientRedis = require('../redis/redisServer')
 const getRole = require('../../plugins/getRole')
 const handleValidate = require('../../plugins/handleValidate')
 const sessionModel = require('../../models/session.model')
+const allowCors = require('../../utils/allowCors')
 
 const resetBanned = async username => {
 	try {
@@ -279,4 +280,4 @@ handleDataEndpointRouter.all('/:topic/:action', async (req, res) => {
 	}
 })
 
-module.exports = handleDataEndpointRouter
+module.exports = allowCors(handleDataEndpointRouter)

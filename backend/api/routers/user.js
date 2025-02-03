@@ -18,6 +18,7 @@ const handleValidate = require('../../plugins/handleValidate')
 const { deleteSession, logoutSession, loggedInSession } = require('../../plugins/handlerSession')
 const { findOneByUsername, updateUserOneField, insertNewUser } = require('../../plugins/handlerUser')
 const getRole = require('../../plugins/getRole')
+const allowCors = require('../../utils/allowCors')
 
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
@@ -301,4 +302,4 @@ handleUserEndpointRouter.delete('/logout', [verify, clearSession], async (req, r
 	}
 })
 
-module.exports = handleUserEndpointRouter
+module.exports = allowCors(handleUserEndpointRouter)
