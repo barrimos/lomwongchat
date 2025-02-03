@@ -15,18 +15,10 @@ const ioconnect = require('./sockets/socket')
 const verify = require('../middlewares/verify')
 
 const options = {
-  origin: 'https://lomwongchat.vercel.app',
+  origin: '*',
   methods: 'GET, POST, DELETE, OPTIONS',
   credentials: true,
 }
-
-app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://lomwongchat.vercel.app'); //หรือใส่แค่เฉพาะ domain ที่ต้องการได้
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  next()
-})
 
 app.use(cors(options))
 
