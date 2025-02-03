@@ -14,21 +14,12 @@ const cors = require('cors')
 const ioconnect = require('./sockets/socket')
 const verify = require('../middlewares/verify')
 
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
-  : ['https://lomwongchat.vercel.app']
-
 const options = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  methods: ['GET', 'POST', 'DELETE'],
+  origin: 'https://lomwongchat.vercel.app',
+  methods: 'GET, POST, DELETE, OPTIONS',
   credentials: true,
 }
+app.use(cors(options))
 
 const app = express()
 const server = http.createServer(app)
@@ -36,7 +27,6 @@ const server = http.createServer(app)
 require('dotenv').config()
 ioconnect(server, options)
 app.use(morgan('tiny'))
-app.use(cors(options))
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
