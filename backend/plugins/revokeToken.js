@@ -1,4 +1,4 @@
-const clientRedis = require('../redis/redisServer')
+const clientRedis = require('../api/redis/redisServer')
 
 const revokeToken = async accessToken => {
   const now = Math.floor(new Date().getTime() / 1000) // Current time in seconds

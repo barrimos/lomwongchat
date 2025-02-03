@@ -1,8 +1,8 @@
 const socket_io = require('socket.io')
 const clientRedis = require('../redis/redisServer')
-const { channelModel, privateRoomModel } = require('../models/chatLogs.model')
-const handleValidate = require('../plugins/handleValidate')
-const { findOneByUsername } = require('../plugins/handlerUser')
+const { channelModel, privateRoomModel } = require('../../models/chatLogs.model')
+const handleValidate = require('../../plugins/handleValidate')
+const { findOneByUsername } = require('../../plugins/handlerUser')
 
 const socket = async (server, options) => {
   // to store clients socket id

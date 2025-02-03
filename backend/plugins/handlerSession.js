@@ -1,8 +1,8 @@
-const SessionModel = require('../models/session.model')
+const sessionModel = require('../models/session.model')
 
 const findSession = async (sessionId, uuid, username) => {
   if (!sessionId || !uuid || !username) return Error('Missing query')
-  const session = await SessionModel.findOne(
+  const session = await sessionModel.findOne(
     {
       $or: [
         { sessionId },
@@ -32,7 +32,7 @@ const findSession = async (sessionId, uuid, username) => {
 
 const findOrCreateUpdate = async (sessionId, username, uuid, agent, ip) => {
   if (!sessionId || !username) return Error('Missing query')
-  return await SessionModel.findOneAndUpdate(
+  return await sessionModel.findOneAndUpdate(
     {
       $or: [
         { sessionId },
@@ -64,7 +64,7 @@ const findOrCreateUpdate = async (sessionId, username, uuid, agent, ip) => {
 
 const checkIsLoggedIn = async (sid, username) => {
   try {
-    return await SessionModel.findOne(
+    return await sessionModel.findOne(
       {
         $or: [
           { sessionId: sid },
@@ -80,7 +80,7 @@ const checkIsLoggedIn = async (sid, username) => {
 
 const updateSessionOneField = async (sessionId, field, value) => {
   try {
-    await SessionModel.updateOne(
+    await sessionModel.updateOne(
       { sessionId },
       { [field]: value }
     )
@@ -91,7 +91,7 @@ const updateSessionOneField = async (sessionId, field, value) => {
 
 const updateSessionAttempts = async (sessionId, decrement = true) => {
   const update = decrement ? { $inc: { attempts: -1 } } : {}
-  return await SessionModel.findOneAndUpdate(
+  return await sessionModel.findOneAndUpdate(
     { sessionId },
     update,
     { new: true, projection: { attempts: 1, isLoggedIn: 1 } }
@@ -99,7 +99,7 @@ const updateSessionAttempts = async (sessionId, decrement = true) => {
 }
 
 const loggedInSession = async sessionId => {
-  await SessionModel.updateOne(
+  await sessionModel.updateOne(
     { sessionId: sessionId },
     {
       $set: {
@@ -112,7 +112,7 @@ const loggedInSession = async sessionId => {
 }
 
 const logoutSession = async (sessionId, deviceId, username) => {
-  await SessionModel.updateOne(
+  await sessionModel.updateOne(
     {
       $or: [
         { sessionId: sessionId },
@@ -133,7 +133,7 @@ const logoutSession = async (sessionId, deviceId, username) => {
 }
 
 const deleteSession = async (sessionId, username, uuid) => {
-  await SessionModel.deleteOne(
+  await sessionModel.deleteOne(
     {
       $or: [
         { sessionId },

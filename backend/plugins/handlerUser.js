@@ -1,8 +1,8 @@
-const UserModel = require('../models/user.model')
+const userModel = require('../models/user.model')
 
 const insertNewUser = async data => {
   try {
-    const newUser = new UserModel(data)
+    const newUser = new userModel(data)
     newUser.save()
     return { success: true }
   } catch (err) {
@@ -12,7 +12,7 @@ const insertNewUser = async data => {
 
 const findOneByUsername = async (username, projection = {}, lean) => {
   try {
-    const query = UserModel.findOne({ username }, projection)
+    const query = userModel.findOne({ username }, projection)
 
     if (lean) {
       return await query.lean()
@@ -26,7 +26,7 @@ const findOneByUsername = async (username, projection = {}, lean) => {
 
 const updateUserOneField = async (username, update) => {
   try {
-    return await UserModel.updateOne(
+    return await userModel.updateOne(
       { username: username },
       { $set: update },
       { new: true, upsert: true }
@@ -38,7 +38,7 @@ const updateUserOneField = async (username, update) => {
 
 const logoutUserByUsername = async username => {
   try {
-    await UserModel.updateOne(
+    await userModel.updateOne(
       { username: username },
       { $set: { [`session.${deviceId}`]: '' } }
     )

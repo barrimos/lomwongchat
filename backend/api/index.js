@@ -12,7 +12,7 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const ioconnect = require('./sockets/socket')
-const verify = require('./middlewares/verify')
+const verify = require('../middlewares/verify')
 
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
