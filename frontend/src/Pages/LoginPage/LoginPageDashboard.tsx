@@ -11,9 +11,10 @@ import Swal from 'sweetalert2'
 import './dist/LoginPageDashboard.css'
 
 const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
-const protocol = isProduction ? 'https://api.' : 'http://'
+const protocol = isProduction ? 'https://' : 'http://'
 const port = isProduction ? '' : ':8080'
-const server = `${protocol}${window.location.hostname}${port}`
+const uri = isProduction ? process.env.REACT_APP_NODE_API : window.location.hostname
+const server = `${protocol}${uri}${port}`
 
 const LoginPageDashboard = () => {
 	const navigate = useNavigate()
