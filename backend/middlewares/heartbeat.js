@@ -4,7 +4,7 @@ const handleValidate = require('../plugins/handleValidate')
 const clientRedis = require('../redis/redisServer')
 const handlerError = require('./handlerError')
 
-const heartbeatCheck = async (req, res, next) => {
+const heartbeat = async (req, res, next) => {
   const { username } = req.headers
   const sid = req.sessionID
 
@@ -75,4 +75,4 @@ const heartbeatCheck = async (req, res, next) => {
   next()
 }
 
-module.exports = heartbeatCheck
+module.exports = heartbeat

@@ -16,9 +16,10 @@ import { getInputValue } from '../../utils/getInputValue'
 import { VerifiedTypes } from '../../types'
 
 const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
-const protocol = isProduction ? 'https://api.' : 'http://'
+const protocol = isProduction ? 'https://' : 'http://'
 const port = isProduction ? '' : ':8080'
-const server = `${protocol}${window.location.hostname}${port}`
+const url = isProduction ? process.env.REACT_APP_NODE_API : 'localhost'
+const server = `${protocol}${url}${port}`
 
 const LoginPage = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -27,6 +28,7 @@ const LoginPage = (): JSX.Element => {
   const [resultCaptcha, setResultCaptcha] = useState<boolean>(false)
   const [event, setEvent] = useState<React.MouseEvent | React.TouchEvent | null>(null)
 
+  const [captcha, setCaptcha] = useState<string>('')
   const [reNewCaptcha, setReNewCaptcha] = useState<boolean>(false)
   const [statusVerfied, setStatusVerified] = useState<string>('')
   const [inputUsername, setInputUsername] = useState<string>('')
@@ -55,13 +57,10 @@ const LoginPage = (): JSX.Element => {
   const handleLogin = async (): Promise<void> => {
     if (resultCaptcha) {
       try {
-        if (inputUsername.length < 3
-          || inputPassword.length < 3
-          || /(?:admin)|(?:administrator)|(?:moderator)|(?:undefined)|(?:null)|(?:true)|(?:false)/i.test(inputUsername)
-        ) {
+        if (inputUsername.length < 3 || inputPassword.length < 3) {
           resetState()
           reCaptcha()
-          throw Error('Username or Password invalid')
+          throw Error('Username and Password should be at least 3 characters')
         }
 
         // middleware trackSession > isMatch
@@ -312,9 +311,37 @@ const LoginPage = (): JSX.Element => {
   }
 
   useEffect(() => {
+
+    const genCaptcha = async (): Promise<void> => {
+      const response: AxiosResponse = await axios.get(`${server}/general/gen`,
+        { withCredentials: true }
+      )
+      if (response.data.state.isLoggedIn) {
+        setStayLoggedIn([response.data.state.username, response.data.state.isLoggedIn])
+      }
+
+      setCaptcha(await response.data.captcha)
+    }
+    genCaptcha()
+
+    if (reNewCaptcha) {
+      setReNewCaptcha(false)
+    }
+
+  }, [reNewCaptcha])
+
+  useEffect(() => {
     window.history.pushState(null, '')
     if (event) {
       setEvent(null)
+
+      if (inputUsername.length < 3 || inputPassword.length < 3) {
+        withReactContent(Swal).fire('Username and Password should be at least 3 characters')
+        resetState()
+        reCaptcha()
+        return
+      }
+
       const eventName: string = (event.target as HTMLButtonElement).name
       if (eventName === 'login') {
         handleLogin()
@@ -398,6 +425,7 @@ const LoginPage = (): JSX.Element => {
                   }
                 </div>
                 <Captcha
+                  captcha={captcha}
                   setIsCanvas={setIsCanvas}
                   setStatusVerified={setStatusVerified}
                   value={inputCaptcha}

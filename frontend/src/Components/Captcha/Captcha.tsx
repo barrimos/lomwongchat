@@ -3,14 +3,9 @@ import Button from '../Button/Button'
 import Input from '../Input/Input'
 import { CaptchaTypes } from '../../types'
 import { getInputValue } from '../../utils/getInputValue'
-import axios, { AxiosResponse } from 'axios'
-
-const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
-const protocol = isProduction ? 'https://api.' : 'http://'
-const port = isProduction ? '' : ':8080'
-const server = `${protocol}${window.location.hostname}${port}`
 
 const Captcha = ({
+  captcha,
   value,
   useLabel,
   reNewCaptcha,
@@ -67,35 +62,11 @@ const Captcha = ({
     ctx.putImageData(imageData, 0, 0)
   }
 
-  const genCaptcha = async (canvas: HTMLCanvasElement): Promise<void> => {
-    try {
-      const response: AxiosResponse = await axios.get(`${server}/general/gen`,
-        { withCredentials: true }
-      )
-      if (response.data.state.isLoggedIn) {
-        setStayLoggedIn([response.data.state.username, response.data.state.isLoggedIn])
-      }
-
-      const captcha = await response.data.captcha
-
-      drawCaptcha(captcha, canvas)
-      setIsCanvas(canvas)
-    } catch (err: any) {
-      console.error(err)
-      throw Error(err)
-    }
-  }
-
   useEffect(() => {
-    genCaptcha(document.getElementById('captchaText') as HTMLCanvasElement)
-  }, [])
-
-  useEffect(() => {
-    if (reNewCaptcha) {
-      genCaptcha(document.getElementById('captchaText') as HTMLCanvasElement)
-      setReNewCaptcha(false)
-    }
-  }, [reNewCaptcha])
+    const canvas: HTMLCanvasElement = document.getElementById('captchaText') as HTMLCanvasElement
+    drawCaptcha(captcha, canvas)
+    setIsCanvas(canvas)
+  }, [captcha])
 
 
   return (

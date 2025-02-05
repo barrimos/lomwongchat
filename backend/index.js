@@ -8,7 +8,7 @@ const boot = async () => {
 
   await mongoose.connect(mongoUri, mongoOption)
   server.listen(config.port, () => {
-    console.log(`server listening on ${config.port}`)
+    console.log(`server lomwongchat listening on ${config.port}`)
   })
 }
 

@@ -11,11 +11,10 @@ const cookieParser = require('cookie-parser')
 const verify = async (req, res, next) => {
   const { accessToken, ghostKey } = req.cookies
   const { username, access } = req.headers
-  const sid = req.sessionID
   let deviceId = req.cookies.deviceId ?? req.headers.pairdeviceid
 
   if (!accessToken) {
-    await logoutSession(sid, deviceId, username)
+    await logoutSession(deviceId, username)
     res.clearCookie('accessToken')
     res.clearCookie('ghostKey')
     handleValidate.error.unauthorized.message = 'Token is require'
@@ -25,12 +24,12 @@ const verify = async (req, res, next) => {
   try {
     if (!deviceId) {
       // get in cache
-      const cahceDeviceId = await clientRedis.GET(`session:${username}:${sid}`)
+      const cacheDeviceId = await clientRedis.GET(`session:${username}:${deviceId}`)
 
-      if (!cahceDeviceId) {
+      if (!cacheDeviceId) {
         // check in database
         try {
-          const { uuid } = await findSession(sid, cahceDeviceId, username)
+          const { uuid } = await findSession(cacheDeviceId, username)
           if (!uuid) throw Error('Device id doesn\'t exist')
 
           deviceId = uuid
@@ -46,7 +45,7 @@ const verify = async (req, res, next) => {
       }
 
       // set deviceId from database
-      res.cookie('deviceId', deviceId ?? cahceDeviceId, {
+      res.cookie('deviceId', deviceId ?? cacheDeviceId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Lax',

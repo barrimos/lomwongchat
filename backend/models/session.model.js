@@ -2,11 +2,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const sessionSchema = new Schema({
-  sessionId: {
-    type: String,
-    required: true,
-    unique: true
-  },
   attempts: {
     type: Number,
     required: true
@@ -25,7 +20,8 @@ const sessionSchema = new Schema({
   },
   uuid: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   isLoggedIn: {
     type: Boolean,

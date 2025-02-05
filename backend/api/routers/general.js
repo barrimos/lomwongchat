@@ -1,5 +1,5 @@
-const sessionModel = require('../models/session.model')
-const genNonce = require('../plugins/genNonce')
+const sessionModel = require('../../models/session.model')
+const genNonce = require('../../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()
 const nodeCrypto = require('node:crypto')

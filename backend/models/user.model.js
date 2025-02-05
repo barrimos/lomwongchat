@@ -27,7 +27,7 @@ const usersSchema = new Schema({
       required: true
     }
   },
-  session: {
+  devices: {
     type: Object,
     default: {}
   },

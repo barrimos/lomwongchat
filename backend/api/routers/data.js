@@ -1,12 +1,13 @@
 const express = require('express')
-const userModel = require('../models/user.model')
-const { channelModel } = require('../models/chatLogs.model')
-const ticketModel = require('../models/ticket.model')
-const uploadFileModel = require('../models/uploadFile.model')
-const clientRedis = require('../redis/redisServer')
-const getRole = require('../plugins/getRole')
-const handleValidate = require('../plugins/handleValidate')
-const sessionModel = require('../models/session.model')
+const userModel = require('../../models/user.model')
+const { channelModel } = require('../../models/chatLogs.model')
+const ticketModel = require('../../models/ticket.model')
+const uploadFileModel = require('../../models/uploadFile.model')
+const clientRedis = require('../../redis/redisServer')
+const getRole = require('../../plugins/getRole')
+const handleValidate = require('../../plugins/handleValidate')
+const sessionModel = require('../../models/session.model')
+const verify = require('../../middlewares/verify')
 
 const resetBanned = async username => {
 	try {
@@ -24,7 +25,7 @@ const resetBanned = async username => {
 
 const handleDataEndpointRouter = express.Router()
 
-handleDataEndpointRouter.all('/:topic/:action', async (req, res) => {
+handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 	// who request where access
 	const { username, access } = req.headers
 	// optional fetch

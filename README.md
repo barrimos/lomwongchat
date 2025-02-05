@@ -38,14 +38,13 @@ but efforts will be made to improve and refine it over time.</br>
 ## Libraries
   - **Socket.io**: A library for real-time web applications, enabling real-time, bidirectional communication between web clients and servers.
   - **Redis (includes Stack)**: A powerful in-memory data structure store, used for caching and real-time data processing.
-  - **Express-session**: Middleware allows the creation and storage of the session data used for authentication or user preferences
   - **Styling**: Bootstrap framework.
 
 ## Mechanism
   - **Nonce**: 15 mins A unique number or value that is used only once in a cryptographic communication to prevent replay attacks.
   - **Locked**: 1 sec Prevent users too much request or refresh page
   - **Last verify**: 15 mins The timestamp or record of the last verification or authentication check.
-  - **Heartbeat**: 30 mins extend session when sent to tells the system or mechanism that is still active and functioning.
+  - **Heartbeat**: 30 mins extend
   - **Cronjob**: 10 mins after `global:locked` and 5 mintues after `global:unlock` automatic save chat logs to ensure no chat logs are lost and all saved.
 
 ## Testing chat

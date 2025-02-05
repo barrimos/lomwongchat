@@ -61,6 +61,7 @@ export interface InputTypes {
 }
 
 export interface CaptchaTypes {
+  captcha: string
   setStatusVerified: Dispatch<SetStateAction<string>>
   value: string
   useLabel?: boolean

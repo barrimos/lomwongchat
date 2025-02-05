@@ -23,9 +23,11 @@ import socketIO from '../../Socket/socket'
 import Loader from '../../Components/Loader/Loader'
 
 const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
-const protocol = isProduction ? 'https://api.' : 'http://'
+const protocol = isProduction ? 'https://' : 'http://'
 const port = isProduction ? '' : ':8080'
-const server = `${protocol}${window.location.hostname}${port}`
+const url = isProduction ? process.env.REACT_APP_NODE_API : 'localhost'
+const server = `${protocol}${url}${port}`
+
 const regexAdmin: RegExp = /(?:^|[^a-zA-Z])(admini?n?i?s?t?r?a?t?o?r?)(?:[^a-zA-Z0-9]|$)|(?:\W+)/i
 const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
 

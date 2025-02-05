@@ -12,9 +12,10 @@ import TicketItems from './TicketItems'
 import Button from '../../Components/Button/Button'
 
 const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
-const protocol = isProduction ? 'https://api.' : 'http://'
+const protocol = isProduction ? 'https://' : 'http://'
 const port = isProduction ? '' : ':8080'
-const server = `${protocol}${window.location.hostname}${port}`
+const url = isProduction ? process.env.REACT_APP_NODE_API : 'localhost'
+const server = `${protocol}${url}${port}`
 
 interface Props { }
 

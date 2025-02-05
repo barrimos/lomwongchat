@@ -1,25 +1,195 @@
+// package
 const express = require('express')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const clientRedis = require('../redis/redisServer')
+const { v4: uuidv4 } = require('uuid')
+const clientRedis = require('../../redis/redisServer')
 
-const verify = require('../middlewares/verify')
-const clearSession = require('../middlewares/clearSession')
-const isMatch = require('../middlewares/isMatch')
-const rateLimiter = require('../middlewares/rateLimit')
-const trackSession = require('../middlewares/trackSession')
-const { encrypt } = require('../middlewares/cipher')
-const heartbeat = require('../middlewares/heartbeat')
+// middlewares
+const verify = require('../../middlewares/verify')
+const rateLimiter = require('../../middlewares/rateLimit')
+const { encrypt } = require('../../middlewares/cipher')
+const heartbeat = require('../../middlewares/heartbeat')
+const handlerError = require('../../middlewares/handlerError')
 
-const signToken = require('../plugins/signToken')
-const handleValidate = require('../plugins/handleValidate')
-
-const { deleteSession, logoutSession, loggedInSession } = require('../plugins/handlerSession')
-const { findOneByUsername, updateUserOneField, insertNewUser } = require('../plugins/handlerUser')
-const getRole = require('../plugins/getRole')
+// plugins
+const signToken = require('../../plugins/signToken')
+const handleValidate = require('../../plugins/handleValidate')
+const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts } = require('../../plugins/handlerSession')
+const { findOneByUsername, updateUserOneField, insertNewUser } = require('../../plugins/handlerUser')
+const getRole = require('../../plugins/getRole')
 
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
+
+const trackSession = async (req, res, next) => {
+  let deviceId = req.cookies.deviceId
+  const { username } = req.headers
+
+  try {
+    if (!deviceId) {
+      // get from database
+      const user = await findOneByUsername(username, { devices: 1 })
+      let availableSlotKey
+      // check available slot
+      if (user) {
+        // if uuid in database was full of 3
+        // find empty slot
+        availableSlotKey = user && Object.keys(user.devices).find(key => user.devices[key] === '')
+        const uuidLen = user ? Object.entries(user.devices).length : 0
+        if (uuidLen >= 3 && !availableSlotKey) {
+          // if not available that mean you logged in reached to maximum login limit
+          // then response error back
+          handleValidate.error.unauthorized.message = 'Maximum login limit reached'
+          return handlerError(handleValidate.error.unauthorized, req, res, next)
+        }
+      }
+
+      // use that uuid for current
+      // or create new one
+      deviceId = availableSlotKey || uuidv4()
+
+      // save in to client-coolie
+      res.cookie('deviceId', deviceId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax',
+        maxAge: 86400000,
+      })
+      req.deviceId = deviceId
+    }
+    next()
+  } catch (err) {
+    console.error('Error during session verification:', err)
+    return handlerError(handleValidate.error.internal, req, res, next)
+  }
+}
+
+
+const isMatch = async (req, res, next) => {
+  const { username, password, access } = req.headers
+  const deviceId = req.cookies.deviceId ?? req.deviceId
+
+  try {
+    // Validate input
+    if (!username || !password || !handleValidate.access[access]) {
+      console.error('Invalid input or access type')
+      handleValidate.error.forbidden.message = 'Invalid input or access type'
+      return handlerError(handleValidate.error.forbidden, req, res, next)
+    }
+    if (!deviceId) {
+      console.error('Device id not found')
+			handleValidate.error.unauthorized.message = 'Device id not found, Login again'
+      return handlerError(handleValidate.error.unauthorized, req, res, next)
+    }
+
+    const userRole = await getRole(username)
+
+    let projection = { password: 1, token: { accessToken: 1 }, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
+    // Check if username is 'admin'
+    if (handleValidate.role.admin === userRole && handleValidate.access[access] === handleValidate.access.adsysop) {
+      // for admin role, only need dmLists
+      // admin can't ban themself so field issue are not necessary
+      projection = { password: 1, token: { accessToken: 1 }, role: 1, dmLists: 1, _id: 0 } // Only get 'dmLists'
+    }
+
+    const user = await findOneByUsername(username, projection, true)
+
+    if (!user) {
+      console.error('No user found to verify credentials')
+      await updateSessionAttempts(username, deviceId)
+			handleValidate.error.unauthorized.message = 'Invalid credentials'
+      return handlerError(handleValidate.error.unauthorized, req, res, next)
+    }
+
+    // Admin role not have permission to access lomwong page
+    if (handleValidate.access[access] === handleValidate.access.lomwong && user.role === handleValidate.role.admin) {
+      handleValidate.error.unauthorized.message = 'Admin cannot access this page'
+      return handlerError(handleValidate.error.unauthorized, req, res, next)
+    }
+
+    // User role not have permission to access adsysop page
+    if (handleValidate.access[access] === handleValidate.access.adsysop && user.role !== handleValidate.role.admin) {
+      await updateSessionAttempts(username, deviceId)
+      return handlerError(handleValidate.error.unauthorized, req, res, next)
+    }
+
+    // Validate password
+    const isPasswordMatch = await bcrypt.compare(password, user.password)
+    if (!isPasswordMatch) {
+      console.error('Unauthorize credentials')
+      await updateSessionAttempts(username, deviceId)
+      return handlerError(handleValidate.error.unauthorized, req, res, next)
+    }
+
+    const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
+    const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
+    const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
+
+    if (isRevoked || isExpired || !user.token.accessToken) {
+      // delete ttl and use other datas for sign new token 
+      delete decoded.iat
+      delete decoded.exp
+      // Issue a new token only if the current one is invalid
+      user.token.accessToken = await jwt.sign(decoded, process.env.ACCESS_KEY, { expiresIn: 900 })
+
+      // update in database
+      await updateUserOneField(username, { 'token.accessToken': user.token.accessToken })
+    }
+
+    // credentials passes
+    // delete cookie captcha, didn't use it anymore
+    res.clearCookie('captcha')
+
+    // Set token in cookies
+    res.cookie('accessToken', user.token.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+      maxAge: 86400000, // 1 day
+    })
+
+    delete user.password
+    delete user.token
+    user.role === handleValidate.role.admin ? delete user.issue : null
+
+    try {
+      // nonce
+      await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+
+      try {
+        // user's data
+        // overwriting
+        await clientRedis.json.SET('users', `$.${username}`, user)
+      } catch (err) {
+        if (err.toString() === 'Error: ERR new objects must be created at the root') {
+          try {
+            await clientRedis.json.SET('users', '$', {})
+            await clientRedis.json.SET('users', `$.${username}`, user)
+          } catch (err) {
+            console.error('Error set new key')
+          }
+        } else {
+          console.error(`Error caching user's data: ${err}`)
+        }
+      }
+
+      // users session ttl
+      // if not set this ttl login and verify will error
+      await clientRedis.SET(`session:${username}:${deviceId}`, deviceId, { NX: true, EX: 1800 }) // expires 30 mins
+
+    } catch (err) {
+      console.error('Error caching signature:', err)
+    }
+
+    // all passes
+    req.verified = { valid: true, deviceId: deviceId }
+    next()
+  } catch (err) {
+    console.error('Error server:', err)
+    return handlerError(handleValidate.error.internal, req, res, next)
+  }
+}
 
 const handleUserEndpointRouter = express.Router()
 
@@ -58,7 +228,8 @@ handleUserEndpointRouter.post('/regisUsers', async (req, res) => {
 				res.status(400).json({ error: `Registration username ${data.username} not complete` })
 			}
 		} catch (err) {
-			res.status(400).json({ error: err.message })
+			console.error('Error registration:', err)
+			res.status(400).json({ error: err })
 		}
 	} catch (err) {
 		console.error('Error registration')
@@ -69,11 +240,10 @@ handleUserEndpointRouter.post('/regisUsers', async (req, res) => {
 handleUserEndpointRouter.get('/login', [rateLimiter, trackSession, isMatch], async (req, res) => {
 	if (req.verified.valid) {
 		const { username } = req.headers
+		const ip = req.ip
 
-		await updateUserOneField(username, { [`session.${req.verified.deviceId}`]: req.sessionID })
-		
-		req.session.isAuthenticated = true
-		req.session.cookie.maxAge = 30 * 60 * 1000
+		await updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
+
 		res.status(200).json({
 			valid: req.verified.valid
 		})
@@ -90,12 +260,12 @@ handleUserEndpointRouter.get('/login', [rateLimiter, trackSession, isMatch], asy
 })
 
 handleUserEndpointRouter.post('/status/:action', async (req, res) => {
-	const { username, access } = req.headers
-	const { statusName, user } = req.body
+	const { username, access } = req.headers // when login
+	const { statusName, user } = req.body // when admin set new status and user in app
 	const { action } = req.params
 	const { issueCode, accessToken } = req.cookies
 
-	if (!username || !handleValidate.access[access]) {
+	if (!username || !handleValidate.access[access] || handleValidate.access[access] !== handleValidate.access.lomwong) {
 		console.error('Error username not found or invalid access type')
 		return res.status(401).json({ valid: false, error: 'Invalid credentials' })
 	}
@@ -255,19 +425,19 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 // authentication before access page
 // status checking while in app and got banned inside
-handleUserEndpointRouter.get('/auth/token', [verify, heartbeat], async (req, res) => { // develop
-// handleUserEndpointRouter.get('/auth/token', [rateLimiter, verify, heartbeatCheck], async (req, res) => { // production
+handleUserEndpointRouter.get('/auth/token', [rateLimiter, verify, heartbeat], async (req, res) => {
+	const { deviceId } = req.cookies
+
 	if (req.verified.valid) {
 		// verify passes
 		// update session state
-		await loggedInSession(req.sessionID)
+		await loggedInSession(deviceId)
 
 		res.status(200).json({
 			valid: req.verified.valid,
-			deviceId: req.verified.deviceId
 		})
 	} else {
-		await logoutSession(req.sessionID)
+		await logoutSession(deviceId)
 		res.clearCookie('accessToken')
 		res.clearCookie('ghostKey')
 		res.status(401).json({
@@ -279,7 +449,7 @@ handleUserEndpointRouter.get('/auth/token', [verify, heartbeat], async (req, res
 	}
 })
 
-handleUserEndpointRouter.delete('/logout', [verify, clearSession], async (req, res) => {
+handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 	try {
 		if (req.verified.valid) {
 			// Clear accessToken cookie
