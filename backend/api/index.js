@@ -20,27 +20,15 @@ const REDIS_PORT = 6379
 const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_REDIS_REST_URL } : { port: REDIS_PORT }
 
 const options = {
-  origin: 'http://localhost:3000',
-  method: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
+  origin: process.env.NODE_ENV === 'production' ? 'https://lomwongchat.onrender.com' : 'http://localhost:3000',
+  methods: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
   allowedHeaders: 'inputcaptcha, Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
   credentials: true,
 }
 
 const app = express()
 const server = http.createServer(app)
-// app.use(cors(options))
-app.use(function (req, res, next) {
-  // res.header("Access-Control-Allow-Origin", "*")
-  const allowedOrigins = 'http://localhost:3000'
-  const origin = req.headers.origin
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin)
-  }
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, inputcaptcha")
-  res.header("Access-Control-Allow-credentials", true)
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE")
-  next()
-})
+app.use(cors(options))
 
 ioconnect(server, options)
 const client = redis.createClient(url)
