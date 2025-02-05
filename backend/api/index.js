@@ -28,7 +28,19 @@ const options = {
 
 const app = express()
 const server = http.createServer(app)
-app.use(cors(options))
+// app.use(cors(options))
+app.use(function (req, res, next) {
+  // res.header("Access-Control-Allow-Origin", "*")
+  const allowedOrigins = 'http://localhost:3000'
+  const origin = req.headers.origin
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, inputcaptcha")
+  res.header("Access-Control-Allow-credentials", true)
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE")
+  next()
+})
 
 ioconnect(server, options)
 const client = redis.createClient(url)
