@@ -1,6 +1,6 @@
 const socket_io = require('socket.io')
 const clientRedis = require('../redis/redisServer')
-const { channelModel, privateRoomModel } = require('../api/models/chatLogs.model')
+const { channelModel, privateRoomModel } = require('../models/chatLogs.model')
 const handleValidate = require('../plugins/handleValidate')
 const { findOneByUsername } = require('../plugins/handlerUser')
 

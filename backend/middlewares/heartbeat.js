@@ -1,4 +1,4 @@
-const SessionModel = require('../api/models/session.model')
+const SessionModel = require('../models/session.model')
 const { checkIsLoggedIn } = require('../plugins/handlerSession')
 const handleValidate = require('../plugins/handleValidate')
 const clientRedis = require('../redis/redisServer')

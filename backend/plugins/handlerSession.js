@@ -1,4 +1,4 @@
-const sessionModel = require('../api/models/session.model')
+const sessionModel = require('../models/session.model')
 
 const findSession = async (sessionId, uuid, username) => {
   if (!sessionId || !uuid || !username) return Error('Missing query')

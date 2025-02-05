@@ -1,4 +1,4 @@
-const userModel = require('../api/models/user.model')
+const userModel = require('../models/user.model')
 
 const getRole = async username => {
 	return await userModel.findOne(

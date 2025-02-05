@@ -20,7 +20,9 @@ const REDIS_PORT = 6379
 const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_REDIS_REST_URL } : { port: REDIS_PORT }
 
 const options = {
-  origin: ['https://lomwongchat.vercel.app', 'http://localhost:3000'],
+  origin: 'http://localhost:3000',
+  method: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
+  allowedHeaders: 'Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
   credentials: true,
 }
 
