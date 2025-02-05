@@ -26,6 +26,7 @@ const options = {
 
 const app = express()
 const server = http.createServer(app)
+app.use(cors(options))
 
 ioconnect(server, options)
 const client = redis.createClient(url)
@@ -33,7 +34,6 @@ client.connect()
 client.on('connect', () => console.log('Redis Client Connected'))
 client.on('error', (err) => console.log('Redis Client Connection Error', err))
 
-app.use(cors(options))
 app.use(morgan('tiny'))
 app.use(cookieParser())
 app.use(express.json())
