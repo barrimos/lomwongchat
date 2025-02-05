@@ -22,7 +22,7 @@ const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_R
 const options = {
   origin: 'http://localhost:3000',
   method: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
-  allowedHeaders: 'Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
+  allowedHeaders: 'inputcaptcha, Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
   credentials: true,
 }
 
