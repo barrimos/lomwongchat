@@ -18,14 +18,16 @@ const sessionSchema = new Schema({
     type: String,
     required: true
   },
-  uuid: {
+  deviceId: {
     type: String,
     required: true,
-    unique: true
   },
   isLoggedIn: {
     type: Boolean,
     required: true
+  },
+  unlockAt: {
+    type: Date,
   },
   createdAt: {
     type: Date,

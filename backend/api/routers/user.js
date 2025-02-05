@@ -9,186 +9,206 @@ const clientRedis = require('../../redis/redisServer')
 // middlewares
 const verify = require('../../middlewares/verify')
 const rateLimiter = require('../../middlewares/rateLimit')
-const { encrypt } = require('../../middlewares/cipher')
+const { encrypt } = require('../../plugins/cipher')
 const heartbeat = require('../../middlewares/heartbeat')
 const handlerError = require('../../middlewares/handlerError')
 
 // plugins
 const signToken = require('../../plugins/signToken')
 const handleValidate = require('../../plugins/handleValidate')
-const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts } = require('../../plugins/handlerSession')
+const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts,username,  findOrCreateUpdate } = require('../../plugins/handlerSession')
 const { findOneByUsername, updateUserOneField, insertNewUser } = require('../../plugins/handlerUser')
 const getRole = require('../../plugins/getRole')
 
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
 const trackSession = async (req, res, next) => {
-  let deviceId = req.cookies.deviceId
-  const { username } = req.headers
+	let deviceId = req.cookies.deviceId
+	const { username } = req.headers
+	const ip = req.ip
 
-  try {
-    if (!deviceId) {
-      // get from database
-      const user = await findOneByUsername(username, { devices: 1 })
-      let availableSlotKey
-      // check available slot
-      if (user) {
-        // if uuid in database was full of 3
-        // find empty slot
-        availableSlotKey = user && Object.keys(user.devices).find(key => user.devices[key] === '')
-        const uuidLen = user ? Object.entries(user.devices).length : 0
-        if (uuidLen >= 3 && !availableSlotKey) {
-          // if not available that mean you logged in reached to maximum login limit
-          // then response error back
-          handleValidate.error.unauthorized.message = 'Maximum login limit reached'
-          return handlerError(handleValidate.error.unauthorized, req, res, next)
-        }
-      }
+	try {
+		if (!deviceId) {
+			// get from database
+			const user = await findOneByUsername(username, { devices: 1 })
+			let availableSlotKey
+			// check available slot
+			if (user) {
+				// if uuid in database was full of 3
+				// find empty slot
+				availableSlotKey = user && Object.keys(user.devices).find(key => user.devices[key] === '')
+				console.log(1, availableSlotKey)
+				const uuidLen = user ? Object.entries(user.devices).length : 0
+				if (uuidLen >= 3 && !availableSlotKey) {
+					// if not available that mean you logged in reached to maximum login limit
+					// then response error back
+					handleValidate.error.unauthorized.message = 'Maximum login limit reached'
+					return handlerError(handleValidate.error.unauthorized, req, res, next)
+				}
+			}
 
-      // use that uuid for current
-      // or create new one
-      deviceId = availableSlotKey || uuidv4()
+			// use that uuid for current
+			// or create new one
+			deviceId = availableSlotKey || uuidv4()
 
-      // save in to client-coolie
-      res.cookie('deviceId', deviceId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Lax',
-        maxAge: 86400000,
-      })
-      req.deviceId = deviceId
-    }
-    next()
-  } catch (err) {
-    console.error('Error during session verification:', err)
-    return handlerError(handleValidate.error.internal, req, res, next)
-  }
+			// save in to client-coolie
+			res.cookie('deviceId', deviceId, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'Lax',
+				maxAge: 86400000,
+			})
+			req.deviceId = deviceId
+		}
+
+		// get agent
+		const agent = req.get('user-agent').match(/windows|mobile|ipad/i)[0]
+
+		// save tracking session into database both update and insert
+		const session = await findOrCreateUpdate(username, deviceId, agent, ip)
+
+		if (session.attempts <= 0) {
+			// if exists and out of attempts
+			console.error('Session locked')
+			res.clearCookie('accessToken')
+			res.clearCookie('ghostKey')
+			handleValidate.error.forbidden.message = 'Session locked. Contact supervisor'
+			return handlerError(handleValidate.error.forbidden, req, res, next)
+		}
+
+		next()
+	} catch (err) {
+		console.error('Error during session verification:', err)
+		return handlerError(handleValidate.error.internal, req, res, next)
+	}
 }
 
 
 const isMatch = async (req, res, next) => {
-  const { username, password, access } = req.headers
-  const deviceId = req.cookies.deviceId ?? req.deviceId
+	const { username, password, access } = req.headers
+	const deviceId = req.cookies.deviceId ?? req.deviceId
+	const ip = req.ip
 
-  try {
-    // Validate input
-    if (!username || !password || !handleValidate.access[access]) {
-      console.error('Invalid input or access type')
-      handleValidate.error.forbidden.message = 'Invalid input or access type'
-      return handlerError(handleValidate.error.forbidden, req, res, next)
-    }
-    if (!deviceId) {
-      console.error('Device id not found')
+	try {
+		// Validate input
+		if (!username || !password || !handleValidate.access[access]) {
+			console.error('Invalid input or access type')
+			handleValidate.error.forbidden.message = 'Invalid input or access type'
+			return handlerError(handleValidate.error.forbidden, req, res, next)
+		}
+		if (!deviceId) {
+			console.error('Device id not found')
 			handleValidate.error.unauthorized.message = 'Device id not found, Login again'
-      return handlerError(handleValidate.error.unauthorized, req, res, next)
-    }
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
 
-    const userRole = await getRole(username)
+		const userRole = await getRole(username)
 
-    let projection = { password: 1, token: { accessToken: 1 }, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
-    // Check if username is 'admin'
-    if (handleValidate.role.admin === userRole && handleValidate.access[access] === handleValidate.access.adsysop) {
-      // for admin role, only need dmLists
-      // admin can't ban themself so field issue are not necessary
-      projection = { password: 1, token: { accessToken: 1 }, role: 1, dmLists: 1, _id: 0 } // Only get 'dmLists'
-    }
+		let projection = { password: 1, token: { accessToken: 1 }, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
+		// Check if username is 'admin'
+		if (handleValidate.role.admin === userRole && handleValidate.access[access] === handleValidate.access.adsysop) {
+			// for admin role, only need dmLists
+			// admin can't ban themself so field issue are not necessary
+			projection = { password: 1, token: { accessToken: 1 }, role: 1, dmLists: 1, _id: 0 } // Only get 'dmLists'
+		}
 
-    const user = await findOneByUsername(username, projection, true)
+		const user = await findOneByUsername(username, projection, true)
 
-    if (!user) {
-      console.error('No user found to verify credentials')
-      await updateSessionAttempts(username, deviceId)
+		if (!user) {
+			console.error('No user found to verify credentials')
+			await updateSessionAttempts(username, ip, deviceId)
 			handleValidate.error.unauthorized.message = 'Invalid credentials'
-      return handlerError(handleValidate.error.unauthorized, req, res, next)
-    }
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
 
-    // Admin role not have permission to access lomwong page
-    if (handleValidate.access[access] === handleValidate.access.lomwong && user.role === handleValidate.role.admin) {
-      handleValidate.error.unauthorized.message = 'Admin cannot access this page'
-      return handlerError(handleValidate.error.unauthorized, req, res, next)
-    }
+		// Admin role not have permission to access lomwong page
+		if (handleValidate.access[access] === handleValidate.access.lomwong && user.role === handleValidate.role.admin) {
+			handleValidate.error.unauthorized.message = 'Admin cannot access this page'
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
 
-    // User role not have permission to access adsysop page
-    if (handleValidate.access[access] === handleValidate.access.adsysop && user.role !== handleValidate.role.admin) {
-      await updateSessionAttempts(username, deviceId)
-      return handlerError(handleValidate.error.unauthorized, req, res, next)
-    }
+		// User role not have permission to access adsysop page
+		if (handleValidate.access[access] === handleValidate.access.adsysop && user.role !== handleValidate.role.admin) {
+			await updateSessionAttempts(username, ip, deviceId)
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
 
-    // Validate password
-    const isPasswordMatch = await bcrypt.compare(password, user.password)
-    if (!isPasswordMatch) {
-      console.error('Unauthorize credentials')
-      await updateSessionAttempts(username, deviceId)
-      return handlerError(handleValidate.error.unauthorized, req, res, next)
-    }
+		// Validate password
+		const isPasswordMatch = await bcrypt.compare(password, user.password)
+		if (!isPasswordMatch) {
+			console.error('Unauthorize credentials')
+			const session = await updateSessionAttempts(username, ip, deviceId)
+			console.log(session)
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
 
-    const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
-    const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
-    const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
+		const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
+		const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
+		const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
 
-    if (isRevoked || isExpired || !user.token.accessToken) {
-      // delete ttl and use other datas for sign new token 
-      delete decoded.iat
-      delete decoded.exp
-      // Issue a new token only if the current one is invalid
-      user.token.accessToken = await jwt.sign(decoded, process.env.ACCESS_KEY, { expiresIn: 900 })
+		if (isRevoked || isExpired || !user.token.accessToken) {
+			// delete ttl and use other datas for sign new token 
+			delete decoded.iat
+			delete decoded.exp
+			// Issue a new token only if the current one is invalid
+			user.token.accessToken = await jwt.sign(decoded, process.env.ACCESS_KEY, { expiresIn: 900 })
 
-      // update in database
-      await updateUserOneField(username, { 'token.accessToken': user.token.accessToken })
-    }
+			// update in database
+			await updateUserOneField(username, { 'token.accessToken': user.token.accessToken })
+		}
 
-    // credentials passes
-    // delete cookie captcha, didn't use it anymore
-    res.clearCookie('captcha')
+		// credentials passes
+		// delete cookie captcha, didn't use it anymore
+		res.clearCookie('captcha')
 
-    // Set token in cookies
-    res.cookie('accessToken', user.token.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
-      maxAge: 86400000, // 1 day
-    })
+		// Set token in cookies
+		res.cookie('accessToken', user.token.accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'Lax',
+			maxAge: 86400000, // 1 day
+		})
 
-    delete user.password
-    delete user.token
-    user.role === handleValidate.role.admin ? delete user.issue : null
+		delete user.password
+		delete user.token
+		user.role === handleValidate.role.admin ? delete user.issue : null
 
-    try {
-      // nonce
-      await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+		try {
+			// nonce
+			await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
-      try {
-        // user's data
-        // overwriting
-        await clientRedis.json.SET('users', `$.${username}`, user)
-      } catch (err) {
-        if (err.toString() === 'Error: ERR new objects must be created at the root') {
-          try {
-            await clientRedis.json.SET('users', '$', {})
-            await clientRedis.json.SET('users', `$.${username}`, user)
-          } catch (err) {
-            console.error('Error set new key')
-          }
-        } else {
-          console.error(`Error caching user's data: ${err}`)
-        }
-      }
+			try {
+				// user's data
+				// overwriting
+				await clientRedis.json.SET('users', `$.${username}`, user)
+			} catch (err) {
+				if (err.toString() === 'Error: ERR new objects must be created at the root') {
+					try {
+						await clientRedis.json.SET('users', '$', {})
+						await clientRedis.json.SET('users', `$.${username}`, user)
+					} catch (err) {
+						console.error('Error set new key')
+					}
+				} else {
+					console.error(`Error caching user's data: ${err}`)
+				}
+			}
 
-      // users session ttl
-      // if not set this ttl login and verify will error
-      await clientRedis.SET(`session:${username}:${deviceId}`, deviceId, { NX: true, EX: 1800 }) // expires 30 mins
+			// users session ttl
+			// if not set this ttl login and verify will error
+			await clientRedis.SET(`session:${username}:${deviceId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
-    } catch (err) {
-      console.error('Error caching signature:', err)
-    }
+		} catch (err) {
+			console.error('Error caching signature:', err)
+		}
 
-    // all passes
-    req.verified = { valid: true, deviceId: deviceId }
-    next()
-  } catch (err) {
-    console.error('Error server:', err)
-    return handlerError(handleValidate.error.internal, req, res, next)
-  }
+		// all passes
+		req.verified = { valid: true, deviceId: deviceId }
+		next()
+	} catch (err) {
+		console.error('Error server:', err)
+		return handlerError(handleValidate.error.internal, req, res, next)
+	}
 }
 
 const handleUserEndpointRouter = express.Router()
@@ -241,11 +261,11 @@ handleUserEndpointRouter.get('/login', [rateLimiter, trackSession, isMatch], asy
 	if (req.verified.valid) {
 		const { username } = req.headers
 		const ip = req.ip
-
+		console.log(true)
 		await updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
 
 		res.status(200).json({
-			valid: req.verified.valid
+			valid: req.verified.valid,
 		})
 	} else {
 		res.status(401).json({
@@ -334,13 +354,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 				|| (!cacheUser[0].issue.code || !issueCode)
 			) {
 				// generate issue code
-				let hashingCode = encrypt(crypto.randomBytes(32).toString('hex'))
-				// adding salting
-				const salt = crypto.createHash('sha256', process.env.SALT_KEY)
-					.update(process.env.GHOST_KEY)
-					.digest('hex')
-
-				hashingCode += salt
+				const hashingCode = encrypt(crypto.randomBytes(32).toString('hex'), process.env.ISSUE_KEY, process.env.ISSUE_IV)
 
 				try {
 					// update issue code into database
@@ -435,6 +449,7 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiter, verify, heartbeat], as
 
 		res.status(200).json({
 			valid: req.verified.valid,
+			deviceId: req.verified.deviceId
 		})
 	} else {
 		await logoutSession(deviceId)
@@ -452,13 +467,25 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiter, verify, heartbeat], as
 handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 	try {
 		if (req.verified.valid) {
+			const key = `logout-attempts:${req.ip}`
+			const lastReset = await redisClient.get(key)
+			const now = Date.now()
+
 			// Clear accessToken cookie
 			res.clearCookie('accessToken')
 			res.clearCookie('ghostKey')
 
 			// clear session that tied with uuid in database to available for next login
-			await deleteSession(req.sessionID, req.headers.username, req.cookies.deviceId)
-			await updateUserOneField(req.headers.username, { [`session.${req.cookies.deviceId}`]: '' })
+			await deleteSession(req.headers.username, req.cookies.deviceId)
+			await updateUserOneField(req.headers.username, { [`devices.${req.cookies.deviceId}`]: '' })
+
+			if (lastReset && now - lastReset < 30 * 1000) {
+				return res.status(429).json({ error: 'Too many logouts, try again later' })
+			}
+
+			await redisClient.set(key, now, EX, 60) // Store with expiry (1 min)
+
+			rateLimiter.resetKey(req.ip)
 
 			// Respond with success
 			res.status(201).end()

@@ -9,6 +9,7 @@ const disputeResolution = require('./routers/disputeResolution')
 
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
+const session = require('express-session')
 const cors = require('cors')
 const ioconnect = require('../sockets/socket')
 

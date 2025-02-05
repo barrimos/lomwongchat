@@ -320,12 +320,12 @@ const LomwongPage = (props: Props): JSX.Element => {
         withCredentials: true
       }
     )
-      .then(async verified => {
-        if (verified.data.valid) {
+      .then(async res => {
+        if (res.data.valid) {
           try {
-            setIsAuthen(verified.data.valid)
-            setUuid(verified.data.deviceId.slice(0, 8) ?? 'undefined')
-            localStorage.setItem('deviceId', verified.data.deviceId)
+            setIsAuthen(res.data.valid)
+            setUuid(res.data.deviceId.slice(0, 8) ?? 'undefined')
+            localStorage.setItem('deviceId', res.data.deviceId)
 
             // Fetch channels after setting up socket listeners
             await fetchChannels()
@@ -336,9 +336,9 @@ const LomwongPage = (props: Props): JSX.Element => {
           }
         } else {
           // if authen token failure back to login page
-          if (verified.data.error) {
+          if (res.data.error) {
             withReactContent(Swal).fire({
-              text: verified.data.error,
+              text: res.data.error,
             })
               .then(() => {
                 navigate('/')

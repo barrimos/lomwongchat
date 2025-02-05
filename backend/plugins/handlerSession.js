@@ -1,46 +1,52 @@
 const SessionModel = require('../models/session.model')
 
-const findSession = async (uuid, username) => {
-  if (!uuid || !username) return Error('Missing query')
+const findSession = async (deviceId, username, projection) => {
+  if (!deviceId || !username) return new Error('Missing query')
+
   const session = await SessionModel.findOne(
-    {
-      $and: [
-        { username },
-        { uuid }
-      ]
-    },
-    { attempts: 1, isLoggedIn: 1 }
+    { username, deviceId },
+    projection
   )
 
   if (session) {
-    // if found
+    // Update session fields if they are different
+    let updated = false
+
     if (session.username !== username) {
       session.username = username
+      updated = true
     }
-    if (session.uuid !== uuid) {
-      session.uuid = uuid
+    if (session.deviceId !== deviceId) {
+      session.deviceId = deviceId
+      updated = true
     }
-    session.save()
+
+    if (updated) {
+      await session.save() // Save only if modified
+    }
 
     return session
   }
+
+  return null // Return null if no session is found
 }
 
-const findOrCreateUpdate = async (username, uuid, agent, ip) => {
-  if (!sessionId || !username) return Error('Missing query')
+const findOrCreateUpdate = async (username, deviceId, agent, ip) => {
+  if (!deviceId || !username) return Error('Missing query')
   return await SessionModel.findOneAndUpdate(
     {
       $and: [
         { username },
-        { uuid }
+        { deviceId }
       ]
     },
     {
       $set: {  // always set these fields during update
         ip,
-        uuid,
+        deviceId,
         agent,
         username,
+        unlockAt: null,
         expiresAt: new Date(Date.now() + 30 * 60 * 1000)  // extend session expiry time
       },
       $setOnInsert: {  // only for document insertion
@@ -50,19 +56,19 @@ const findOrCreateUpdate = async (username, uuid, agent, ip) => {
       }
     },
     {
-      upsert: true,  // create a new document if no matching sessionId
+      upsert: true,  // create a new document if no matching deviceId and username
       new: true      // return the updated document
     }
   )
 }
 
-const checkIsLoggedIn = async (sid, username) => {
+const checkIsLoggedIn = async (deviceId, username) => {
   try {
     return await SessionModel.findOne(
       {
         $and: [
-          { sessionId: sid },
-          { username: username }
+          { deviceId },
+          { username }
         ]
       },
       { isLoggedIn: 1 }
@@ -72,10 +78,10 @@ const checkIsLoggedIn = async (sid, username) => {
   }
 }
 
-const updateSessionOneField = async (uuid, field, value) => {
+const updateSessionOneField = async (deviceId, field, value) => {
   try {
     await SessionModel.updateOne(
-      { uuid },
+      { deviceId },
       { [field]: value }
     )
   } catch (err) {
@@ -83,18 +89,24 @@ const updateSessionOneField = async (uuid, field, value) => {
   }
 }
 
-const updateSessionAttempts = async (uuid, decrement = true) => {
+const updateSessionAttempts = async (username, ip, deviceId, decrement = true) => {
   const update = decrement ? { $inc: { attempts: -1 } } : {}
   return await SessionModel.findOneAndUpdate(
-    { uuid },
+    {
+      $or: [
+        { deviceId },
+        { username },
+        { ip },
+      ]
+    },
     update,
     { new: true, projection: { attempts: 1, isLoggedIn: 1 } }
   )
 }
 
-const loggedInSession = async uuid => {
+const loggedInSession = async deviceId => {
   await SessionModel.updateOne(
-    { uuid },
+    { deviceId },
     {
       $set: {
         isLoggedIn: true,
@@ -105,11 +117,11 @@ const loggedInSession = async uuid => {
   )
 }
 
-const logoutSession = async (uuid, username) => {
+const logoutSession = async (deviceId, username) => {
   await SessionModel.updateOne(
     {
       $and: [
-        { uuid },
+        { deviceId },
         { username }
       ]
     },
@@ -123,12 +135,12 @@ const logoutSession = async (uuid, username) => {
   )
 }
 
-const deleteSession = async (username, uuid) => {
+const deleteSession = async (username, deviceId) => {
   await SessionModel.deleteOne(
     {
       $and: [
         { username },
-        { uuid }
+        { deviceId }
       ]
     }
   )

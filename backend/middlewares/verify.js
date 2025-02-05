@@ -6,7 +6,6 @@ const handleValidate = require('../plugins/handleValidate')
 const handlerError = require('./handlerError')
 const { findSession, logoutSession, deleteSession } = require('../plugins/handlerSession')
 const { updateUserOneField, findOneByUsername } = require('../plugins/handlerUser')
-const cookieParser = require('cookie-parser')
 
 const verify = async (req, res, next) => {
   const { accessToken, ghostKey } = req.cookies
@@ -29,17 +28,17 @@ const verify = async (req, res, next) => {
       if (!cacheDeviceId) {
         // check in database
         try {
-          const { uuid } = await findSession(cacheDeviceId, username)
-          if (!uuid) throw Error('Device id doesn\'t exist')
+          const data = await findSession(cacheDeviceId, username, { deviceId: 1 })
+          if (!data.deviceId) throw Error('Device id doesn\'t exist')
 
-          deviceId = uuid
+          deviceId = data.deviceId
 
         } catch (err) {
           console.error(`Error: ${err}`)
-          await logoutSession(sid, deviceId, username)
+          await logoutSession(deviceId, username)
           res.clearCookie('accessToken')
           res.clearCookie('ghostKey')
-          await updateUserOneField(username, { [`session.${deviceId}`]: '' })
+          await updateUserOneField(username, { [`devices.${deviceId}`]: '' })
           return handlerError(handleValidate.error.internal, req, res, next)
         }
       }
@@ -53,17 +52,9 @@ const verify = async (req, res, next) => {
       })
     }
 
-    // if session in database and in cache doesn't exist then log user out
-    // happen after refresh or request something
-    // Verify signed session ID
-    const signCookies = cookieParser.signedCookies(req.cookies, process.env.SESSION_KEY)
-    if (!sid || !signCookies['connect.sid'] || sid !== signCookies['connect.sid']) {
-      throw Error(`Invalid session id`)
-    }
-
   } catch (err) {
     console.error(`Error verify session: ${err.message ?? err}`)
-    await logoutSession(sid, deviceId, username)
+    await logoutSession(deviceId, username)
 
     // force logout when catch error
     const now = Math.floor(new Date().getTime() / 1000) // Current time in seconds
@@ -79,7 +70,7 @@ const verify = async (req, res, next) => {
     await deleteSession(null, username, deviceId)
     res.clearCookie('accessToken')
     res.clearCookie('ghostKey')
-    await updateUserOneField(username, { [`session.${deviceId}`]: '' })
+    await updateUserOneField(username, { [`devices.${deviceId}`]: '' })
     handleValidate.error.unauthorized.message = `Error verify: ${err.message ?? err}`
     return handlerError(handleValidate.error.unauthorized, req, res, next)
   }
@@ -88,7 +79,7 @@ const verify = async (req, res, next) => {
   if (isRevoked === accessToken) {
     console.error(`Token revoked`)
     handleValidate.error.unauthorized.message = 'Token revoked'
-    await logoutSession(sid, deviceId, username)
+    await logoutSession(deviceId, username)
     res.clearCookie('accessToken')
     res.clearCookie('ghostKey')
     return handlerError(handleValidate.error.unauthorized, req, res, next)
@@ -143,7 +134,7 @@ const verify = async (req, res, next) => {
       const isLocked = await clientRedis.SET(lockKey, 'locked', { NX: true, EX: 1 }) // Lock 1 sec
       // if lockKey is Exists response error
       if (!isLocked) {
-        await logoutSession(sid, deviceId, username)
+        await logoutSession(deviceId, username)
         res.clearCookie('accessToken')
         res.clearCookie('ghostKey')
         return handlerError(handleValidate.error.tooMuch, req, res, next)
@@ -177,7 +168,7 @@ const verify = async (req, res, next) => {
       }
     } catch (err) {
       console.error(`Error to set specific cookies: ${err}`)
-      await logoutSession(sid, deviceId, username)
+      await logoutSession(deviceId, username)
       res.clearCookie('accessToken')
       res.clearCookie('ghostKey')
       handleValidate.error.badReq.message = 'Error to set specific cookies'
@@ -192,7 +183,7 @@ const verify = async (req, res, next) => {
 
       if (!ref) {
         console.error('Error reference not found')
-        await logoutSession(sid, deviceId, username)
+        await logoutSession(deviceId, username)
         res.clearCookie('accessToken')
         res.clearCookie('ghostKey')
         return handlerError(handleValidate.error.notFound, req, res, next)

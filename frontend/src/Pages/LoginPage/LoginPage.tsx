@@ -311,6 +311,16 @@ const LoginPage = (): JSX.Element => {
   }
 
   useEffect(() => {
+    const getSession = async () => {
+      await axios.get(`${server}/general/session`, { withCredentials: true })
+    }
+    getSession()
+    return () => {
+      console.log('Session had set')
+    }
+  }, [])
+
+  useEffect(() => {
 
     const genCaptcha = async (): Promise<void> => {
       const response: AxiosResponse = await axios.get(`${server}/general/gen`,

@@ -36,11 +36,11 @@ const updateUserOneField = async (username, update) => {
   }
 }
 
-const logoutUserByUsername = async username => {
+const logoutUserByUsername = async (username, deviceId) => {
   try {
     await UserModel.updateOne(
       { username: username },
-      { $set: { [`session.${deviceId}`]: '' } }
+      { $set: { [`deviceId.${deviceId}`]: '' } }
     )
   } catch (err) {
     return Error(`Logout user error: ${err}`)

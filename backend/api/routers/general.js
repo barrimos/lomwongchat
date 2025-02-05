@@ -3,6 +3,7 @@ const genNonce = require('../../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()
 const nodeCrypto = require('node:crypto')
+const { encrypt } = require('../../plugins/cipher')
 
 handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	const { action } = req.params
@@ -73,6 +74,19 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 		} catch (err) {
 			console.error(`Error Get remains: ${err}`)
 			return res.status(400).json({ error: 'Get remains error', remains: 3 })
+		}
+	}
+
+	if (action === 'session') {
+		if (!req.cookies.sessionId) {
+			const generateRandomString = encrypt(nodeCrypto.randomBytes(32).toString('hex').slice(0, 32), process.env.SESSION_KEY, process.env.SESSION_IV)
+			res.cookie('sessionId', generateRandomString, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'Lax',
+				maxAge: 86400000
+			})
+			return res.status(201).end()
 		}
 	}
 })

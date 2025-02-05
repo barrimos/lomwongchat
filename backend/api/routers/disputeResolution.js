@@ -7,7 +7,7 @@ const uploadFileModel = require('../../models/uploadFile.model')
 const clientRedis = require('../../redis/redisServer')
 
 const verify = require('../../middlewares/verify')
-const { decrypt } = require('../../middlewares/cipher')
+const { decrypt } = require('../../plugins/cipher')
 const checkOwner = require('../../middlewares/checkOwner')
 
 const IMG = {
@@ -79,15 +79,21 @@ disputeResolution.post('/open', async (req, res) => {
 // still check every refresh page
 // should use cache instead
 // cache should short life
-disputeResolution.get('/:code/:username/:user?', [checkOwner, verify, decrypt], async (req, res) => {
-	if (req.verified.valid) {
+disputeResolution.get('/:code/:username/:user?', [checkOwner, verify], async (req, res) => {
+	const decryptionCode = decrypt(req.cookies.issueCode, process.env.ISSUE_KEY, process.env.ISSUE_IV, true)
+	if (req.verified.valid && decryptionCode === req.cookies.issueCode) {
 		res.status(201).json({ valid: req.verified.valid, message: 'Authorized' })
 	} else {
 		res.status(503).json({ valid: req.verified.valid, error: 'Forbidden Zone' })
 	}
 })
 
-disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verify, decrypt], async (req, res) => {
+disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verify], async (req, res) => {
+	const decryptionCode = decrypt(req.cookies.issueCode, process.env.ISSUE_KEY, process.env.ISSUE_IV, true)
+	if (decryptionCode !== req.cookies.issueCode) {
+		return res.status(401).json({ valid: false, error: 'Invalid issue or Unauthorized' })
+	}
+
 	const topic = []
 	if (!req.verified.valid) {
 		return res.status(401).json({
@@ -141,7 +147,12 @@ disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verif
 	}
 })
 
-disputeResolution.post('/postComment/:code/:username/:user?', [checkOwner, verify, decrypt, upload.single('file')], async (req, res) => {
+disputeResolution.post('/postComment/:code/:username/:user?', [checkOwner, verify, upload.single('file')], async (req, res) => {
+	const decryptionCode = decrypt(req.cookies.issueCode, process.env.ISSUE_KEY, process.env.ISSUE_IV, true)
+	if (decryptionCode !== req.cookies.issueCode) {
+		return res.status(401).json({ valid: false, error: 'Invalid issue or Unauthorized' })
+	}
+
 	if (req.verified.valid) {
 		// always owner
 		const uname = req.params.user === 'undefined' ? req.params.username : req.params.user
@@ -248,7 +259,12 @@ disputeResolution.post('/postComment/:code/:username/:user?', [checkOwner, verif
 	}
 })
 
-disputeResolution.post('/requestCloseIssue/:code/:username/:user?', [checkOwner, verify, decrypt], async (req, res) => {
+disputeResolution.post('/requestCloseIssue/:code/:username/:user?', [checkOwner, verify], async (req, res) => {
+	const decryptionCode = decrypt(req.cookies.issueCode, process.env.ISSUE_KEY, process.env.ISSUE_IV, true)
+	if (decryptionCode !== req.cookies.issueCode) {
+		return res.status(401).json({ valid: false, error: 'Invalid issue or Unauthorized' })
+	}
+
 	if (req.verified.valid) {
 		const uname = req.params.user === 'undefined' ? req.params.username : req.params.user
 		await userModel.updateOne({ username: uname }, { $set: { 'issue.requestClose': true } }, { new: true })
