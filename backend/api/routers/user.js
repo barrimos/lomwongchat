@@ -2,7 +2,7 @@ const express = require('express')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const clientRedis = require('../redis/redisServer')
+const clientRedis = require('../../redis/redisServer')
 
 const verify = require('../../middlewares/verify')
 const clearSession = require('../../middlewares/clearSession')

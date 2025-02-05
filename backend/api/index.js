@@ -2,6 +2,8 @@ const express = require('express')
 const http = require('node:http')
 const path = require('node:path')
 const session = require('express-session')
+require('dotenv').config()
+const config = require('../config')
 
 const general = require('./routers/general')
 const user = require('./routers/user')
@@ -11,23 +13,20 @@ const disputeResolution = require('./routers/disputeResolution')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+const mongoose = require('mongoose')
 const ioconnect = require('../sockets/socket')
-const verify = require('../middlewares/verify')
-const { default: mongoose } = require('mongoose')
 
 const options = {
-  origin: 'https://lomwongchat.vercel.app',
-  methods: 'GET, POST, DELETE, OPTIONS',
-  allowedHeaders: 'Content-Type, username, password, inputcaptcha, access, pairdeviceid, ticket',
+  origin: ['https://lomwongchat.vercel.app', 'http://localhost:3000'],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization,Origin,X-Requested-With,Accept,username, password, inputcaptcha, access, pairdeviceid, ticket',
   credentials: true,
   optionsSuccessStatus: 204
 }
 
-
 const app = express()
 const server = http.createServer(app)
 
-require('dotenv').config()
 ioconnect(server, options)
 app.use(cors(options))
 app.use(morgan('tiny'))
@@ -64,7 +63,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')))
 
 app.use('/general', general) // check 1
 app.use('/user', user) // check 5
-app.use('/data', verify, data) // check 1
+app.use('/data', data) // check 1
 app.use('/disputeResolution', disputeResolution) // check 5
 
 app.use('*', (req, res, next) => {

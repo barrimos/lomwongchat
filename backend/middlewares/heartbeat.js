@@ -1,7 +1,7 @@
-const SessionModel = require('../models/session.model')
+const SessionModel = require('../api/models/session.model')
 const { checkIsLoggedIn } = require('../plugins/handlerSession')
 const handleValidate = require('../plugins/handleValidate')
-const clientRedis = require('../api/redis/redisServer')
+const clientRedis = require('../redis/redisServer')
 const handlerError = require('./handlerError')
 
 const heartbeatCheck = async (req, res, next) => {

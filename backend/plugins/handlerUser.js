@@ -1,4 +1,4 @@
-const userModel = require('../models/user.model')
+const userModel = require('../api/models/user.model')
 
 const insertNewUser = async data => {
   try {

@@ -1,4 +1,4 @@
-const sessionModel = require('../../models/session.model')
+const sessionModel = require('../models/session.model')
 const genNonce = require('../../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()

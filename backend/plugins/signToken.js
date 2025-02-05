@@ -1,6 +1,6 @@
 const nodeCrypto = require('node:crypto')
 const jwt = require('jsonwebtoken')
-const clientRedis = require('../api/redis/redisServer')
+const clientRedis = require('../redis/redisServer')
 
 const signToken = async (username, role, isRefExpired = false, currKid = null) => {
   const kid = isRefExpired ? await nodeCrypto.randomBytes(4).toString('hex') : currKid
