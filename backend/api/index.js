@@ -21,10 +21,7 @@ const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_R
 
 const options = {
   origin: ['https://lomwongchat.vercel.app', 'http://localhost:3000'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: 'Content-Type,Authorization,Origin,X-Requested-With,Accept,username, password, inputcaptcha, access, pairdeviceid, ticket',
   credentials: true,
-  optionsSuccessStatus: 204
 }
 
 const app = express()
@@ -36,7 +33,7 @@ client.connect()
 client.on('connect', () => console.log('Redis Client Connected'))
 client.on('error', (err) => console.log('Redis Client Connection Error', err))
 
-app.use(cors(options))
+app.use(cors())
 app.use(morgan('tiny'))
 app.use(cookieParser())
 app.use(express.json())
