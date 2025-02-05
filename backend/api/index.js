@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const ioconnect = require('../sockets/socket')
 const verify = require('../middlewares/verify')
+const { default: mongoose } = require('mongoose')
 
 const options = {
   origin: 'https://lomwongchat.vercel.app',
@@ -47,6 +48,16 @@ app.use(session({
     maxAge: 86400000, // 1 day
   }
 }))
+
+if (process.env.ISVERCEL) {
+  const mongoUri = process.env.NODE_ENV === 'production' ? config.mongoUri : 'mongodb://localhost:27017/lomwongchat'
+  const mongoOption = process.env.NODE_ENV === 'production' ? config.mongoOptions : {}
+
+  app.use(async (req, res, next) => {
+    await mongoose.connect(mongoUri, mongoOption)
+    return next()
+  })
+}
 
 // for load image in dipute page
 app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')))
