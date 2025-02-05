@@ -17,7 +17,9 @@ const verify = require('../middlewares/verify')
 const options = {
   origin: 'https://lomwongchat.vercel.app',
   methods: 'GET, POST, DELETE, OPTIONS',
+  allowedHeaders: 'Content-Type, username, password, inputcaptcha, access, pairdeviceid, ticket',
   credentials: true,
+  optionsSuccessStatus: 204
 }
 
 

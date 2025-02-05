@@ -1,7 +1,8 @@
 {
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "api/redis/redisServer.js"
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
     }
-  }
+  ]
 }
