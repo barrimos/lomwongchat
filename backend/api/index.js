@@ -20,9 +20,9 @@ const REDIS_PORT = 6379
 const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_REDIS_REST_URL } : { port: REDIS_PORT }
 
 const options = {
-  origin: process.env.NODE_ENV === 'production' ? 'https://lomwongchatapp.onrender.com' : 'http://localhost:3000',
+  origin: ['https://lomwongchatapp.onrender.com', 'http://localhost:3000'],
   methods: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
-  allowedHeaders: 'inputcaptcha, Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
+  allowedHeaders: 'inputcaptcha, username, password, access, pairdeviceid, Content-Type, Authorization, Origin, X-Requested-With, Accept, Content-Length, Accept-Encoding, X-CSRF-Token, X-Auth-Token, X-Render-Origin-Server, X-Render-Routing',
   credentials: true,
 }
 
