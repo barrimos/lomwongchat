@@ -15,6 +15,9 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const ioconnect = require('../sockets/socket')
+const redis = require('redis')
+const REDIS_PORT = 6379
+const url = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_REDIS_REST_URL } : { port: REDIS_PORT }
 
 const options = {
   origin: ['https://lomwongchat.vercel.app', 'http://localhost:3000'],
@@ -28,6 +31,11 @@ const app = express()
 const server = http.createServer(app)
 
 ioconnect(server, options)
+const client = redis.createClient(url)
+client.connect()
+client.on('connect', () => console.log('Redis Client Connected'))
+client.on('error', (err) => console.log('Redis Client Connection Error', err))
+
 app.use(cors(options))
 app.use(morgan('tiny'))
 app.use(cookieParser())
