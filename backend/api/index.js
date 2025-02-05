@@ -33,7 +33,7 @@ client.connect()
 client.on('connect', () => console.log('Redis Client Connected'))
 client.on('error', (err) => console.log('Redis Client Connection Error', err))
 
-app.use(cors())
+app.use(cors(options))
 app.use(morgan('tiny'))
 app.use(cookieParser())
 app.use(express.json())
