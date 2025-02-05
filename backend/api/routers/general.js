@@ -26,7 +26,13 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 		try {
 			const strCaptcha = genNonce(6)
 			const signCaptcha = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(strCaptcha).digest('hex')
-			res.cookie('captcha', `${strCaptcha}.${signCaptcha}`)
+			res.cookie('captcha', `${strCaptcha}.${signCaptcha}`,
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'Lax'
+				}
+			)
 
 			return res.status(200).json({ captcha: strCaptcha, state: state.isStayLoggedIn || false })
 		} catch (err) {
@@ -37,7 +43,6 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 
 	if (action === 'verifyCaptcha') {
 		const { inputcaptcha } = req.headers
-		console.log(req.cookies)
 		const [captcha, signature] = req.cookies.captcha.split('.')
 		const validateSignature = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(captcha).digest('hex')
 
