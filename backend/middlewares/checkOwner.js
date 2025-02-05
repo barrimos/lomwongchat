@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const handlerError = require('./handlerError')
 const clientRedis = require('../redis/redisServer')
-const userModel = require('../models/user.model')
+const userModel = require('../api/models/user.model')
 const { logoutSession } = require('../plugins/handlerSession')
 const handleValidate = require('../plugins/handleValidate')
 

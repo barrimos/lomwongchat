@@ -1,8 +1,8 @@
 const express = require('express')
 const multer = require('multer')
 
-const userModel = require('../../models/user.model')
-const uploadFileModel = require('../../models/uploadFile.model')
+const userModel = require('../models/user.model')
+const uploadFileModel = require('../models/uploadFile.model')
 
 const clientRedis = require('../../redis/redisServer')
 
