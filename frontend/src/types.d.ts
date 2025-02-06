@@ -16,7 +16,7 @@ export interface ButtonTypes {
 
 export interface UsersWhereAreYouTypes {
   targetUsername: string
-  uuid: string
+  deviceId: string
   leaveChannel: string
   targetChannel: string
   currJoinChannel: { [key: string]: string }
@@ -117,7 +117,7 @@ export interface SessionsDataTypes {
   sessionId: string
   ip: string
   username: string
-  uuid: string
+  deviceId: string
   isLoggedIn: boolean
   agent: string
   checked?: boolean

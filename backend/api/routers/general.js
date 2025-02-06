@@ -1,23 +1,21 @@
-const sessionModel = require('../../models/session.model')
 const genNonce = require('../../plugins/genNonce')
 const express = require('express')
 const handleGeneralEndpointRouter = express.Router()
 const nodeCrypto = require('node:crypto')
 const { encrypt } = require('../../plugins/cipher')
+const { findSessionWithProjection } = require('../../plugins/handlerSession')
 
 handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	const { action } = req.params
-	const deviceId = req.cookies.deviceId
+	const { username } = req.headers
+	const { deviceId, sessionId, captcha } = req.cookies
 	const state = {
 		isStayLoggedIn: false
 	}
 	try {
 		// initial
 		// check uuid that is stay logged in isn't it
-		state.isStayLoggedIn = await sessionModel.findOne(
-			{ uuid: req.cookies.deviceId },
-			{ username: 1, isLoggedIn: 1 }
-		)
+		state.isStayLoggedIn = await findSessionWithProjection(sessionId, deviceId, username, { username: 1, isLoggedIn: 1 })
 	} catch (err) {
 		console.error(`Error get login state: ${err}`)
 	}
@@ -43,10 +41,10 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 
 	if (action === 'verifyCaptcha') {
 		const { inputcaptcha } = req.headers
-		const [captcha, signature] = req.cookies.captcha.split('.')
-		const validateSignature = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(captcha).digest('hex')
+		const [stringCaptcha, signature] = captcha.split('.')
+		const validateSignature = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(stringCaptcha).digest('hex')
 
-		if (inputcaptcha === captcha && validateSignature === signature) {
+		if (inputcaptcha === stringCaptcha && validateSignature === signature) {
 			return res.status(200).json({ verified: true })
 		} else {
 			console.error('Verification captcha error')
@@ -58,15 +56,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 		res.clearCookie('captcha')
 		try {
 			// get attempts
-			const session = await sessionModel.findOne(
-				{
-					$or: [
-						{ sessionId: req.sessionID },
-						{ uuid: deviceId }
-					]
-				},
-				{ attempts: 1, isLoggedIn: 1 }
-			)
+			const session = await findSessionWithProjection(sessionId, deviceId, username, { attempts: 1 })
 
 			if (!session) throw Error('Require session id')
 
@@ -79,15 +69,16 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 
 	if (action === 'session') {
 		if (!req.cookies.sessionId) {
-			const generateRandomString = encrypt(nodeCrypto.randomBytes(32).toString('hex').slice(0, 32), process.env.SESSION_KEY, process.env.SESSION_IV)
-			res.cookie('sessionId', generateRandomString, {
+			const data = nodeCrypto.randomBytes(32).toString('hex').slice(0, 16)
+			const sessionId = encrypt(data, process.env.SESSION_KEY, process.env.SESSION_IV)
+			res.cookie('sessionId', sessionId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: 'Lax',
 				maxAge: 86400000
 			})
-			return res.status(201).end()
 		}
+		return res.status(201).end()
 	}
 })
 

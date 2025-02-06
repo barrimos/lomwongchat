@@ -44,7 +44,7 @@ const LomwongPage = (props: Props): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   const [isAuthen, setIsAuthen] = useState<boolean>(false)
-  const [uuid, setUuid] = useState<string>('')
+  const [deviceId, setDeviceId] = useState<string>('')
   const [isChangeAsideTab, setIsChangeAsideTab] = useState<boolean>(false)
   const [currTab, setCurrTab] = useState<string[]>(['asideChannels', 'New channel', 'Create'])
 
@@ -228,7 +228,7 @@ const LomwongPage = (props: Props): JSX.Element => {
 
     setJoinNewChannel(true)
 
-    socket.emit('joinChannel', [currChannel, targetChannel, yourName, uuid])
+    socket.emit('joinChannel', [currChannel, targetChannel, yourName, deviceId])
     setCurrChannel(targetChannel)
     sessionStorage.setItem('channel', targetChannel)
     navigate(`/lomwong/${yourName}/${targetChannel}`)
@@ -302,7 +302,7 @@ const LomwongPage = (props: Props): JSX.Element => {
     } catch (err) {
       console.error(err)
     }
-    socket.emit('logout', yourName, currChannel, uuid)
+    socket.emit('logout', yourName, currChannel, deviceId)
     sessionStorage.clear()
     localStorage.clear()
     socket.disconnect()
@@ -324,7 +324,7 @@ const LomwongPage = (props: Props): JSX.Element => {
         if (res.data.valid) {
           try {
             setIsAuthen(res.data.valid)
-            setUuid(res.data.deviceId.slice(0, 8) ?? 'undefined')
+            setDeviceId(res.data.deviceId.slice(0, 8) ?? 'undefined')
             localStorage.setItem('deviceId', res.data.deviceId)
 
             // Fetch channels after setting up socket listeners
@@ -380,7 +380,7 @@ const LomwongPage = (props: Props): JSX.Element => {
   useEffect(() => {
     const initConnect = async () => {
       // authenticate user
-      socket.auth = { username: yourName, role: userRole, uuid: uuid }
+      socket.auth = { username: yourName, role: userRole, deviceId: deviceId }
       // connect socket
       socket.connect()
       // Set loading state off and authorized only after completing all tasks
@@ -540,7 +540,7 @@ const LomwongPage = (props: Props): JSX.Element => {
                 <aside id='asideProfile'>
                   <div className='profileUsername'>
                     <h1>{yourName}</h1>
-                    <div className='uuid'>{uuid}</div>
+                    <div className='deviceId'>{deviceId}</div>
                   </div>
                   <div className='asideProfileMenu'>
                     <span>Reports</span>

@@ -1,74 +1,87 @@
+const handlerError = require('../middlewares/handlerError')
 const SessionModel = require('../models/session.model')
+const { updateUserOneField } = require('./handlerUser')
 
-const findSession = async (deviceId, username, projection) => {
-  if (!deviceId || !username) return new Error('Missing query')
+const findSessionWithProjection = async (sessionId, deviceId, username, projection) => {
+  if (!sessionId || !deviceId) return new Error('Missing query')
 
   const session = await SessionModel.findOne(
-    { username, deviceId },
+    {
+      $or: [
+        { sessionId },
+        {
+          $and: [
+            { username },
+            { sessionId }
+          ]
+        }
+      ]
+    },
     projection
   )
 
-  if (session) {
-    // Update session fields if they are different
-    let updated = false
-
-    if (session.username !== username) {
-      session.username = username
-      updated = true
-    }
-    if (session.deviceId !== deviceId) {
-      session.deviceId = deviceId
-      updated = true
-    }
-
-    if (updated) {
-      await session.save() // Save only if modified
-    }
-
-    return session
-  }
-
-  return null // Return null if no session is found
+  return session
 }
 
-const findOrCreateUpdate = async (username, deviceId, agent, ip) => {
-  if (!deviceId || !username) return Error('Missing query')
+/**
+ * 
+ * @param {*} sessionId string
+ * @param {*} username string
+ * @param {*} deviceId string
+ * @param {*} agent string
+ * @param {*} ip string
+ * @param {*} projection { field: 1, field: 0 } default {}
+ * @returns 
+ */
+const findOrCreateUpdate = async (sessionId, username, deviceId, agent, ip) => {
+  if (!sessionId || !deviceId || !username) return Error('Missing query')
   return await SessionModel.findOneAndUpdate(
     {
-      $and: [
-        { username },
-        { deviceId }
+      $or: [
+        { sessionId },
+        {
+          $and: [
+            { username },
+            { deviceId }
+          ]
+        }
       ]
     },
     {
       $set: {  // always set these fields during update
+        sessionId,
         ip,
         deviceId,
         agent,
         username,
-        unlockAt: null,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000)  // extend session expiry time
       },
       $setOnInsert: {  // only for document insertion
         attempts: 3,
         isLoggedIn: false,
         createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),  // extend session expiry time
+        unlockAt: null
       }
     },
     {
       upsert: true,  // create a new document if no matching deviceId and username
-      new: true      // return the updated document
+      new: true,      // return the updated document
     }
   )
 }
 
-const checkIsLoggedIn = async (deviceId, username) => {
+const checkIsLoggedIn = async (sessionId, deviceId, username) => {
   try {
     return await SessionModel.findOne(
       {
-        $and: [
-          { deviceId },
-          { username }
+        $or: [
+          { sessionId },
+          {
+            $and: [
+              { deviceId },
+              { username }
+            ]
+          },
         ]
       },
       { isLoggedIn: 1 }
@@ -78,22 +91,27 @@ const checkIsLoggedIn = async (deviceId, username) => {
   }
 }
 
-const updateSessionOneField = async (deviceId, field, value) => {
+const updateSessionOneField = async (sessionId, field, value) => {
   try {
     await SessionModel.updateOne(
-      { deviceId },
-      { [field]: value }
+      { sessionId },
+      {
+        $set:
+          { [field]: value }
+      },
+      { new: true, upsert: true }
     )
   } catch (err) {
     return Error(`Error update session data: ${err}`)
   }
 }
 
-const updateSessionAttempts = async (username, ip, deviceId, decrement = true) => {
+const updateSessionAttempts = async (sessionId, username, ip, deviceId, decrement = true) => {
   const update = decrement ? { $inc: { attempts: -1 } } : {}
   return await SessionModel.findOneAndUpdate(
     {
       $or: [
+        { sessionId },
         { deviceId },
         { username },
         { ip },
@@ -104,46 +122,76 @@ const updateSessionAttempts = async (username, ip, deviceId, decrement = true) =
   )
 }
 
-const loggedInSession = async deviceId => {
+const loggedInSession = async sessionId => {
   await SessionModel.updateOne(
-    { deviceId },
+    { sessionId },
     {
       $set: {
         isLoggedIn: true,
-        attempts: 0
+        attempts: 0,
       }
     },
     { new: true }
   )
 }
 
-const logoutSession = async (deviceId, username) => {
+const logoutSession = async (sessionId, deviceId, username) => {
   await SessionModel.updateOne(
     {
-      $and: [
-        { deviceId },
-        { username }
+      $or: [
+        { sessionId },
+        {
+          $and: [
+            { deviceId },
+            { username }
+          ]
+        }
       ]
     },
     {
       $set: {
-        isLoggedIn: false,
-        attempts: 3
+        isLoggedIn: false
       }
     },
     { new: true }
   )
 }
 
-const deleteSession = async (username, deviceId) => {
+const deleteSession = async (sessionId, username, deviceId) => {
   await SessionModel.deleteOne(
     {
-      $and: [
-        { username },
-        { deviceId }
+      $or: [
+        { sessionId },
+        {
+          $and: [
+            { username },
+            { deviceId }
+          ]
+        }
       ]
     }
   )
 }
 
-module.exports = { findSession, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, checkIsLoggedIn }
+
+const handlerSessionFailed = async (req, res, next, sessionId, deviceId, username, errorName, isLogoutApp = false, isDeleteSession = false) => {
+  await logoutSession(sessionId, deviceId, username)
+  res.clearCookie('accessToken')
+  res.clearCookie('ghostKey')
+
+  if (isLogoutApp) {
+    await updateUserOneField(username, { [`devices.${deviceId}`]: '' })
+  }
+
+  if (isDeleteSession) {
+    await deleteSession(sessionId, username, deviceId)
+  }
+
+  // reduce attempts
+  const session = await updateSessionAttempts(sessionId, username, deviceId)
+  handleValidate.error[errorName].remains = session.attempts
+  // always redirect to login page
+  return handlerError(handleValidate.error[errorName], req, res, next)
+}
+
+module.exports = { findSessionWithProjection, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, checkIsLoggedIn, handlerSessionFailed }

@@ -43,7 +43,7 @@ const Dashboard = (props: Props) => {
 
   const { username }: Readonly<Params<string>> = useParams()
   const adminRole: string = '100'
-  const [uuid, setUuid] = useState<string>('')
+  const [deviceId, setDeviceId] = useState<string>('')
 
   const [allChannelsList, setAllChannelsList] = useState<string[]>([])
   const [allUsers, setAllUsers] = useState<DashboardUsers[]>([])
@@ -214,13 +214,13 @@ const Dashboard = (props: Props) => {
                 {
                   userSessions[user.username] ?
                     userSessions[user.username]?.map((item: string[], i: number) => (
-                      <option key={i} value={`v${i}`} data-uuid={item[0]} data-room-join={item[1]}>
+                      <option key={i} value={`v${i}`} data-deviceId={item[0]} data-room-join={item[1]}>
                         {`${item[0]}-${item[1]}`}
                       </option>
                     ))
                     :
                     <>
-                      <option value='v1' data-uuid='null' data-room-join='null'>Offline</option>
+                      <option value='v1' data-deviceId='null' data-room-join='null'>Offline</option>
                     </>
                 }
               </select>
@@ -258,17 +258,14 @@ const Dashboard = (props: Props) => {
       }
     )
       .then(() => {
-        socket.emit('logout', username, currChannel, uuid)
-        reset()
-        socket.disconnect()
-        navigate('/adsysop')
+        socket.emit('logout', username, currChannel, deviceId)
       })
       .catch(err => {
         console.error(err.response.data.eror)
-        reset()
-        socket.disconnect()
-        navigate('/adsysop')
       })
+      reset()
+      socket.disconnect()
+      navigate('/adsysop')
   }
 
   const updateUserStatus = async (e: React.MouseEvent | React.TouchEvent, user: DashboardUsers, statusNum: string): Promise<void> => {
@@ -308,7 +305,7 @@ const Dashboard = (props: Props) => {
 
   // join channel when click at side menu and navbar
   const joinChannel = async (targetChannel: string): Promise<void> => {
-    await socket.emit('joinChannel', [currChannel, targetChannel, username!, uuid])
+    await socket.emit('joinChannel', [currChannel, targetChannel, username!, deviceId])
     setCurrChannel(targetChannel)
     sessionStorage.setItem('channel', targetChannel)
     setJoinNewChannel(true)
@@ -330,7 +327,7 @@ const Dashboard = (props: Props) => {
       )
         .then(async res => {
           setIsAuthPass(res.data.valid)
-          setUuid(res.data.deviceId.slice(0, 8))
+          setDeviceId(res.data.deviceId.slice(0, 8))
           localStorage.setItem('deviceId', res.data.deviceId)
           // fetching data
           await fetchData()
@@ -490,7 +487,7 @@ const Dashboard = (props: Props) => {
     refState!(prev => !prev)
   }
 
-  const updateUsersLive = (targetUsername: string, uuid: string, leaveChannel: string, targetChannel: string, isLogOut: boolean): void => {
+  const updateUsersLive = (targetUsername: string, deviceId: string, leaveChannel: string, targetChannel: string, isLogOut: boolean): void => {
     // find user element
     try {
       const selectElement: HTMLElement | null = document.querySelector(`td[data-username="${targetUsername}"] select`) as HTMLElement | null
@@ -504,9 +501,9 @@ const Dashboard = (props: Props) => {
           if (!leaveChannel) {
             console.error(`Error value of leave channel is not found: ${leaveChannel}`)
           }
-          targetElement = selectElement.querySelector(`option[data-uuid="${uuid}"]`) as HTMLOptionElement
+          targetElement = selectElement.querySelector(`option[data-deviceId="${deviceId}"]`) as HTMLOptionElement
           targetElement.setAttribute('data-room-join', 'null')
-          targetElement.setAttribute('data-uuid', 'null')
+          targetElement.setAttribute('data-deviceId', 'null')
           targetElement.innerText = 'Offline'
         } else {
           if (!targetChannel) {
@@ -514,11 +511,11 @@ const Dashboard = (props: Props) => {
           } else {
             // bind channel to element when user join
             // if you change the channel use same element
-            targetElement = selectElement.querySelector(`option[data-uuid="${uuid}"]`) as HTMLOptionElement
+            targetElement = selectElement.querySelector(`option[data-deviceId="${deviceId}"]`) as HTMLOptionElement
 
             // if another devices or first login find a empty slot
             if (!targetElement) {
-              targetElement = selectElement.querySelector(`option[data-uuid="null"]`) as HTMLOptionElement
+              targetElement = selectElement.querySelector(`option[data-deviceId="null"]`) as HTMLOptionElement
               // but if still not have a slot, it error
               if (!targetElement) {
                 console.error(`Error slots for ${targetUsername} is full or not found: ${targetElement}`)
@@ -526,8 +523,8 @@ const Dashboard = (props: Props) => {
             }
 
             targetElement.setAttribute('data-room-join', targetChannel)
-            targetElement.setAttribute('data-uuid', uuid)
-            targetElement.innerText = uuid + '-' + targetChannel
+            targetElement.setAttribute('data-deviceId', deviceId)
+            targetElement.innerText = deviceId + '-' + targetChannel
           }
         }
       }
@@ -552,7 +549,7 @@ const Dashboard = (props: Props) => {
 
   useEffect(() => {
     const initConnect = async () => {
-      socket.auth = { username: username, role: adminRole, uuid: uuid }
+      socket.auth = { username: username, role: adminRole, deviceId: deviceId }
       socket.connect()
 
       // Set loading state off and authorized only after completing all tasks
@@ -626,22 +623,33 @@ const Dashboard = (props: Props) => {
       setUsersOnline(usersConnect)
     }
 
+    const forceLogout = (message: string): void => {
+      withReactContent(Swal).fire({
+        title: message,
+        allowOutsideClick: true
+      })
+      logoutDashboard()
+    }
+
+
     socket.on('getCacheNoti', getCacheNoti)
     socket.on('inviteDm', receiveInviteDm)
     socket.on('broadcast', getNotification)
     socket.on('usersOnline', getUsersOnline)
+    socket.on('forceLogout', forceLogout)
 
     return () => {
       socket.off('getCacheNoti', getCacheNoti)
       socket.off('inviteDm', receiveInviteDm)
       socket.off('broadcast', getNotification)
       socket.off('usersOnline', getUsersOnline)
+      socket.off('forceLogout', forceLogout)
     }
   }, [])
 
   useEffect(() => {
-    const whereUsersLive = ({ targetUsername, uuid, leaveChannel, targetChannel, currJoinChannel, isLogOut }: UsersWhereAreYouTypes): void => {
-      updateUsersLive(targetUsername, uuid, leaveChannel, targetChannel, isLogOut)
+    const whereUsersLive = ({ targetUsername, deviceId, leaveChannel, targetChannel, currJoinChannel, isLogOut }: UsersWhereAreYouTypes): void => {
+      updateUsersLive(targetUsername, deviceId, leaveChannel, targetChannel, isLogOut)
       // if admin join after users join it will not show currently where users join
       // have to wait for users refresh page or join other channel and send emission back
       // so use currJoinChannel that contains all users where they joining instead
@@ -672,6 +680,7 @@ const Dashboard = (props: Props) => {
   useEffect(() => {
     // isDeleteSession[0] is flag
     if (isDeleteSession[0]) {
+      
       // isDeleteSession[1] is array of user's name list who selected to force logout
       socket.emit('forceUserLogout', isDeleteSession[1], username, adminRole, 'Please login again')
       setIsDeleteSession([false, []])

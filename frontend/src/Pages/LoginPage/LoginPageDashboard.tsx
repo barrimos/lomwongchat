@@ -30,7 +30,12 @@ const LoginPageDashboard = () => {
 		setInpSysUsername('')
 		setInpSysPassword('')
 		sessionStorage.clear()
+		localStorage.clear()
 		initialRef.current = false
+	}
+
+	const getSession = async () => {
+		await axios.get(`${server}/general/session`, { withCredentials: true })
 	}
 
 	const handlerVerifyAccess = async (): Promise<void> => {
@@ -103,8 +108,11 @@ const LoginPageDashboard = () => {
 
 	useEffect(() => {
 		loadRemain()
+    getSession()
+
 		return () => {
 			console.log('Reamining loaded')
+			console.log('Session had set')
 		}
 	}, [])
 

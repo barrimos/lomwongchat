@@ -3,43 +3,54 @@ const clientRedis = require('../redis/redisServer')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const handleValidate = require('../plugins/handleValidate')
-const handlerError = require('./handlerError')
-const { findSession, logoutSession, deleteSession } = require('../plugins/handlerSession')
+const { findSessionWithProjection, handlerSessionFailed } = require('../plugins/handlerSession')
 const { updateUserOneField, findOneByUsername } = require('../plugins/handlerUser')
+const { decrypt } = require('../plugins/cipher')
 
 const verify = async (req, res, next) => {
-  const { accessToken, ghostKey } = req.cookies
+  const { accessToken, ghostKey, sessionId } = req.cookies
   const { username, access } = req.headers
   let deviceId = req.cookies.deviceId ?? req.headers.pairdeviceid
 
-  if (!accessToken) {
-    await logoutSession(deviceId, username)
-    res.clearCookie('accessToken')
-    res.clearCookie('ghostKey')
-    handleValidate.error.unauthorized.message = 'Token is require'
-    return handlerError(handleValidate.error.unauthorized, req, res, next)
+  try {
+    if (!accessToken || !sessionId) {
+      if (!accessToken) {
+        handleValidate.error.unauthorized.message = 'Token is require'
+      }
+      if (!sessionId) {
+        handleValidate.error.unauthorized.message = 'Session Id is require'
+      }
+      return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'unauthorized')
+    }
+  } catch (err) {
+    console.error(`Error missing credentials ${err}`)
   }
+
+  try {
+    // check if decryption not error that mean all pass
+    decrypt(sessionId, process.env.SESSION_KEY, process.env.SESSION_IV)
+  } catch (err) {
+    console.error(`Error: decryption sesion id: ${err}`)
+    return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'unauthorized')
+  }
+
 
   try {
     if (!deviceId) {
       // get in cache
-      const cacheDeviceId = await clientRedis.GET(`session:${username}:${deviceId}`)
+      const cacheDeviceId = await clientRedis.GET(`session:${username}:${sessionId}`)
 
       if (!cacheDeviceId) {
         // check in database
         try {
-          const data = await findSession(cacheDeviceId, username, { deviceId: 1 })
+          const data = await findSessionWithProjection(sessionId, cacheDeviceId, username, { deviceId: 1 })
           if (!data.deviceId) throw Error('Device id doesn\'t exist')
 
           deviceId = data.deviceId
 
         } catch (err) {
           console.error(`Error: ${err}`)
-          await logoutSession(deviceId, username)
-          res.clearCookie('accessToken')
-          res.clearCookie('ghostKey')
-          await updateUserOneField(username, { [`devices.${deviceId}`]: '' })
-          return handlerError(handleValidate.error.internal, req, res, next)
+          return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'internal', true)
         }
       }
 
@@ -54,7 +65,6 @@ const verify = async (req, res, next) => {
 
   } catch (err) {
     console.error(`Error verify session: ${err.message ?? err}`)
-    await logoutSession(deviceId, username)
 
     // force logout when catch error
     const now = Math.floor(new Date().getTime() / 1000) // Current time in seconds
@@ -67,22 +77,15 @@ const verify = async (req, res, next) => {
       console.error('Token is already expired')
     }
 
-    await deleteSession(null, username, deviceId)
-    res.clearCookie('accessToken')
-    res.clearCookie('ghostKey')
-    await updateUserOneField(username, { [`devices.${deviceId}`]: '' })
     handleValidate.error.unauthorized.message = `Error verify: ${err.message ?? err}`
-    return handlerError(handleValidate.error.unauthorized, req, res, next)
+    return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'unauthorized', true, true)
   }
 
   const isRevoked = await clientRedis.GET(`revoke:token:${accessToken}`)
   if (isRevoked === accessToken) {
     console.error(`Token revoked`)
     handleValidate.error.unauthorized.message = 'Token revoked'
-    await logoutSession(deviceId, username)
-    res.clearCookie('accessToken')
-    res.clearCookie('ghostKey')
-    return handlerError(handleValidate.error.unauthorized, req, res, next)
+    return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'unauthorized')
   }
 
   try {
@@ -134,10 +137,7 @@ const verify = async (req, res, next) => {
       const isLocked = await clientRedis.SET(lockKey, 'locked', { NX: true, EX: 1 }) // Lock 1 sec
       // if lockKey is Exists response error
       if (!isLocked) {
-        await logoutSession(deviceId, username)
-        res.clearCookie('accessToken')
-        res.clearCookie('ghostKey')
-        return handlerError(handleValidate.error.tooMuch, req, res, next)
+        return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'tooMuch')
       }
 
       // set new Timestamp
@@ -168,11 +168,8 @@ const verify = async (req, res, next) => {
       }
     } catch (err) {
       console.error(`Error to set specific cookies: ${err}`)
-      await logoutSession(deviceId, username)
-      res.clearCookie('accessToken')
-      res.clearCookie('ghostKey')
       handleValidate.error.badReq.message = 'Error to set specific cookies'
-      return handlerError(handleValidate.error.badReq, req, res, next)
+      return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'badReq')
     }
 
     next()
@@ -183,10 +180,7 @@ const verify = async (req, res, next) => {
 
       if (!ref) {
         console.error('Error reference not found')
-        await logoutSession(deviceId, username)
-        res.clearCookie('accessToken')
-        res.clearCookie('ghostKey')
-        return handlerError(handleValidate.error.notFound, req, res, next)
+        return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'notFound')
       }
 
       const refPayload = ref.token.refreshToken.split('.')[1]

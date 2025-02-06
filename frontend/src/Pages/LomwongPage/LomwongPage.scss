@@ -339,7 +339,7 @@ button{
             white-space: nowrap;
             @include render_prefixes('user-select', 'none');
         }
-        .uuid{
+        .deviceId{
             font-size: .8em;
             color: hsl(0, 0%, 35%);
         }

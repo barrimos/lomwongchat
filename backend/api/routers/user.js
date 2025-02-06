@@ -8,7 +8,7 @@ const clientRedis = require('../../redis/redisServer')
 
 // middlewares
 const verify = require('../../middlewares/verify')
-const rateLimiter = require('../../middlewares/rateLimit')
+const { rateLimiterLogin, rateLimiterAuthen } = require('../../middlewares/rateLimit')
 const { encrypt } = require('../../plugins/cipher')
 const heartbeat = require('../../middlewares/heartbeat')
 const handlerError = require('../../middlewares/handlerError')
@@ -16,7 +16,7 @@ const handlerError = require('../../middlewares/handlerError')
 // plugins
 const signToken = require('../../plugins/signToken')
 const handleValidate = require('../../plugins/handleValidate')
-const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts,username,  findOrCreateUpdate } = require('../../plugins/handlerSession')
+const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts, findOrCreateUpdate } = require('../../plugins/handlerSession')
 const { findOneByUsername, updateUserOneField, insertNewUser } = require('../../plugins/handlerUser')
 const getRole = require('../../plugins/getRole')
 
@@ -24,31 +24,26 @@ const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
 const trackSession = async (req, res, next) => {
 	let deviceId = req.cookies.deviceId
+	const { sessionId } = req.cookies
 	const { username } = req.headers
 	const ip = req.ip
 
 	try {
-		if (!deviceId) {
-			// get from database
-			const user = await findOneByUsername(username, { devices: 1 })
-			let availableSlotKey
-			// check available slot
-			if (user) {
-				// if uuid in database was full of 3
-				// find empty slot
-				availableSlotKey = user && Object.keys(user.devices).find(key => user.devices[key] === '')
-				console.log(1, availableSlotKey)
-				const uuidLen = user ? Object.entries(user.devices).length : 0
-				if (uuidLen >= 3 && !availableSlotKey) {
-					// if not available that mean you logged in reached to maximum login limit
-					// then response error back
-					handleValidate.error.unauthorized.message = 'Maximum login limit reached'
-					return handlerError(handleValidate.error.unauthorized, req, res, next)
-				}
+		const user = await findOneByUsername(username, { devices: 1 })
+
+		if (user) {
+			// if uuid in database was full of 3
+			// find empty slot
+			const availableSlotKey = Object.keys(user.devices).find(key => user.devices[key] === '')
+
+			const uuidLen = user ? Object.entries(user.devices).length : 0
+			if (uuidLen >= 3 && !availableSlotKey) {
+				// if not available that mean you logged in reached to maximum login limit
+				// then response error back
+				handleValidate.error.unauthorized.message = 'Maximum login limit reached'
+				return handlerError(handleValidate.error.unauthorized, req, res, next)
 			}
 
-			// use that uuid for current
-			// or create new one
 			deviceId = availableSlotKey || uuidv4()
 
 			// save in to client-coolie
@@ -65,9 +60,11 @@ const trackSession = async (req, res, next) => {
 		const agent = req.get('user-agent').match(/windows|mobile|ipad/i)[0]
 
 		// save tracking session into database both update and insert
-		const session = await findOrCreateUpdate(username, deviceId, agent, ip)
+		// it always check if same session id but deifference username or device id or ip or agent
+		// it will update
+		const session = await findOrCreateUpdate(sessionId, username, deviceId, agent, ip)
 
-		if (session.attempts <= 0) {
+		if (session.attempts <= 0 || session.unlockAt) {
 			// if exists and out of attempts
 			console.error('Session locked')
 			res.clearCookie('accessToken')
@@ -86,18 +83,24 @@ const trackSession = async (req, res, next) => {
 
 const isMatch = async (req, res, next) => {
 	const { username, password, access } = req.headers
-	const deviceId = req.cookies.deviceId ?? req.deviceId
+	const deviceId = req.deviceId ?? req.cookies.deviceId
+	const { sessionId } = req.cookies
 	const ip = req.ip
+	let session
 
 	try {
 		// Validate input
 		if (!username || !password || !handleValidate.access[access]) {
 			console.error('Invalid input or access type')
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.forbidden.remains = session.attempts
 			handleValidate.error.forbidden.message = 'Invalid input or access type'
 			return handlerError(handleValidate.error.forbidden, req, res, next)
 		}
 		if (!deviceId) {
 			console.error('Device id not found')
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.unauthorized.remains = session.attempts
 			handleValidate.error.unauthorized.message = 'Device id not found, Login again'
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
@@ -116,7 +119,8 @@ const isMatch = async (req, res, next) => {
 
 		if (!user) {
 			console.error('No user found to verify credentials')
-			await updateSessionAttempts(username, ip, deviceId)
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.unauthorized.remains = session.attempts
 			handleValidate.error.unauthorized.message = 'Invalid credentials'
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
@@ -129,7 +133,8 @@ const isMatch = async (req, res, next) => {
 
 		// User role not have permission to access adsysop page
 		if (handleValidate.access[access] === handleValidate.access.adsysop && user.role !== handleValidate.role.admin) {
-			await updateSessionAttempts(username, ip, deviceId)
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.unauthorized.remains = session.attempts
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 
@@ -137,8 +142,8 @@ const isMatch = async (req, res, next) => {
 		const isPasswordMatch = await bcrypt.compare(password, user.password)
 		if (!isPasswordMatch) {
 			console.error('Unauthorize credentials')
-			const session = await updateSessionAttempts(username, ip, deviceId)
-			console.log(session)
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.unauthorized.remains = session.attempts
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 
@@ -179,7 +184,6 @@ const isMatch = async (req, res, next) => {
 
 			try {
 				// user's data
-				// overwriting
 				await clientRedis.json.SET('users', `$.${username}`, user)
 			} catch (err) {
 				if (err.toString() === 'Error: ERR new objects must be created at the root') {
@@ -196,14 +200,14 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			await clientRedis.SET(`session:${username}:${deviceId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			await clientRedis.SET(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
 		}
 
 		// all passes
-		req.verified = { valid: true, deviceId: deviceId }
+		req.verified = { valid: true, deviceId }
 		next()
 	} catch (err) {
 		console.error('Error server:', err)
@@ -257,11 +261,11 @@ handleUserEndpointRouter.post('/regisUsers', async (req, res) => {
 	}
 })
 
-handleUserEndpointRouter.get('/login', [rateLimiter, trackSession, isMatch], async (req, res) => {
+handleUserEndpointRouter.get('/login', [rateLimiterLogin, trackSession, isMatch], async (req, res) => {
 	if (req.verified.valid) {
 		const { username } = req.headers
 		const ip = req.ip
-		console.log(true)
+
 		await updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
 
 		res.status(200).json({
@@ -439,20 +443,20 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 // authentication before access page
 // status checking while in app and got banned inside
-handleUserEndpointRouter.get('/auth/token', [rateLimiter, verify, heartbeat], async (req, res) => {
-	const { deviceId } = req.cookies
+handleUserEndpointRouter.get('/auth/token', [rateLimiterAuthen, verify, heartbeat], async (req, res) => {
+	const { sessionId } = req.cookies
 
 	if (req.verified.valid) {
 		// verify passes
 		// update session state
-		await loggedInSession(deviceId)
+		await loggedInSession(sessionId)
 
 		res.status(200).json({
 			valid: req.verified.valid,
 			deviceId: req.verified.deviceId
 		})
 	} else {
-		await logoutSession(deviceId)
+		await logoutSession(sessionId)
 		res.clearCookie('accessToken')
 		res.clearCookie('ghostKey')
 		res.status(401).json({
@@ -468,7 +472,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 	try {
 		if (req.verified.valid) {
 			const key = `logout-attempts:${req.ip}`
-			const lastReset = await redisClient.get(key)
+			const lastReset = await clientRedis.get(key)
 			const now = Date.now()
 
 			// Clear accessToken cookie
@@ -476,16 +480,17 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 			res.clearCookie('ghostKey')
 
 			// clear session that tied with uuid in database to available for next login
-			await deleteSession(req.headers.username, req.cookies.deviceId)
+			await deleteSession(req.cookies.sessionId, req.headers.username, req.cookies.deviceId)
 			await updateUserOneField(req.headers.username, { [`devices.${req.cookies.deviceId}`]: '' })
 
 			if (lastReset && now - lastReset < 30 * 1000) {
 				return res.status(429).json({ error: 'Too many logouts, try again later' })
 			}
 
-			await redisClient.set(key, now, EX, 60) // Store with expiry (1 min)
+			await clientRedis.SET(key, now, { EX: 60 }) // Store with expiry (1 min)
 
-			rateLimiter.resetKey(req.ip)
+			rateLimiterLogin.resetKey(req.ip)
+			rateLimiterAuthen.resetKey(req.ip)
 
 			// Respond with success
 			res.status(201).end()

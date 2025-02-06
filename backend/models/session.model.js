@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const sessionSchema = new Schema({
+  sessionId: {
+    type: String,
+    unique: true,
+    required: true
+  },
   attempts: {
     type: Number,
     required: true
@@ -26,9 +31,6 @@ const sessionSchema = new Schema({
     type: Boolean,
     required: true
   },
-  unlockAt: {
-    type: Date,
-  },
   createdAt: {
     type: Date,
     required: true
@@ -36,6 +38,10 @@ const sessionSchema = new Schema({
   expiresAt: {
     type: Date,
     required: true
+  },
+  unlockAt: {
+    type: Number || null,
+    default: null
   },
   checked: {
     type: Boolean,

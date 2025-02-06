@@ -89,13 +89,13 @@ const socket = async (server, options) => {
   const authHandshake = (socket, next) => {
     const username = socket.handshake.auth.username
     const userRole = socket.handshake.auth.role
-    const userUuid = socket.handshake.auth.uuid
-    if (!username || !userRole || !userUuid) {
+    const userDeviceId = socket.handshake.auth.deviceId
+    if (!username || !userRole || !userDeviceId) {
       return next(new Error('Unauthorized'))
     }
     socket.username = username
     socket.role = userRole
-    socket.uuid = userUuid
+    socket.deviceId = userDeviceId
     next()
   }
 
@@ -176,13 +176,13 @@ const socket = async (server, options) => {
 
       if (!currJoinChannel[username]) {
         currJoinChannel[username] = {}
-        currJoinChannel[username][socket.uuid] = null
+        currJoinChannel[username][socket.deviceId] = null
       }
 
       // send socket id back
       // in case user stay logged in (not log out request) will attached recently channel joined
       // if log out request it will cleared recent channel join
-      await socket.emit('getId', socket.id, currJoinChannel[username][socket.uuid])
+      await socket.emit('getId', socket.id, currJoinChannel[username][socket.deviceId])
 
       // send to all clients include yourself to lists user who online
       // include admin
@@ -242,8 +242,8 @@ const socket = async (server, options) => {
       }
     })
 
-    socket.on('joinChannel', async ([leaveChannel, targetChannel, uname, uuid]) => {
-      if (uuid !== socket.uuid || uname !== socket.username) return
+    socket.on('joinChannel', async ([leaveChannel, targetChannel, uname, deviceId]) => {
+      if (deviceId !== socket.deviceId || uname !== socket.username) return
 
       const chLeave = channels[leaveChannel]
       let chJoin = channels[targetChannel]
@@ -257,7 +257,7 @@ const socket = async (server, options) => {
       if (leaveChannel) {
         chLeave.count--
         // update users in channel
-        chLeave.users = chLeave.users.filter(user => user !== `${socket.uuid}:${socket.username}`)
+        chLeave.users = chLeave.users.filter(user => user !== `${socket.deviceId}:${socket.username}`)
 
         // leave from channel
         socket.leave(leaveChannel)
@@ -274,23 +274,23 @@ const socket = async (server, options) => {
         }
 
         // if users not in this channel
-        if (!chJoin.users.includes(`${socket.uuid}:${socket.username}`)) {
+        if (!chJoin.users.includes(`${socket.deviceId}:${socket.username}`)) {
 
           // increase amount
           chJoin.count++
 
-          // add user name with valud uuid
-          chJoin.users.push(`${socket.uuid}:${socket.username}`)
+          // add user name with valud deviceId
+          chJoin.users.push(`${socket.deviceId}:${socket.username}`)
         }
         // attach new channel joining
-        currJoinChannel[socket.username][socket.uuid] = targetChannel
+        currJoinChannel[socket.username][socket.deviceId] = targetChannel
 
         socket.join(targetChannel)
 
         // report to admin where are you now
         io.emit('whereUsersLive', {
           targetUsername: socket.username,
-          uuid: socket.uuid,
+          deviceId: socket.deviceId,
           leaveChannel: leaveChannel,
           targetChannel: targetChannel,
           currJoinChannel: currJoinChannel,
@@ -492,41 +492,45 @@ const socket = async (server, options) => {
     socket.on('forceUserLogout', (listsUsersTarget, username, role, reason) => {
       if (!adminConnected[username] || role !== handleValidate.role.admin) return
       listsUsersTarget.forEach(username => {
-        io.to(clientsConnected[username]).emit('forceLogout', reason)
+        io.to(adminConnected[username] ?? clientsConnected[username]).emit('forceLogout', reason)
       })
       // when force log users out, cron job will be emit socket name 'logout'
     })
 
-    socket.on('logout', (username, leaveChannel, uuid) => {
-      if (username !== socket.username || uuid !== socket.uuid) return
-
-      channels[leaveChannel].users = channels[leaveChannel].users.filter(uname => uname !== `${socket.uuid ?? uuid}:${socket.username ?? username}`)
-      channels[leaveChannel].count--
-
-      // report to admin
-      io.emit('whereUsersLive', {
-        targetUsername: socket.username ?? username,
-        uuid: socket.uuid ?? uuid,
-        leaveChannel: leaveChannel,
-        targetChannel: null,
-        clientsConnected: clientsConnected,
-        isLogOut: true
-      })
-
-      // then delete in mapping
-      delete loginName[clientsConnected[socket.username ?? username]]
-
-      // if admin logout
-      delete adminConnected[socket.username ?? username]
-      // if client logout
-      delete clientsConnected[socket.username ?? username]
-      delete currJoinChannel[socket.username ?? username][socket.uuid ?? uuid]
-
-      // broadcast who leaved
-      io.to(leaveChannel).emit('whoJustJoinedAndLeave', socket.username ?? username, false)
-
-      // to update online user lists
-      io.emit('usersOnline', Object.keys(clientsConnected))
+    socket.on('logout', (username, leaveChannel, deviceId) => {
+      try {
+        if (username !== socket.username || deviceId !== socket.deviceId) return
+  
+        channels[leaveChannel].users = channels[leaveChannel].users.filter(uname => uname !== `${socket.deviceId ?? deviceId}:${socket.username ?? username}`)
+        channels[leaveChannel].count--
+  
+        // then delete in mapping
+        delete loginName[clientsConnected[socket.username ?? username]]
+  
+        // if admin logout
+        delete adminConnected[socket.username ?? username]
+        // if client logout
+        delete clientsConnected[socket.username ?? username]
+        delete currJoinChannel[socket.username ?? username][socket.deviceId ?? deviceId]
+  
+        // report to admin
+        io.emit('whereUsersLive', {
+          targetUsername: socket.username ?? username,
+          deviceId: socket.deviceId ?? deviceId,
+          leaveChannel: leaveChannel,
+          targetChannel: null,
+          clientsConnected: clientsConnected,
+          isLogOut: true
+        })
+  
+        // broadcast who leaved
+        io.to(leaveChannel).emit('whoJustJoinedAndLeave', socket.username ?? username, false)
+  
+        // to update online user lists
+        io.emit('usersOnline', Object.keys(clientsConnected))
+      } catch (err) {
+        console.error(`Error socket logout: ${err}`)
+      }
     })
 
     socket.on('disconnect', () => {

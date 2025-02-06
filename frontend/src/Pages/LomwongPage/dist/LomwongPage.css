@@ -329,7 +329,7 @@ button {
   -o-user-select: none;
   user-select: none;
 }
-#asideProfile .profileUsername .uuid {
+#asideProfile .profileUsername .deviceId {
   font-size: 0.8em;
   color: #595959;
 }

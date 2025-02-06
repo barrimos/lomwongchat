@@ -8,6 +8,8 @@ const getRole = require('../../plugins/getRole')
 const handleValidate = require('../../plugins/handleValidate')
 const sessionModel = require('../../models/session.model')
 const verify = require('../../middlewares/verify')
+const { logoutSession } = require('../../plugins/handlerSession')
+const { logoutUserByUsername } = require('../../plugins/handlerUser')
 
 const resetBanned = async username => {
 	try {
@@ -28,6 +30,7 @@ const handleDataEndpointRouter = express.Router()
 handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 	// who request where access
 	const { username, access } = req.headers
+	const { deviceId, sessionId } = req.cookies
 	// optional fetch
 	const { topic, action } = req.params
 	// topic : action
@@ -64,8 +67,7 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 					&& userRole === handleValidate.role.admin
 				) {
 					// for admin role and request from adsysop page only
-					const usersData = await userModel.find(
-						{  },
+					const usersData = await userModel.find({},
 						{
 							dmLists: 0,
 							'issue.comment': 0,
@@ -77,7 +79,8 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 					)
 					const reportsData = await ticketModel.find({}, { _id: 0 })
 
-					const sessions = await sessionModel.find({},
+					const sessions = await sessionModel.find(
+						{},
 						{
 							attempts: 0,
 							createdAt: 0,
@@ -102,6 +105,8 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 			}
 		} catch (err) {
 			console.error(`Error fetch env: ${err}`)
+			await logoutSession(sessionId, deviceId, username)
+			await logoutUserByUsername(username, deviceId)
 			return res.status(400).json({ error: 'Error fetch environments' })
 		}
 
@@ -239,25 +244,24 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 
 		try {
 			if (topic === 'ssid') {
-				if (handleValidate.access[access] === handleValidate.access.adsysop && userRole === handleValidate.role.admin) {
-					const { data, uuid } = req.body
-					if (data.length < 1) {
+				const payload = JSON.parse(atob(req.cookies.accessToken.split('.')[1]))
+				if (handleValidate.access[access] === handleValidate.access.adsysop
+					&& userRole === handleValidate.role.admin && handleValidate.role.admin === payload.role
+				) {
+					const { ssid, deviceId } = req.body
+					if (ssid.length < 1) {
 						return res.status(400).json({ valid: false, error: 'Invalid delete data' })
 					}
 					if (action === 'delete') {
-						// cron job
-						// const now = new Date()
-						// await sessionModel.deleteMany({ expiresAt: { $lte: now } })
-
 						const success = await sessionModel.deleteMany(
-							{ sessionId: { $in: data } }
+							{ sessionId: { $in: ssid } }
 						)
 
 						if (success.deletedCount > 0) {
 							res.status(201).json({ valid: true, message: 'Delete sesion id complete' })
 
 							// delete session in cache
-							uuid.forEach(async id => {
+							deviceId.forEach(async id => {
 								await clientRedis.DEL(`session:${username}:${id}`)
 							})
 						} else {

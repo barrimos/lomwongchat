@@ -61,7 +61,7 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
     const newDataSelectChecked: { [key: string]: string[] | number } = {}
     sessionsListsPerPage.forEach(item => {
       item.checked = isChecked
-      newDataSelectChecked[item.uuid] = [item.sessionId, item.username]
+      newDataSelectChecked[item.deviceId] = [item.sessionId, item.username]
     })
 
     setSelectedSessionItems((prev: { [key: string]: string[] | number }) => {
@@ -72,7 +72,7 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
       } else {
         // Remove items if not checked
         sessionsListsPerPage.forEach(item => {
-          delete updatedData[item.uuid]
+          delete updatedData[item.deviceId]
         })
       }
 
@@ -81,13 +81,13 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
     })
   }
 
-  const hanlderSelectIndividualSessionItem = (e: ChangeEvent<HTMLInputElement>, sid: string, username: string, uuid: string, isChecked: boolean): void => {
+  const hanlderSelectIndividualSessionItem = (e: ChangeEvent<HTMLInputElement>, sid: string, username: string, deviceId: string, isChecked: boolean): void => {
     // add select items
     const newDataSelectChecked: { [key: string]: string[] } = {}
     sessionsListsPerPage.forEach(item => {
-      if (item.uuid === uuid && item.sessionId === sid && item.username === username) {
+      if (item.deviceId === deviceId && item.sessionId === sid && item.username === username) {
         item.checked = isChecked
-        newDataSelectChecked[item.uuid] = [item.sessionId, item.username]
+        newDataSelectChecked[item.deviceId] = [item.sessionId, item.username]
       }
     })
 
@@ -99,8 +99,8 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
       } else {
         // Remove items if not checked
         sessionsListsPerPage.forEach(item => {
-          if (item.uuid === uuid && item.sessionId === sid && item.username === username) {
-            delete updatedData[item.uuid]
+          if (item.deviceId === deviceId && item.sessionId === sid && item.username === username) {
+            delete updatedData[item.deviceId]
           }
         })
       }
@@ -121,13 +121,13 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
         usernameListsToDelete.push(item[1])
       }
     })
-    const uuidListsToDelete = Object.keys(selectedSessionItems).filter(key => key !== 'length')
+    const deviceIdListsToDelete = Object.keys(selectedSessionItems).filter(key => key !== 'length')
 
     try {
       const isSuccess: { data: { valid: boolean, message: string } } = await axios.post(`${server}/data/ssid/delete`,
         {
-          data: ssidListsToDelete,
-          uuid: uuidListsToDelete
+          ssid: ssidListsToDelete,
+          deviceId: deviceIdListsToDelete
         },
         {
           headers: {
@@ -298,14 +298,14 @@ const SessionManage = (props: SessionManageTypes): JSX.Element => {
                                   id={item.sessionId}
                                   className='checkItem'
                                   checked={item.checked}
-                                  onChange={(e: ChangeEvent<HTMLInputElement>) => hanlderSelectIndividualSessionItem(e, item.sessionId, item.username, item.uuid, e.target.checked)}
+                                  onChange={(e: ChangeEvent<HTMLInputElement>) => hanlderSelectIndividualSessionItem(e, item.sessionId, item.username, item.deviceId, e.target.checked)}
                                 />
                               </td>
                               <td colSpan={1} className='sidUsername'>
                                 <i className={`fa ${item.isLoggedIn ? 'fa-circle loggedin' : 'fa-circle-o loggedoff'}`}></i>
                                 <span>{item.username}</span>
                               </td>
-                              <td colSpan={2} className='sidUuid'>{item.uuid}</td>
+                              <td colSpan={2} className='sidUuid'>{item.deviceId}</td>
                               <td colSpan={2} className='sidId'>{item.sessionId}</td>
                               <td colSpan={2} className='sidAgent'>{item.agent}</td>
                               <td colSpan={2} className='sidIp'>{item.ip}</td>

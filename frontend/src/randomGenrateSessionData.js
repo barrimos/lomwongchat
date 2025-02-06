@@ -38,4 +38,6 @@ const generateSessionData = (count = 50) => {
   return sessions;
 };
 
-console.log(JSON.stringify(generateSessionData(), null, 2));
+// console.log(JSON.stringify(generateSessionData(), null, 2));
+
+console.log(generateRandomString(128))

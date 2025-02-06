@@ -65,16 +65,13 @@ const decrypt = (encrypt, key, iv, isSalt = false) => {
 			.digest('base64')
 			.substr(0, 32)
 
-		const ivMaster = Buffer.from(iv, 'hex')
+		const ivMaster = Buffer.from(iv)
 
 		const decipher = crypto.createDecipheriv('aes-256-cbc', keyMaster, ivMaster)
 
 		// Decrypt the data
 		let decrypted = decipher.update(code, 'hex', 'utf8')
 		decrypted += decipher.final('utf8')
-
-		// Attach the decrypted data to the request object
-		return decrypted
 	} catch (err) {
 		console.error('Decryption error:', err)
 		throw err

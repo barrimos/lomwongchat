@@ -326,11 +326,11 @@ const LoginPage = (): JSX.Element => {
       const response: AxiosResponse = await axios.get(`${server}/general/gen`,
         { withCredentials: true }
       )
-      if (response.data.state.isLoggedIn) {
+      if (response.data.state.isLoggedIn && response.data.state.username === inputUsername) {
         setStayLoggedIn([response.data.state.username, response.data.state.isLoggedIn])
+      } else { 
+        setCaptcha(await response.data.captcha)
       }
-
-      setCaptcha(await response.data.captcha)
     }
     genCaptcha()
 
