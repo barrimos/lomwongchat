@@ -1,6 +1,7 @@
 # LOMWONG CHAT (ล้อมวงคุย)
 - [LOMWONG CHAT (ล้อมวงคุย)](#lomwong-chat-ล้อมวงคุย)
   - [Describe](#describe)
+  - [Disclaimer](#disclaimer)
   - [Concept](#concept)
   - [Versions 1.0.0a](#versions-100a)
   - [Stacks](#stacks)
@@ -18,12 +19,16 @@
 ## Describe
 is a real-time chatting web application designed to facilitate seamless communication between users. It supports both one-to-one and one-to-many chat rooms, allowing users to create global rooms, search for rooms and usernames, and interact with various chat features.
 
+## Disclaimer
+Since this web application is my `practice project`, so I've use many machanism techniques for `practice to learn`
+`"What Why How When and Where"` to someday I can can use it for best situation to use it.
+
 ## Concept
 __Gather 'round, folks! I've got a story to tell__
 `Lomwong Chat` in Thai, which translates to `Campfire Chat` in English, evokes a warm and cozy atmosphere where people `gather around` a campfire to share stories, ideas, and experiences and mysteries stories.
 
 ## Versions 1.0.0a
-**Note:** This web application is a `programming practice project.`
+**Note**: This web application is a `programming practice project.`
 The code may not follow best practices,
 but efforts will be made to improve and refine it over time.</br>
 **Duration development** 7 ~ 8 months (or more than that + 1) 😭
