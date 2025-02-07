@@ -19,7 +19,7 @@ const app = express()
 
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
-  : ['https://lomwongchat.vercel.app', 'https://lomwongchat.onrender.com', 'http://localhost:3000', 'http://127.0.0.1:3000']
+  : ['https://lomwongchat.vercel.app', 'https://lomwongchat.onrender.com']
 
 const corsOptions = {
   origin: function (origin, callback) {
