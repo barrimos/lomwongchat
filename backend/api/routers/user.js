@@ -8,7 +8,7 @@ const clientRedis = require('../../redis/redisServer')
 
 // middlewares
 const verify = require('../../middlewares/verify')
-const { rateLimiterLogin, rateLimiterAuthen } = require('../../middlewares/rateLimit')
+const { rateLimiterLogin, rateLimiterAuthen, rateLimiterRegistration } = require('../../middlewares/rateLimit')
 const { encrypt } = require('../../plugins/cipher')
 const heartbeat = require('../../middlewares/heartbeat')
 const handlerError = require('../../middlewares/handlerError')
@@ -238,7 +238,7 @@ const isMatch = async (req, res, next) => {
 
 const handleUserEndpointRouter = express.Router()
 
-handleUserEndpointRouter.post('/regisUsers', async (req, res) => {
+handleUserEndpointRouter.post('/regisUsers', rateLimiterRegistration, async (req, res) => {
 	const data = {
 		username: '',
 		password: '',
@@ -310,7 +310,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 	const { action } = req.params
 	const { issueCode, accessToken } = req.cookies
 
-	if (!username || !handleValidate.access[access] || handleValidate.access[access] !== handleValidate.access.lomwong) {
+	if (!username || !handleValidate.access[access]) {
 		console.error('Error username not found or invalid access type')
 		return res.status(401).json({ valid: false, error: 'Invalid credentials' })
 	}

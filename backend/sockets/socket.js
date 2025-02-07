@@ -38,15 +38,6 @@ const socket = async (server, options) => {
 
   const cronJobSaveChatLogs = async () => {
     try {
-      // // Get all active rooms from Redis
-      // let allChannels = await clientRedis.LRANGE('channels', 0, -1)
-
-      // // If no rooms are found in cache, retrieve from database
-      // if (!allChannels || allChannels.length === 0) {
-      //   const dbRooms = await channelModel.find({}, { room: 1, _id: 0 })
-      //   allChannels = dbRooms.map(item => item.room)
-      // }
-
       for (const room in flag) {
         // Skip rooms with no updates
         // flag[room][0] room has changes update ?
@@ -500,19 +491,20 @@ const socket = async (server, options) => {
     socket.on('logout', (username, leaveChannel, deviceId) => {
       try {
         if (username !== socket.username || deviceId !== socket.deviceId) return
-  
+
         channels[leaveChannel].users = channels[leaveChannel].users.filter(uname => uname !== `${socket.deviceId ?? deviceId}:${socket.username ?? username}`)
         channels[leaveChannel].count--
-  
+
         // then delete in mapping
         delete loginName[clientsConnected[socket.username ?? username]]
-  
+
         // if admin logout
-        delete adminConnected[socket.username ?? username]
-        // if client logout
-        delete clientsConnected[socket.username ?? username]
+        adminConnected[socket.username ?? username]
+          ? delete adminConnected[socket.username ?? username]
+          : delete clientsConnected[socket.username ?? username]
+
         delete currJoinChannel[socket.username ?? username][socket.deviceId ?? deviceId]
-  
+
         // report to admin
         io.emit('whereUsersLive', {
           targetUsername: socket.username ?? username,
@@ -522,10 +514,10 @@ const socket = async (server, options) => {
           clientsConnected: clientsConnected,
           isLogOut: true
         })
-  
+
         // broadcast who leaved
         io.to(leaveChannel).emit('whoJustJoinedAndLeave', socket.username ?? username, false)
-  
+
         // to update online user lists
         io.emit('usersOnline', Object.keys(clientsConnected))
       } catch (err) {

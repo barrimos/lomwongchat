@@ -4,8 +4,9 @@ const handleGeneralEndpointRouter = express.Router()
 const nodeCrypto = require('node:crypto')
 const { encrypt } = require('../../plugins/cipher')
 const { findSessionWithProjection } = require('../../plugins/handlerSession')
+const { rateLimiterPreventRefreshLoginPage } = require('../../middlewares/rateLimit')
 
-handleGeneralEndpointRouter.get('/:action', async (req, res) => {
+handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, async (req, res) => {
 	const { action } = req.params
 	const { username } = req.headers
 	const { deviceId, sessionId, captcha } = req.cookies
