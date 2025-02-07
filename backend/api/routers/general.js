@@ -28,7 +28,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+					sameSite: 'Lax'
 				}
 			)
 
@@ -74,7 +74,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 			res.cookie('sessionId', sessionId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				sameSite: 'Lax',
 				maxAge: 86400000
 			})
 		}
