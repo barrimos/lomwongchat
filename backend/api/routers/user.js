@@ -50,7 +50,7 @@ const trackSession = async (req, res, next) => {
 			res.cookie('deviceId', deviceId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'None',
+				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				maxAge: 86400000,
 			})
 			req.deviceId = deviceId
@@ -71,7 +71,7 @@ const trackSession = async (req, res, next) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -79,7 +79,7 @@ const trackSession = async (req, res, next) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -182,7 +182,7 @@ const isMatch = async (req, res, next) => {
 			{
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'None',
+				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
@@ -191,7 +191,7 @@ const isMatch = async (req, res, next) => {
 		res.cookie('accessToken', user.token.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'None',
+			sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 			maxAge: 86400000, // 1 day
 		})
 
@@ -413,7 +413,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-				sameSite: 'None', // Allow cross-origin in production
+				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Allow cross-origin in production
 				maxAge: 86400000
 			})
 
@@ -482,7 +482,7 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiterAuthen, verify, heartbea
 			{
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'None',
+				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
@@ -490,7 +490,7 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiterAuthen, verify, heartbea
 			{
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'None',
+				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
@@ -515,7 +515,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -523,7 +523,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
 			)

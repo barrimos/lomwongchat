@@ -1,6 +1,7 @@
 const handlerError = require('../middlewares/handlerError')
 const SessionModel = require('../models/session.model')
 const { updateUserOneField } = require('./handlerUser')
+const handleValidate = require('./handleValidate')
 
 const findSessionWithProjection = async (sessionId, deviceId, username, projection) => {
   if (!sessionId || !deviceId) return new Error('Missing query')
@@ -180,7 +181,7 @@ const handlerSessionFailed = async (req, res, next, sessionId, deviceId, usernam
     {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       path: '/'
     }
   )
@@ -188,7 +189,7 @@ const handlerSessionFailed = async (req, res, next, sessionId, deviceId, usernam
     {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       path: '/'
     }
   )

@@ -20,7 +20,7 @@ const heartbeat = async (req, res, next) => {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
         path: '/'
       }
     )
@@ -28,7 +28,7 @@ const heartbeat = async (req, res, next) => {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
         path: '/'
       }
     )
@@ -47,7 +47,7 @@ const heartbeat = async (req, res, next) => {
           {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'None',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
             path: '/'
           }
         )
@@ -55,7 +55,7 @@ const heartbeat = async (req, res, next) => {
           {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'None',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
             path: '/'
           }
         )
@@ -83,7 +83,7 @@ const heartbeat = async (req, res, next) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
       )
@@ -91,7 +91,7 @@ const heartbeat = async (req, res, next) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'None',
+					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 					path: '/'
 				}
       )
