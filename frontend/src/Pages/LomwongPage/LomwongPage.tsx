@@ -302,7 +302,8 @@ const LomwongPage = (props: Props): JSX.Element => {
     } catch (err) {
       console.error(err)
     }
-    socket.emit('logout', yourName, currChannel, deviceId)
+
+    socket.emit('logout', yourName, currChannel || sessionStorage.getItem('channel'), deviceId || localStorage.getItem('deviceId')!.slice(0, 8))
     sessionStorage.clear()
     localStorage.clear()
     socket.disconnect()

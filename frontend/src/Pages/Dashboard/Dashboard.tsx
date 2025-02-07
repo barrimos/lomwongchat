@@ -299,7 +299,7 @@ const Dashboard = (props: Props) => {
         socket.emit('forceUserLogout', [user.username], username, adminRole, 'You was banned, Login again')
       })
       .catch(err => {
-        withReactContent(Swal).fire(err)
+        withReactContent(Swal).fire(err.response.data.error)
       })
   }
 

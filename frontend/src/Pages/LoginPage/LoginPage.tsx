@@ -323,13 +323,20 @@ const LoginPage = (): JSX.Element => {
   useEffect(() => {
 
     const genCaptcha = async (): Promise<void> => {
-      const response: AxiosResponse = await axios.get(`${server}/general/gen`,
-        { withCredentials: true }
-      )
-      if (response.data.state.isLoggedIn && response.data.state.username === inputUsername) {
-        setStayLoggedIn([response.data.state.username, response.data.state.isLoggedIn])
-      } else { 
-        setCaptcha(await response.data.captcha)
+      try {
+        const response: AxiosResponse = await axios.get(`${server}/general/gen`,
+          { withCredentials: true }
+        )
+        if (response.data.state.isLoggedIn && response.data.state.username === inputUsername) {
+          setStayLoggedIn([response.data.state.username, response.data.state.isLoggedIn])
+        } else { 
+          setCaptcha(await response.data.captcha)
+        }
+      } catch (err: any) {
+        console.log(err.response.data.error)
+        withReactContent(Swal).fire({
+          title: err.response.data.error
+        })
       }
     }
     genCaptcha()
