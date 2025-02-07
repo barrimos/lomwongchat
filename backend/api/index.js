@@ -9,9 +9,11 @@ const disputeResolution = require('./routers/disputeResolution')
 
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const session = require('express-session')
 const cors = require('cors')
 const ioconnect = require('../sockets/socket')
+const { default: mongoose } = require('mongoose')
+const config = require('../config')
+require('dotenv').config()
 
 const app = express()
 
@@ -44,7 +46,15 @@ app.use(cors(corsOptions))
 
 const server = http.createServer(app)
 
-require('dotenv').config()
+
+if (config.isVercel) {
+  app.use(async (req, res, next) => {
+    await mongoose.connect(config.mongoUri, config.mongoOptions)
+    next()
+  })
+}
+
+
 ioconnect(server, corsOptions)
 app.use(morgan('tiny'))
 app.use(cookieParser())
