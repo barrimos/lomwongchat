@@ -42,6 +42,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 
 	if (action === 'verifyCaptcha') {
 		const { inputcaptcha } = req.headers
+		if (!captcha || !inputcaptcha) return
 		const [stringCaptcha, signature] = captcha.split('.')
 		const validateSignature = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(stringCaptcha).digest('hex')
 
