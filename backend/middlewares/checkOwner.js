@@ -58,7 +58,14 @@ const checkOwner = async (req, res, next) => {
 	) {
 		if (payload.role !== handleValidate.role.admin) {
 			await logoutSession(sid)
-			res.clearCookie('accessToken')
+			res.clearCookie('accessToken',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
 		}
 		console.error('Error authenticate owner this page')
 		return handlerError(handleValidate.error.unauthorized, req, res, next)
@@ -87,7 +94,14 @@ const checkOwner = async (req, res, next) => {
 		} catch (err) {
 			if (payload.role !== handleValidate.role.admin) {
 				await logoutSession(sid)
-				res.clearCookie('accessToken')
+				res.clearCookie('accessToken',
+					{
+						httpOnly: true,
+						secure: process.env.NODE_ENV === 'production',
+						sameSite: 'None',
+						path: '/'
+					}
+				)
 			}
 			console.error(`Error fetch issue: ${err.message ?? err}`)
 			handleValidate.error.internal.message = 'Error fetch issue'
@@ -100,7 +114,14 @@ const checkOwner = async (req, res, next) => {
 	if (!cacheIssue.length || code !== cacheIssue[0].code || cacheIssue[0].status === false) {
 		if (payload.role !== handleValidate.role.admin) {
 			await logoutSession(sid)
-			res.clearCookie('accessToken')
+			res.clearCookie('accessToken',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
 		}
 		console.error('No issue data found or Incorrect data')
 		handleValidate.error.notFound.message = 'No issue data found or Incorrect data'

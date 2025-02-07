@@ -27,8 +27,22 @@ const customHandler = async (req, res) => {
     }
     // log out session
     await logoutSession(sessionId, deviceId, username)
-    res.clearCookie('accessToken')
-    res.clearCookie('ghostKey')
+    res.clearCookie('accessToken',
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None',
+        path: '/'
+      }
+    )
+    res.clearCookie('ghostKey',
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None',
+        path: '/'
+      }
+    )
     await logoutUserByUsername(username, deviceId)
 
     // Send a custom response and stop further middleware

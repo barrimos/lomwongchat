@@ -58,7 +58,7 @@ const verify = async (req, res, next) => {
       res.cookie('deviceId', deviceId ?? cacheDeviceId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Lax',
+        sameSite: 'None',
         maxAge: 86400000
       })
     }
@@ -161,7 +161,7 @@ const verify = async (req, res, next) => {
             httpOnly: true,
             // Use secure cookies in production
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Lax', // Allow cross-origin in production
+            sameSite: 'None', // Allow cross-origin in production
             maxAge: 86400000
           })
         }
@@ -222,7 +222,7 @@ const verify = async (req, res, next) => {
             res.cookie('accessToken', newToken.accessToken, {
               httpOnly: true,
               secure: process.env.NODE_ENV === 'production', // Use secure cookies in production, // Use secure cookies in production
-              sameSite: 'Lax', // Allow cross-origin in production
+              sameSite: 'None', // Allow cross-origin in production
               maxAge: 86400000
             })
           } else {

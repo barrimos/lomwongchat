@@ -176,8 +176,22 @@ const deleteSession = async (sessionId, username, deviceId) => {
 
 const handlerSessionFailed = async (req, res, next, sessionId, deviceId, username, errorName, isLogoutApp = false, isDeleteSession = false) => {
   await logoutSession(sessionId, deviceId, username)
-  res.clearCookie('accessToken')
-  res.clearCookie('ghostKey')
+  res.clearCookie('accessToken',
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
+      path: '/'
+    }
+  )
+  res.clearCookie('ghostKey',
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
+      path: '/'
+    }
+  )
 
   if (isLogoutApp) {
     await updateUserOneField(username, { [`devices.${deviceId}`]: '' })

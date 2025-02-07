@@ -28,7 +28,8 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 				{
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
-					sameSite: 'Lax'
+					sameSite: 'None',
+					path: '/'
 				}
 			)
 
@@ -53,7 +54,14 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 	}
 
 	if (action === 'getRemainsAttempts') {
-		res.clearCookie('captcha')
+		res.clearCookie('captcha',
+			{
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'None',
+				path: '/'
+			}
+		)
 		try {
 			// get attempts
 			const session = await findSessionWithProjection(sessionId, deviceId, username, { attempts: 1 })
@@ -74,7 +82,7 @@ handleGeneralEndpointRouter.get('/:action', async (req, res) => {
 			res.cookie('sessionId', sessionId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'Lax',
+				sameSite: 'None',
 				maxAge: 86400000
 			})
 		}

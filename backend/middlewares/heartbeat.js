@@ -16,8 +16,22 @@ const heartbeat = async (req, res, next) => {
   } catch (err) {
     console.error(`Error check state login: ${err}`)
     await logoutSession(sessionId, deviceId, username)
-    res.clearCookie('accessToken')
-    res.clearCookie('ghostKey')
+    res.clearCookie('accessToken',
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None',
+        path: '/'
+      }
+    )
+    res.clearCookie('ghostKey',
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None',
+        path: '/'
+      }
+    )
     handleValidate.error.notFound.message = 'Session timeout, Login again'
     return handlerError(handleValidate.error.notFound, req, res, next)
   }
@@ -29,8 +43,22 @@ const heartbeat = async (req, res, next) => {
         console.error('Error session doesn\'t exists')
         handleValidate.error.notFound.message = 'Session id not found'
         await logoutSession(sessionId, deviceId, username)
-        res.clearCookie('accessToken')
-        res.clearCookie('ghostKey')
+        res.clearCookie('accessToken',
+          {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'None',
+            path: '/'
+          }
+        )
+        res.clearCookie('ghostKey',
+          {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'None',
+            path: '/'
+          }
+        )
         return handlerError(handleValidate.error.notFound, req, res, next)
       }
 
@@ -51,8 +79,22 @@ const heartbeat = async (req, res, next) => {
     } catch (err) {
       console.error(`Error heartbeat check: ${err}`)
       await logoutSession(sessionId, deviceId, username)
-      res.clearCookie('accessToken')
-      res.clearCookie('ghostKey')
+      res.clearCookie('accessToken',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+      )
+      res.clearCookie('ghostKey',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+      )
       return handlerError(handleValidate.error.internal, req, res, next)
     }
   }

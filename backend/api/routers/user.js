@@ -50,7 +50,7 @@ const trackSession = async (req, res, next) => {
 			res.cookie('deviceId', deviceId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'Lax',
+				sameSite: 'None',
 				maxAge: 86400000,
 			})
 			req.deviceId = deviceId
@@ -67,8 +67,22 @@ const trackSession = async (req, res, next) => {
 		if (session.attempts <= 0 || session.unlockAt) {
 			// if exists and out of attempts
 			console.error('Session locked')
-			res.clearCookie('accessToken')
-			res.clearCookie('ghostKey')
+			res.clearCookie('accessToken',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
+			res.clearCookie('ghostKey',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
 			handleValidate.error.forbidden.message = 'Session locked. Contact supervisor'
 			return handlerError(handleValidate.error.forbidden, req, res, next)
 		}
@@ -164,13 +178,20 @@ const isMatch = async (req, res, next) => {
 
 		// credentials passes
 		// delete cookie captcha, didn't use it anymore
-		res.clearCookie('captcha')
+		res.clearCookie('captcha',
+			{
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'None',
+				path: '/'
+			}
+		)
 
 		// Set token in cookies
 		res.cookie('accessToken', user.token.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'Lax',
+			sameSite: 'None',
 			maxAge: 86400000, // 1 day
 		})
 
@@ -392,7 +413,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-				sameSite: 'Lax', // Allow cross-origin in production
+				sameSite: 'None', // Allow cross-origin in production
 				maxAge: 86400000
 			})
 
@@ -457,8 +478,22 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiterAuthen, verify, heartbea
 		})
 	} else {
 		await logoutSession(sessionId)
-		res.clearCookie('accessToken')
-		res.clearCookie('ghostKey')
+		res.clearCookie('accessToken',
+			{
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'None',
+				path: '/'
+			}
+		)
+		res.clearCookie('ghostKey',
+			{
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'None',
+				path: '/'
+			}
+		)
 		res.status(401).json({
 			valid: req.verified.valid,
 			error: req.verified.error,
@@ -476,8 +511,22 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 			const now = Date.now()
 
 			// Clear accessToken cookie
-			res.clearCookie('accessToken')
-			res.clearCookie('ghostKey')
+			res.clearCookie('accessToken',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
+			res.clearCookie('ghostKey',
+				{
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'None',
+					path: '/'
+				}
+			)
 
 			// clear session that tied with uuid in database to available for next login
 			await deleteSession(req.cookies.sessionId, req.headers.username, req.cookies.deviceId)
