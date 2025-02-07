@@ -50,7 +50,7 @@ const trackSession = async (req, res, next) => {
 			res.cookie('deviceId', deviceId, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'Lax',
+				sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
 				maxAge: 86400000,
 			})
 			req.deviceId = deviceId
@@ -170,7 +170,7 @@ const isMatch = async (req, res, next) => {
 		res.cookie('accessToken', user.token.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'Lax',
+			sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
 			maxAge: 86400000, // 1 day
 		})
 
@@ -392,7 +392,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-				sameSite: 'Lax', // Allow cross-origin in production
+				sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax', // Allow cross-origin in production
 				maxAge: 86400000
 			})
 
