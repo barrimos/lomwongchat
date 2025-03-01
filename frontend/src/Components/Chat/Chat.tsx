@@ -352,6 +352,7 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
         // adjust size display chat and position for input
         if (isKeyboardOpen) {
           displayChat.current!.style.height = `${newDisplayHeight}px`
+          displayChat.current!.style.cssText = `height: ${newDisplayHeight}px !important`
         } else {
           displayChat.current!.style.height = `${baseDisplayHeight}px`
         }

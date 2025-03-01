@@ -3,7 +3,7 @@
   - [Describe](#describe)
   - [Disclaimer](#disclaimer)
   - [Concept](#concept)
-  - [Versions 1.0.0a](#versions-100a)
+  - [Versions 1.0.1a](#versions-101a)
   - [Stacks](#stacks)
   - [Libraries](#libraries)
   - [Mechanism](#mechanism)
@@ -27,7 +27,8 @@ Since this web application is my `practice project`, so I've use many machanism 
 __Gather 'round, folks! I've got a story to tell__
 `Lomwong Chat` in Thai, which translates to `Campfire Chat` in English, evokes a warm and cozy atmosphere where people `gather around` a campfire to share stories, ideas, and experiences and mysteries stories.
 
-## Versions 1.0.0a
+## Versions 1.0.1a
+**1.0.1a**: fixed virtual keyboard overshadow should not overlay input chat field.
 **Note**: This web application is a `programming practice project.`
 The code may not follow best practices,
 but efforts will be made to improve and refine it over time.</br>
