@@ -78,6 +78,17 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
 
   const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
 
+  const handleDisplayChatDefaultHeightBase = () => {
+    const initNavHeight: number = 40
+    const mainInputWrapperHeight: number = 50
+    const heightDisplayChat =
+      id === 'dmDisplay'
+        ? parseInt(displayChat.current!.style.height)
+        : window.innerHeight
+    const baseDisplayHeight: number = heightDisplayChat - (initNavHeight + mainInputWrapperHeight)
+    displayChat.current!.style.height = `${baseDisplayHeight}px`
+  }
+
   const handleSubmitMessage = (e?: React.MouseEvent | React.TouchEvent): void => {
 
     if (/^\s*$/.test(inpMessage)) {
@@ -100,6 +111,11 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
 
     socket.emit('message', [bubble, isDm], role)
     setInpMessage('')
+
+    if (replyBubble) {
+      handleDisplayChatDefaultHeightBase()
+    }
+
     setReplyBubble(undefined)
     setCurrIdContext('')
 
@@ -161,6 +177,7 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
       }
     }
     setCloseContext(true)
+    inputWrapper.current ? (inputWrapper.current?.childNodes[0] as HTMLElement).focus() : <></>
   }
 
   const reportMessage = async (e: React.MouseEvent | React.TouchEvent, message: string, ...replies: string[]): Promise<void> => {
@@ -244,6 +261,8 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
         }
       }
     }
+    handleDisplayChatDefaultHeightBase()
+    inputWrapper.current ? (inputWrapper.current?.childNodes[0] as HTMLElement).focus() : <></>
   }
 
   useEffect(() => {
@@ -347,14 +366,13 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
             : window.innerHeight
 
         const newDisplayHeight: number = heightDisplayChat - (keyboardHeight + initNavHeight + mainInputWrapperHeight)
-        const baseDisplayHeight: number = heightDisplayChat - (initNavHeight + mainInputWrapperHeight)
 
         // adjust size display chat and position for input
         if (isKeyboardOpen) {
-          displayChat.current!.style.height = `${newDisplayHeight}px`
-          displayChat.current!.style.cssText = `height: ${newDisplayHeight}px !important`
+          displayChat.current!.style.height = `${newDisplayHeight - (replyBubble ? 50 : 0)}px`
+          displayChat.current!.style.cssText = `height: ${newDisplayHeight - (replyBubble ? 50 : 0)}px !important`
         } else {
-          displayChat.current!.style.height = `${baseDisplayHeight}px`
+          handleDisplayChatDefaultHeightBase()
         }
 
         if (viewport.offsetTop >= 0) {
@@ -379,7 +397,7 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
       window.visualViewport?.removeEventListener('resize', trackViewport)
       window.visualViewport?.addEventListener("scroll", trackViewport)
     }
-  }, [chatWrapper, displayChat, id, inputWrapper])
+  }, [chatWrapper, displayChat, id, inputWrapper, replyBubble])
 
 
 
