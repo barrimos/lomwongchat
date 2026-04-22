@@ -111,13 +111,6 @@ const isMatch = async (req, res, next) => {
 			handleValidate.error.forbidden.message = 'Invalid input or access type'
 			return handlerError(handleValidate.error.forbidden, req, res, next)
 		}
-		if (!deviceId) {
-			console.error('Device id not found')
-			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
-			handleValidate.error.unauthorized.remains = session.attempts
-			handleValidate.error.unauthorized.message = 'Device id not found, Login again'
-			return handlerError(handleValidate.error.unauthorized, req, res, next)
-		}
 
 		const userRole = await getRole(username)
 
@@ -134,8 +127,16 @@ const isMatch = async (req, res, next) => {
 		if (!user) {
 			console.error('No user found to verify credentials')
 			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
-			handleValidate.error.unauthorized.remains = session.attempts
+			handleValidate.error.unauthorized.remains = session?.attempts
 			handleValidate.error.unauthorized.message = 'Invalid credentials'
+			return handlerError(handleValidate.error.unauthorized, req, res, next)
+		}
+
+		if (!deviceId) {
+			console.error('Device id not found')
+			session = await updateSessionAttempts(sessionId, username, ip, deviceId)
+			handleValidate.error.unauthorized.remains = session.attempts
+			handleValidate.error.unauthorized.message = 'Device id not found, Login again'
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 

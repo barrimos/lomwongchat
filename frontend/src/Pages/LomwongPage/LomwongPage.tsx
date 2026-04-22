@@ -190,7 +190,7 @@ const LomwongPage = (props: Props): JSX.Element => {
       return [...prev, targetUser] // new dm list
     })
 
-    if (!isOpenDM && !document.querySelector(`.moda[data-receiver="${targetUser}"]`)) {
+    if (!isOpenDM && !document.querySelector(`.modal[data-receiver="${targetUser}"]`)) {
       // index 0 is who you want to talk to
       // index 1 is your name it for generate room name with index 0
       // automatic invitation to targetUser too but don't want users connect this room immediatly
