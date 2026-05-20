@@ -3,7 +3,7 @@
   - [Describe](#describe)
   - [Disclaimer](#disclaimer)
   - [Concept](#concept)
-  - [Versions 1.0.3a](#versions-103a)
+  - [Versions 1.0.4a](#versions-104a)
   - [Stacks](#stacks)
   - [Libraries](#libraries)
   - [Mechanism](#mechanism)
@@ -27,10 +27,11 @@ Since this web application is my `practice project`, so I've use many machanism 
 __Gather 'round, folks! I've got a story to tell__
 `Lomwong Chat` in Thai, which translates to `Campfire Chat` in English, evokes a warm and cozy atmosphere where people `gather around` a campfire to share stories, ideas, and experiences and mysteries stories.
 
-## Versions 1.0.3a
-- **1.0.3a**: rearrange login workflow, resolved stuck on loading screen (main cause is if database not have lobby channel it will not re-direct to main app)
-- **1.0.2a**: fixed virtual keyboard overshadow should not overlay input chat field and improve input chat field interaction more user-friendly by auto focus input box.
-- **1.0.1a**: fixed virtual keyboard overshadow should not overlay input chat field.
+## Versions 1.0.4a
+- **1.0.4a - 05/20/2026**: revised the login system to remove the CAPTCHA from the login page. When the server is inactive, generating and rendering the CAPTCHA image takes too long.
+- **1.0.3a - 04/22/2026**: rearrange login workflow, resolved stuck on loading screen (main cause is if database not have lobby channel it will not re-direct to main app).
+- **1.0.2a - 03/01/2025**: fixed virtual keyboard overshadow should not overlay input chat field and improve input chat field interaction more user-friendly by auto focus input box.
+- **1.0.1a - 03/01/2025**: fixed virtual keyboard overshadow should not overlay input chat field.
 
 **Note**: This web application is a `programming practice project.`
 The code may not follow best practices,
