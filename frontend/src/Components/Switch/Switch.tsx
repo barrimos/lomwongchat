@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
+import React, { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import './dist/Switch.css'
 
 interface Props {
@@ -18,19 +18,19 @@ interface Props {
 
 const Switch = ({ name, id, className, offValue, onValue, textOff, textOn, useOwnIcon: useIcon, onIcon, offIcon, setThemeSwitch }: Props) => {
 
-  const [switchValue, setSwitchValue] = useState<boolean>(false)
+  // const [switchValue, setSwitchValue] = useState<boolean>(false)
 
   const handleOnSwitchTheme = (e: ChangeEvent): void => {
     const target = e.target as HTMLInputElement
     if (target.checked) {
       target.parentElement!.style.transform = 'translateX(calc(100% - 3px))'
       setThemeSwitch!('')
-      setSwitchValue(target.checked)
+      // setSwitchValue(target.checked)
       target.setAttribute('ckecked', 'true')
     } else {
       target.parentElement!.style.transform = 'translateX(0)'
       setThemeSwitch!('light')
-      setSwitchValue(target.checked)
+      // setSwitchValue(target.checked)
       target.setAttribute('ckecked', 'false')
     }
   }

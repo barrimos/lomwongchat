@@ -3,7 +3,6 @@ import Button from '../Button/Button'
 import Menu from '../Menu/Menu'
 import './dist/Navbar.css'
 import { ExitRoomIcon } from '../Icons/ExitRoomIcon'
-import { Socket } from 'socket.io-client'
 
 type Props = {
   yourName: string | undefined

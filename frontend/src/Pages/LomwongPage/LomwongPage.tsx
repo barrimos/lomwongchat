@@ -39,8 +39,10 @@ const LomwongPage = (props: Props): JSX.Element => {
   const initialized = useRef(false)
   const navigate = useNavigate()
 
-  const { yourName, paramsChannel }: Readonly<Params<string>> = useParams()
-  const [userRole, setUserRole] = useState<string>('301')
+  const { yourName }: Readonly<Params<string>> = useParams()
+  // const { yourName, paramsChannel }: Readonly<Params<string>> = useParams()
+  const userRole = '301'
+  // const [userRole, setUserRole] = useState<string>('301')
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   const [isAuthen, setIsAuthen] = useState<boolean>(false)
@@ -434,7 +436,7 @@ const LomwongPage = (props: Props): JSX.Element => {
 
     const getNotification = async ([newMessage, isDm, channel]: [BubbleTypes['bubble'][], boolean, string]): Promise<void> => {
       const newMsg: BubbleTypes['bubble'][] = newMessage
-      newMsg.map((msg: BubbleTypes['bubble']) => {
+      newMsg.forEach((msg: BubbleTypes['bubble']) => {
 
         const sender: string = msg.username
 

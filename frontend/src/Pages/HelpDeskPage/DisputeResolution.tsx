@@ -17,7 +17,7 @@ const port = isProduction ? '' : ':8080'
 const url = isProduction ? process.env.REACT_APP_NODE_API : 'localhost'
 const server = `${protocol}${url}${port}`
 
-const patternUrl: RegExp = new RegExp(/https?:\/\/[a-z0-9A-Z]+\.[a-zA-Z]{2,}(\/[a-z0-9A-Z]+)*(\/)*((\?|\&)([a-z0-9A-Z]+(\={1,}\w+)?))*/g)
+const patternUrl: RegExp = new RegExp(/https?:\/\/[a-z0-9A-Z]+\.[a-zA-Z]{2,}(\/[a-z0-9A-Z]+)*(\/)*((\?|&)([a-z0-9A-Z]+(={1,}\w+)?))*/g)
 
 const DisputeResolution = () => {
   const { code, username, user }: Readonly<Params<string>> = useParams()

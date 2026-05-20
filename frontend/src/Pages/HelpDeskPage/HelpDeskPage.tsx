@@ -24,7 +24,7 @@ const HelpDeskPage = (props: Props) => {
   const navigatate = useNavigate()
   const params: Readonly<Params<string>> = useParams()
 
-  const [isMobileDevice, setIsMobileDevice] = useState<boolean>(false)
+  // const [isMobileDevice, setIsMobileDevice] = useState<boolean>(false)
   const [isAuthen, setIsAuthen] = useState<boolean>(false)
   const [inpSearchTicket, setInpSearchTicket] = useState<string>('')
   const [searchTicketResult, setSearchTicketResult] = useState<TicketBubbleTypes[]>([])
@@ -132,8 +132,8 @@ const HelpDeskPage = (props: Props) => {
           if (verified.data.valid) {
             setIsAuthen(verified.data.valid)
 
-            const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
-            setIsMobileDevice(isMobileSupported)
+            // const isMobileSupported: boolean = /android|iphone|kindle|ipad/i.test(navigator.userAgent)
+            // setIsMobileDevice(isMobileSupported)
 
             getReports()
 

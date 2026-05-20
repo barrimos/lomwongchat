@@ -138,11 +138,12 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
       // if menu context was opened at some bubble remove menu wrapper and then add menu context to new bubble called
       if (menu_context_opened !== null) {
         setReplyBubble(undefined)
-
-        if (toTopButton.current && toTopButton.current!.classList.contains('active')) {
-          if (displayChat.current!.scrollHeight > displayChat.current!.clientHeight * 2) {
-            if (displayChat.current!.scrollTop * 2 < displayChat.current!.scrollHeight * .9) {
-              toTopButton.current!.style.bottom = '60px'
+        const toTopButtonCurrent = toTopButton.current
+        const displayChatCurrent = displayChat.current
+        if (toTopButtonCurrent && toTopButtonCurrent!.classList.contains('active')) {
+          if (displayChatCurrent!.scrollHeight > displayChatCurrent!.clientHeight * 2) {
+            if (displayChatCurrent!.scrollTop * 2 < displayChatCurrent!.scrollHeight * .9) {
+              toTopButtonCurrent!.style.bottom = '60px'
             }
           }
         }
@@ -166,18 +167,20 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
       message: message.slice(0, 40) + '...' as string,
     }
     setReplyBubble(dataReply)
-
-    if (toTopButton.current && toTopButton.current!.classList.contains('active')) {
-      if (displayChat.current!.scrollHeight > displayChat.current!.clientHeight * 2) {
-        if (displayChat.current!.scrollTop * 2 < displayChat.current!.scrollHeight * .9) {
-          toTopButton.current!.style.bottom = '110px'
+    const toTopButtonCurrent = toTopButton.current
+    const displayChatCurrent = displayChat.current
+    const inputWrapperCurrent = inputWrapper.current
+    if (toTopButtonCurrent && toTopButtonCurrent!.classList.contains('active')) {
+      if (displayChatCurrent!.scrollHeight > displayChatCurrent!.clientHeight * 2) {
+        if (displayChatCurrent!.scrollTop * 2 < displayChatCurrent!.scrollHeight * .9) {
+          toTopButtonCurrent!.style.bottom = '110px'
         } else {
-          toTopButton.current!.style.bottom = '60px'
+          toTopButtonCurrent!.style.bottom = '60px'
         }
       }
     }
     setCloseContext(true)
-    inputWrapper.current ? (inputWrapper.current?.childNodes[0] as HTMLElement).focus() : <></>
+    inputWrapperCurrent ? (inputWrapperCurrent?.childNodes[0] as HTMLElement).focus() : <></>
   }
 
   const reportMessage = async (e: React.MouseEvent | React.TouchEvent, message: string, ...replies: string[]): Promise<void> => {
@@ -253,53 +256,57 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
 
   const closereplyForm = (e: React.MouseEvent | React.TouchEvent): void => {
     setReplyBubble(undefined)
-
-    if (toTopButton.current && toTopButton.current!.classList.contains('active')) {
-      if (displayChat.current!.scrollHeight > displayChat.current!.clientHeight * 2) {
-        if (displayChat.current!.scrollTop * 2 < displayChat.current!.scrollHeight * .9) {
-          toTopButton.current!.style.bottom = '60px'
+    const toTopButtonCurrent = toTopButton.current
+    const displayChatCurrent = displayChat.current
+    const inputWrapperCurrent = inputWrapper.current
+    if (toTopButtonCurrent && toTopButtonCurrent!.classList.contains('active')) {
+      if (displayChatCurrent!.scrollHeight > displayChatCurrent!.clientHeight * 2) {
+        if (displayChatCurrent!.scrollTop * 2 < displayChatCurrent!.scrollHeight * .9) {
+          toTopButtonCurrent!.style.bottom = '60px'
         }
       }
     }
     handleDisplayChatDefaultHeightBase()
-    inputWrapper.current ? (inputWrapper.current?.childNodes[0] as HTMLElement).focus() : <></>
+    inputWrapperCurrent ? (inputWrapperCurrent?.childNodes[0] as HTMLElement).focus() : <></>
   }
 
   useEffect(() => {
-    if (toTopButton.current?.classList.contains('active')) {
+    const toTopButtonCurrent = toTopButton.current
+    const chatWrapperCurrent = chatWrapper.current
+    if (toTopButtonCurrent?.classList.contains('active')) {
       if (replyBubble !== undefined) {
-        toTopButton.current!.style.bottom = '110px'
+        toTopButtonCurrent!.style.bottom = '110px'
       } else {
-        toTopButton.current!.style.bottom = '60px'
+        toTopButtonCurrent!.style.bottom = '60px'
       }
     }
 
     const activeScrollToToptn = (e: Event) => {
       e.preventDefault()
       e.stopPropagation()
-      if (chatWrapper.current!.scrollHeight - chatWrapper.current!.scrollTop - chatWrapper.current!.clientHeight > 1200) {
-        toTopButton.current!.classList.add('active')
+      if (chatWrapperCurrent!.scrollHeight - chatWrapperCurrent!.scrollTop - chatWrapperCurrent!.clientHeight > 1200) {
+        toTopButtonCurrent!.classList.add('active')
         if (replyBubble !== undefined) {
-          toTopButton.current!.style.bottom = '110px'
+          toTopButtonCurrent!.style.bottom = '110px'
         } else {
-          toTopButton.current!.style.bottom = '60px'
+          toTopButtonCurrent!.style.bottom = '60px'
         }
       } else {
-        toTopButton.current!.classList.remove('active')
-        toTopButton.current!.style.bottom = '5px'
+        toTopButtonCurrent!.classList.remove('active')
+        toTopButtonCurrent!.style.bottom = '5px'
       }
     }
 
     const scrollToTop = () => {
-      chatWrapper.current!.scrollTop = chatWrapper.current!.scrollHeight
+      chatWrapperCurrent!.scrollTop = chatWrapperCurrent!.scrollHeight
     }
 
-    toTopButton.current!.addEventListener('click', scrollToTop)
-    chatWrapper.current?.addEventListener('scroll', activeScrollToToptn)
+    toTopButtonCurrent!.addEventListener('click', scrollToTop)
+    chatWrapperCurrent?.addEventListener('scroll', activeScrollToToptn)
 
     return () => {
-      toTopButton.current!.removeEventListener('click', scrollToTop)
-      chatWrapper.current!.removeEventListener('scroll', activeScrollToToptn)
+      toTopButtonCurrent!.removeEventListener('click', scrollToTop)
+      chatWrapperCurrent!.removeEventListener('scroll', activeScrollToToptn)
     }
   }, [replyBubble])
 
@@ -354,37 +361,40 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
         // main inputWrapper
         const mainInputWrapperHeight: number = 50
         // padding modal
-        const paddingModal: number = 15
+        // const paddingModal: number = 15
+        let displayChatCurrent = displayChat.current
+        const inputWrapperCurrent = inputWrapper.current
+        const chatWrapperCurrent = chatWrapper.current
 
         if (id === 'dmDisplay') {
-          displayChat.current = (displayChat.current?.closest('.modal.dmModal')! as HTMLElement)
+          displayChatCurrent = (displayChatCurrent?.closest('.modal.dmModal')! as HTMLElement)
         }
 
         const heightDisplayChat =
           id === 'dmDisplay'
-            ? parseInt(displayChat.current!.style.height)
+            ? parseInt(displayChatCurrent!.style.height)
             : window.innerHeight
 
         const newDisplayHeight: number = heightDisplayChat - (keyboardHeight + initNavHeight + mainInputWrapperHeight)
 
         // adjust size display chat and position for input
         if (isKeyboardOpen) {
-          displayChat.current!.style.height = `${newDisplayHeight - (replyBubble ? 50 : 0)}px`
-          displayChat.current!.style.cssText = `height: ${newDisplayHeight - (replyBubble ? 50 : 0)}px !important`
+          displayChatCurrent!.style.height = `${newDisplayHeight - (replyBubble ? 50 : 0)}px`
+          displayChatCurrent!.style.cssText = `height: ${newDisplayHeight - (replyBubble ? 50 : 0)}px !important`
         } else {
           handleDisplayChatDefaultHeightBase()
         }
 
         if (viewport.offsetTop >= 0) {
           if (id === 'dmDisplay') {
-            displayChat.current!.style.transform = `translateY(${Math.min(0, viewport.offsetTop)}px)`
+            displayChatCurrent!.style.transform = `translateY(${Math.min(0, viewport.offsetTop)}px)`
           } else {
-            displayChat.current!.parentElement!.style.transform = `translateY(${Math.max(0, viewport.offsetTop)}px)`
+            displayChatCurrent!.parentElement!.style.transform = `translateY(${Math.max(0, viewport.offsetTop)}px)`
           }
         }
 
-        inputWrapper.current!.style.transform = 'translateY(0)'
-        chatWrapper.current!.scrollTop = chatWrapper.current!.scrollHeight
+        inputWrapperCurrent!.style.transform = 'translateY(0)'
+        chatWrapperCurrent!.scrollTop = chatWrapperCurrent!.scrollHeight
       })
     }
 

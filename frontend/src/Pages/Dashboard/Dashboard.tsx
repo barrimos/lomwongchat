@@ -68,7 +68,7 @@ const Dashboard = (props: Props) => {
   const [themeSwitch, setThemeSwitch] = useState<string>('light')
 
   const [sortedAsc, setSortedAsc] = useState<boolean>(true)
-  const [selectValue, setSelectValue] = useState<string>('')
+  // const [selectValue, setSelectValue] = useState<string>('')
 
   const [ticketsItems, setTicketsItems] = useState<TicketBubbleTypes[]>([])
   const [isTicketManageOpen, setIsTicketManageOpen] = useState<boolean>(false)
@@ -99,7 +99,7 @@ const Dashboard = (props: Props) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectValue(event.target.value) // Update the state with the selected value
+  //   setSelectValue(event.target.value) // Update the state with the selected value
   }
 
   const clearPM = async (e: React.MouseEvent | React.TouchEvent): Promise<void> => {
@@ -410,7 +410,8 @@ const Dashboard = (props: Props) => {
 
 
   const deleteTicket = async (e: MouseEvent | TouchEvent): Promise<void> => {
-    const { ticket, currStatus } = (e.currentTarget as HTMLButtonElement).dataset
+    const { ticket } = (e.currentTarget as HTMLButtonElement).dataset
+    // const { ticket, currStatus } = (e.currentTarget as HTMLButtonElement).dataset
     if (!ticket) return
 
     await axios.delete(`${server}/data/ticket/close`,
@@ -579,10 +580,9 @@ const Dashboard = (props: Props) => {
   useEffect(() => {
     const getNotification = ([newMessage, isDm, channel]: [BubbleTypes['bubble'][], boolean, string]) => {
       const newMsg: BubbleTypes['bubble'][] = newMessage
-      newMsg.map((msg: BubbleTypes['bubble']) => {
+      newMsg.forEach((msg: BubbleTypes['bubble']) => {
         const sender: string = msg.username
 
-        // show notification
         if (sender !== username && !isOpenDM && isDm && !document.querySelector(`.modal[data-receiver=${sender}`)) {
           setListsDM((prev: string[]) => {
             if (prev.includes(sender)) return prev
@@ -596,7 +596,6 @@ const Dashboard = (props: Props) => {
           socket.emit('saveNotiToCache', sender, username)
         }
       })
-
     }
 
     const getCacheNoti = (noti: { [key: string]: number }) => {
@@ -663,7 +662,7 @@ const Dashboard = (props: Props) => {
           if (!userChannels) return
 
           updatedSessions[uname] = []
-          Object.entries(userChannels).map(item => {
+          Object.entries(userChannels).forEach(item => {
             updatedSessions[uname].push([item[0], item[1]])
           })
         })
