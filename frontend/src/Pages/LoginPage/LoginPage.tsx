@@ -239,7 +239,7 @@ const LoginPage = (): JSX.Element => {
           :
           <div id='loginPageBody' className='d-flex justify-content-center align-items-center w-100'>
             {
-              <Form action='#' method='POST' className='form p-15 p-md-20' id='loginForm' head='LomWongChat' headClass='titleHead' subHead='Login' subHeadClass='subHead' target='_self' autoComplete='on'>
+              <Form action='#' method='POST' className='form p-15 p-md-20' id='loginForm' head='LomWongChat' headClass='titleHead' subHead='Keep the chat on fire!' subHeadClass='subHead' target='_self' autoComplete='on'>
                 <div className='inputWrapper'>
                   <Input
                     onChange={(e: ChangeEvent<HTMLInputElement>) => getInputValue(e, setInputUsername, 15)}
@@ -285,7 +285,7 @@ const LoginPage = (): JSX.Element => {
                       <></>
                   }
                 </div>
-                <div className='buttonWrapper d-block d-md-flex'>
+                <div className='buttonWrapper d-block'>
                   {
                     <>
                       {
@@ -306,8 +306,8 @@ const LoginPage = (): JSX.Element => {
                               type='button'
                               name='regis'
                               id='regisBtn'
-                              className='btn regisBtn formBtn mb-10 mb-md-0 ml-md-10'
-                              innerText='Register'
+                              className='btn regisBtn formBtn mb-10 mb-md-0'
+                              innerText='Not a member ? Register Now'
                             />
                           </>
                       }
