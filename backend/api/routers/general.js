@@ -21,6 +21,10 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 		console.error(`Error get login state: ${err}`)
 	}
 
+	if (action === 'healthz') {
+		res.status(200).end()
+	}
+
 	if (action === 'gen') {
 		try {
 			const strCaptcha = genNonce(6)

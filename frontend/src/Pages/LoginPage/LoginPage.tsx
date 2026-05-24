@@ -40,7 +40,12 @@ const LoginPage = (): JSX.Element => {
     setChecking(false)
   }
 
-  const handleLogin = async (): Promise<void> => {
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>): Promise<void> => {
+    // disable multiple click button login
+    e.preventDefault()
+    const button = e.currentTarget as HTMLButtonElement;
+    button.disabled = true // disable the button to prevent multiple clicks
+
     try {
       if (inputUsername.length < 3 || inputPassword.length < 3) {
         resetState()
@@ -152,6 +157,7 @@ const LoginPage = (): JSX.Element => {
               })
             }
           }
+          button.disabled = false
         })
       } else {
         withReactContent(Swal).fire({
@@ -163,10 +169,16 @@ const LoginPage = (): JSX.Element => {
       // reset all state
       setIsLoading(false)
       resetState()
+      button.disabled = false
     }
   }
 
-  const handleRegistration = async (): Promise<void> => {
+  const handleRegistration = async (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>): Promise<void> => {
+    // disable multiple click button registration
+    e.preventDefault()
+    const button = e.currentTarget as HTMLButtonElement;
+    button.disabled = true // disable the button to prevent multiple clicks
+
     if (pattern.test(inputUsername) || /\s+/g.test(inputPassword)) {
       withReactContent(Swal).fire('Username or Password is wrong condition')
       resetState()
@@ -206,6 +218,7 @@ const LoginPage = (): JSX.Element => {
           }
         })
     }
+    button.disabled = false
   }
 
   useEffect(() => {

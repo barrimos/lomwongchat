@@ -38,7 +38,12 @@ const LoginPageDashboard = () => {
 		await axios.get(`${server}/general/session`, { withCredentials: true })
 	}
 
-	const handlerVerifyAccess = async (): Promise<void> => {
+	const handlerVerifyAccess = async (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>): Promise<void> => {
+		// disable multiple click button login
+		e.preventDefault()
+		const button = e.currentTarget as HTMLButtonElement;
+		button.disabled = true // disable the button to prevent multiple clicks
+
 		try {
 			if (attempRemains! <= 0) {
 				reset()
@@ -81,11 +86,13 @@ const LoginPageDashboard = () => {
 						title: err.response.data.error
 					})
 					setAttempRemains(err.response.data.remains)
+					button.disabled = false
 				})
 		} catch (err: any) {
 			withReactContent(Swal).fire({
 				title: err.message ?? err.name ?? err.response.data.error ?? err
 			})
+			button.disabled = false
 		}
 	}
 
