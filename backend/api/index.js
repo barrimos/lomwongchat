@@ -21,24 +21,24 @@ const allowedOrigins = process.env.CORS_ORIGINS.split(',') // Convert the comma-
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log('Incoming Request Origin:', origin);
+    console.log('Incoming Request Origin:', origin)
     
     // IF ORIGIN IS UNDEFINED: Force it to assign your real frontend URL
     if (!origin) {
-      return callback(null, 'https://lomwongchat.vercel.app'); 
+      return callback(null, 'https://lomwongchat.vercel.app') 
     }
     
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
+      callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'))
     }
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'access', 'username', 'password', 'pairdeviceid', 'inputcaptcha'],
   credentials: true,
   optionsSuccessStatus: 200
-};
+}
 
 app.use(cors(corsOptions))
 app.options('*', cors(corsOptions))

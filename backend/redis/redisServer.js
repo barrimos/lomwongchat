@@ -1,10 +1,25 @@
-const redis = require('redis')
-const REDIS_PORT = 6379
-const option = process.env.NODE_ENV === 'production' ? { url: process.env.UPSTASH_REDIS_REST_URL } : { port: REDIS_PORT }
-const client = redis.createClient(option)
+const process = require('process')
 
-client.connect()
-client.on('connect', () => console.log('Redis Client Connected'))
-client.on('error', (err) => console.log('Redis Client Connection Error', err))
+let client
+
+if (process.env.NODE_ENV === 'production') {
+  // Production: Use HTTP REST SDK designed for Vercel
+  const { Redis } = require('@upstash/redis')
+  
+  client = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  })
+  
+  console.log('Redis Client Configured (HTTP REST for Production)')
+} else {
+  // Local: Use standard TCP connection
+  const redis = require('redis')
+  client = redis.createClient({ url: 'redis://localhost:6379' })
+  
+  client.connect()
+    .then(() => console.log('Local Redis Client Connected'))
+    .catch((err) => console.error('Local Redis Connection Error', err))
+}
 
 module.exports = client
