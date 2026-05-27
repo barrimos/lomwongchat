@@ -38,7 +38,7 @@ const heartbeat = async (req, res, next) => {
 
   if (req.verified.extend) {
     try {
-      const isExists = await clientRedis.EXISTS(`session:${username}:${sessionId}`)
+      const isExists = await clientRedis.exists(`session:${username}:${sessionId}`)
       if (!isExists) {
         console.error('Error session doesn\'t exists')
         handleValidate.error.notFound.message = 'Session id not found'
@@ -64,7 +64,7 @@ const heartbeat = async (req, res, next) => {
 
       // reset session TTL in cache
       console.log(`Session ${username}:${sessionId} TTL in cache reset`)
-      await clientRedis.EXPIRE(`session:${username}:${sessionId}`, 1800) // 30 minutes
+      await clientRedis.expire(`session:${username}:${sessionId}`, 1800) // 30 minutes
 
       // update expire time in database
       const newExpiresAt = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes

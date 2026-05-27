@@ -341,7 +341,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 		// get data from cache
 		try {
-			cacheUser = await clientRedis.json.GET('users', { path: `$.${username}` })
+			cacheUser = await clientRedis.json.get('users', { path: `$.${username}` })
 			// in case user not found return empty array []
 		} catch (err) {
 			console.error('Error get caching user', err)
