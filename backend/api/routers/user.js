@@ -23,11 +23,12 @@ const getRole = require('../../plugins/getRole')
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
 const validateInput = async (req, res, next) => {
-	const { username, password } = req.headers
+	const { username, password } = await req.headers
 	
 	if (!username || !password) {
 		return res.status(400).json({ error: 'Missing username or password field' })
 	}
+	next()
 }
 
 const trackSession = async (req, res, next) => {
@@ -291,7 +292,7 @@ handleUserEndpointRouter.post('/regisUsers', [validateInput, rateLimiterRegistra
 	}
 })
 
-handleUserEndpointRouter.get('/login', [validateInput, rateLimiterLogin, trackSession, isMatch], async (req, res) => {
+handleUserEndpointRouter.get('/login', [rateLimiterLogin, trackSession, isMatch], async (req, res) => {
 	if (req.verified.valid) {
 		const { username } = req.headers
 		const ip = req.ip
