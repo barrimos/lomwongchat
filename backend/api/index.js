@@ -37,6 +37,7 @@ const corsOptions = {
   optionsSuccessStatus: 200 // Fixes older browser/legacy issues with OPTIONS
 }
 
+app.use(cors(corsOptions))
 app.options('*', cors(corsOptions))
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
@@ -45,7 +46,6 @@ app.use((req, res, next) => {
     next()
   }
 })
-app.use(cors(corsOptions))
 
 const server = http.createServer(app)
 
