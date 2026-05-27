@@ -171,7 +171,7 @@ const isMatch = async (req, res, next) => {
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 
-		const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
+		const isRevoked = await clientRedis.get(`revoke:token:${user.token.accessToken}`)
 		const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
 		const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
 
@@ -211,16 +211,16 @@ const isMatch = async (req, res, next) => {
 
 		try {
 			// nonce
-			await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+			await clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
 			try {
 				// user's data
-				await clientRedis.json.SET('users', `$.${username}`, user)
+				await clientRedis.json.set('users', `$.${username}`, user)
 			} catch (err) {
 				if (err.toString() === 'Error: ERR new objects must be created at the root') {
 					try {
-						await clientRedis.json.SET('users', '$', {})
-						await clientRedis.json.SET('users', `$.${username}`, user)
+						await clientRedis.json.set('users', '$', {})
+						await clientRedis.json.set('users', `$.${username}`, user)
 					} catch (err) {
 						console.error('Error set new key')
 					}
@@ -231,7 +231,7 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			await clientRedis.SET(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
@@ -333,7 +333,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			const isKeyExist = await clientRedis.exists('users')
 			if (!isKeyExist) {
 				// create new key
-				await clientRedis.json.SET('users', '$', {})
+				await clientRedis.json.set('users', '$', {})
 			}
 		} catch (err) {
 			console.error(`Error check exist key: ${err}`)
@@ -411,7 +411,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		if (flag) {
 			try {
 				// caching new data
-				await clientRedis.json.SET('users', `$.${username}`, cacheUser[0])
+				await clientRedis.json.set('users', `$.${username}`, cacheUser[0])
 			} catch (err) {
 				console.error('Error caching user data:', err)
 			}
@@ -450,7 +450,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 				const success = await updateUserOneField(user.username, { status: statusName })
 
 				try {
-					await clientRedis.json.SET('users', `$.${user.username}.status`, statusName)
+					await clientRedis.json.set('users', `$.${user.username}.status`, statusName)
 				} catch (err) {
 					console.error(`Error update user's status: ${err}`)
 				}
@@ -546,7 +546,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 				return res.status(429).json({ error: 'Too many logouts, try again later' })
 			}
 
-			await clientRedis.SET(key, now, { EX: 60 }) // Store with expiry (1 min)
+			await clientRedis.set(key, now, { EX: 60 }) // Store with expiry (1 min)
 
 			rateLimiterLogin.resetKey(req.ip)
 			rateLimiterAuthen.resetKey(req.ip)
