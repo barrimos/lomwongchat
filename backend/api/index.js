@@ -21,15 +21,20 @@ const allowedOrigins = process.env.CORS_ORIGINS.split(',') // Convert the comma-
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Log the incoming origin to your Vercel server console so you can inspect it
+    console.log("Incoming Request Origin:", origin);
+    
+    // Allow server-to-server, Postman, or matched frontend origins
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error(`CORS Blocked: ${origin} is not in allowed list`));
     }
   },
-  methods: 'OPTIONS, GET, POST, PUT, PATCH, DELETE',
-  allowedHeaders: 'Content-Type, access, username, password, pairdeviceid, inputcaptcha',
-  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'access', 'username', 'password', 'pairdeviceid', 'inputcaptcha'],
+  credentials: true, // REQUIRED for your cookie-based auth
+  optionsSuccessStatus: 200 // Fixes older browser/legacy issues with OPTIONS
 }
 
 app.options('*', cors(corsOptions))
