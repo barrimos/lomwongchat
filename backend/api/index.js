@@ -17,9 +17,7 @@ require('dotenv').config()
 
 const app = express()
 
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
-  : ['https://lomwongchat.vercel.app', 'https://lomwongchat.onrender.com']
+const allowedOrigins = process.env.CORS_ORIGINS.split(',') // Convert the comma-separated string to an array
 
 const corsOptions = {
   origin: function (origin, callback) {

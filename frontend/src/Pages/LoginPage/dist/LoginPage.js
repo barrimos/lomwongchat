@@ -45,6 +45,7 @@ var Input_1 = require("../../Components/Input/Input");
 var Button_1 = require("../../Components/Button/Button");
 var Form_1 = require("../../Components/Form/Form");
 var Loader_1 = require("../../Components/Loader/Loader");
+var CookieConsent_1 = require("../../Components/CookieConsent/CookieConsent");
 require("./dist/LoginPage.css");
 var getInputValue_1 = require("../../utils/getInputValue");
 var isProduction = process.env.REACT_APP_NODE_ENV === 'production';
@@ -308,27 +309,29 @@ var LoginPage = function () {
             setPasswordValidatedChecked(false);
         }
     }, [inputUsername, inputPassword]);
-    return (React.createElement(React.Fragment, null, isLoading ?
-        React.createElement(Loader_1["default"], null)
-        :
-            React.createElement("div", { id: 'loginPageBody', className: 'd-flex justify-content-center align-items-center w-100' }, React.createElement(Form_1["default"], { action: '#', method: 'POST', className: 'form p-15 p-md-20', id: 'loginForm', head: 'LomWongChat', headClass: 'titleHead', subHead: 'Keep the chat on fire!', subHeadClass: 'subHead', target: '_self', autoComplete: 'on' },
-                React.createElement("div", { className: 'inputWrapper' },
-                    React.createElement(Input_1["default"], { onChange: function (e) { return getInputValue_1.getInputValue(e, setInputUsername, 15); }, type: 'text', name: 'inpUsername', value: inputUsername || '', min: '3', max: '15', id: 'inpUsername', className: 'inp inpUsername posRe', placeHolder: '', useLabel: true, labelText: 'Username', labelId: 'labelUsername', labelClass: 'labelUsername', required: true }),
-                    usernameValidatedChecked ?
-                        React.createElement("i", { className: 'fa fa-check-circle validatedChecked' })
+    return (React.createElement(React.Fragment, null,
+        isLoading ?
+            React.createElement(Loader_1["default"], null)
+            :
+                React.createElement("div", { id: 'loginPageBody', className: 'd-flex justify-content-center align-items-center w-100' }, React.createElement(Form_1["default"], { action: '#', method: 'POST', className: 'form p-15 p-md-20', id: 'loginForm', head: 'LomWongChat', headClass: 'titleHead', subHead: 'Keep the chat on fire!', subHeadClass: 'subHead', target: '_self', autoComplete: 'on' },
+                    React.createElement("div", { className: 'inputWrapper' },
+                        React.createElement(Input_1["default"], { onChange: function (e) { return getInputValue_1.getInputValue(e, setInputUsername, 15); }, type: 'text', name: 'inpUsername', value: inputUsername || '', min: '3', max: '15', id: 'inpUsername', className: 'inp inpUsername posRe', placeHolder: '', useLabel: true, labelText: 'Username', labelId: 'labelUsername', labelClass: 'labelUsername', required: true }),
+                        usernameValidatedChecked ?
+                            React.createElement("i", { className: 'fa fa-check-circle validatedChecked' })
+                            :
+                                React.createElement(React.Fragment, null)),
+                    React.createElement("div", { className: 'inputWrapper' },
+                        React.createElement(Input_1["default"], { onChange: function (e) { return getInputValue_1.getInputValue(e, setInputPassword, 20); }, type: toggleShowHide ? 'text' : 'password', name: 'inpPassword', value: inputPassword || '', id: 'inpPassword', className: 'inp inpPassword', placeHolder: '', useLabel: true, labelText: 'Password', labelId: 'labelPassword', labelClass: 'labelPassword', useShowHide: [true, setToggleShowHide], required: true }),
+                        passwordValidatedChecked ?
+                            React.createElement("i", { className: 'fa fa-check-circle passValidatedChecked' })
+                            :
+                                React.createElement(React.Fragment, null)),
+                    React.createElement("div", { className: 'buttonWrapper d-block' }, React.createElement(React.Fragment, null, checking ?
+                        React.createElement(Button_1["default"], { type: 'button', name: 'checking', id: 'checkingBtn', className: 'btn checkingBtn formBtn mb-10 mb-md-0', innerText: 'checking', disabled: true })
                         :
-                            React.createElement(React.Fragment, null)),
-                React.createElement("div", { className: 'inputWrapper' },
-                    React.createElement(Input_1["default"], { onChange: function (e) { return getInputValue_1.getInputValue(e, setInputPassword, 20); }, type: toggleShowHide ? 'text' : 'password', name: 'inpPassword', value: inputPassword || '', id: 'inpPassword', className: 'inp inpPassword', placeHolder: '', useLabel: true, labelText: 'Password', labelId: 'labelPassword', labelClass: 'labelPassword', useShowHide: [true, setToggleShowHide], required: true }),
-                    passwordValidatedChecked ?
-                        React.createElement("i", { className: 'fa fa-check-circle passValidatedChecked' })
-                        :
-                            React.createElement(React.Fragment, null)),
-                React.createElement("div", { className: 'buttonWrapper d-block' }, React.createElement(React.Fragment, null, checking ?
-                    React.createElement(Button_1["default"], { type: 'button', name: 'checking', id: 'checkingBtn', className: 'btn checkingBtn formBtn mb-10 mb-md-0', innerText: 'checking', disabled: true })
-                    :
-                        React.createElement(React.Fragment, null,
-                            React.createElement(Button_1["default"], { onClick: handleLogin, type: 'button', name: 'login', id: 'loginBtn', className: 'btn loginBtn formBtn mb-10 mb-md-0', innerText: 'Login' }),
-                            React.createElement(Button_1["default"], { onClick: handleRegistration, type: 'button', name: 'regis', id: 'regisBtn', className: 'btn regisBtn formBtn mb-10 mb-md-0', innerText: 'Not a member ? Register Now' }))))))));
+                            React.createElement(React.Fragment, null,
+                                React.createElement(Button_1["default"], { onClick: handleLogin, type: 'submit', name: 'login', id: 'loginBtn', className: 'btn loginBtn formBtn mb-10 mb-md-0', innerText: 'Login' }),
+                                React.createElement(Button_1["default"], { onClick: handleRegistration, type: 'submit', name: 'regis', id: 'regisBtn', className: 'btn regisBtn formBtn mb-10 mb-md-0', innerText: 'Not a member ? Register Now' })))))),
+        React.createElement(CookieConsent_1["default"], null)));
 };
 exports["default"] = LoginPage;

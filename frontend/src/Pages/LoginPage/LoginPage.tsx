@@ -308,7 +308,7 @@ const LoginPage = (): JSX.Element => {
                           <>
                             <Button
                               onClick={handleLogin}
-                              type='button'
+                              type='submit'
                               name='login'
                               id='loginBtn'
                               className='btn loginBtn formBtn mb-10 mb-md-0'
@@ -316,7 +316,7 @@ const LoginPage = (): JSX.Element => {
                             />
                             <Button
                               onClick={handleRegistration}
-                              type='button'
+                              type='submit'
                               name='regis'
                               id='regisBtn'
                               className='btn regisBtn formBtn mb-10 mb-md-0'
