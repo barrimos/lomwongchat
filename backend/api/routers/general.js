@@ -23,8 +23,8 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 	}
 
 	if (action === 'healthz') {
-    await clientRedis.ping()
-		res.status(200).end()
+    const awakeRedis = await clientRedis.get('ping')
+		res.status(200).json(awakeRedis)
 	}
 
 	if (action === 'gen') {
