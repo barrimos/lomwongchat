@@ -74,7 +74,7 @@ const checkOwner = async (req, res, next) => {
 	// find data of owner dispute page
 	try {
 		// find in cache first
-		cacheIssue = await clientRedis.json.GET('users', { path: `$.${uname}.issue` })
+		cacheIssue = await clientRedis.json.get('users', { path: `$.${uname}.issue` })
 	} catch (err) {
 		// get from database instead
 		cacheIssue = []

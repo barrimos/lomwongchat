@@ -59,8 +59,8 @@ disputeResolution.post('/open', async (req, res) => {
 
 		if (success.modifiedCount === 1) {
 			try {
-				await clientRedis.json.SET('users', `$.${username}.issue.status`, true)
-				await clientRedis.json.ARRAPPEND('users', `$.${username}.issue.comment`, [title, detail])
+				await clientRedis.json.set('users', `$.${username}.issue.status`, true)
+				await clientRedis.json.arrappend('users', `$.${username}.issue.comment`, [title, detail])
 			} catch (err) {
 				console.error(`Error caching issue update: ${err}`)
 			}
@@ -106,7 +106,7 @@ disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verif
 	const uname = req.params.user === 'undefined' ? req.params.username : req.params.user
 	try {
 		// fetch from cache first
-		const cacheIssue = await clientRedis.json.GET('users', { path: `$.${uname}.issue` })
+		const cacheIssue = await clientRedis.json.get('users', { path: `$.${uname}.issue` })
 		// first title and detail should have been stored since user opening page
 		// so it should already have data
 		res.status(200).json({
@@ -131,7 +131,7 @@ disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verif
 
 				// Push the first two comments into the topic array if they exist
 				if (comment.length > 0) {
-					topic.push(comment[0], comment[1]);
+					topic.push(comment[0], comment[1])
 				}
 
 				res.status(200).json({
@@ -158,7 +158,7 @@ disputeResolution.post('/postComment/:code/:username/:user?', [checkOwner, verif
 		const uname = req.params.user === 'undefined' ? req.params.username : req.params.user
 
 		try {
-			const isRequestedClose = await clientRedis.json.GET('users', `$.${uname}.issue.requestClose`)
+			const isRequestedClose = await clientRedis.json.get('users', `$.${uname}.issue.requestClose`)
 			if (isRequestedClose[0]) {
 				return res.status(409).json({ error: 'User requested to close' })
 			}
@@ -233,7 +233,7 @@ disputeResolution.post('/postComment/:code/:username/:user?', [checkOwner, verif
 						res.status(500).json({ error: 'Error insert attach file' })
 					}
 				}
-				await clientRedis.json.ARRAPPEND('users', `$.${uname}.issue.comment`, dataComment)
+				await clientRedis.json.arrappend('users', `$.${uname}.issue.comment`, dataComment)
 
 			} catch (error) {
 				console.error('Upload error:', error)

@@ -23,11 +23,12 @@ const getRole = require('../../plugins/getRole')
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
 const validateInput = async (req, res, next) => {
-	const { username, password } = req.headers
+  const { username, password } = await req.body
 	
 	if (!username || !password) {
 		return res.status(400).json({ error: 'Missing username or password field' })
 	}
+	next()
 }
 
 const trackSession = async (req, res, next) => {
@@ -60,6 +61,7 @@ const trackSession = async (req, res, next) => {
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				maxAge: 86400000,
+        path: '/'
 			})
 			req.deviceId = deviceId
 		}
@@ -122,7 +124,7 @@ const isMatch = async (req, res, next) => {
 
 		const userRole = await getRole(username)
 
-		let projection = { password: 1, token: { accessToken: 1 }, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
+		let projection = { password: 1, 'token.accessToken': 1, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
 		// Check if username is 'admin'
 		if (handleValidate.role.admin === userRole && handleValidate.access[access] === handleValidate.access.adsysop) {
 			// for admin role, only need dmLists
@@ -170,7 +172,7 @@ const isMatch = async (req, res, next) => {
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 
-		const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
+		const isRevoked = await clientRedis.get(`revoke:token:${user.token.accessToken}`)
 		const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
 		const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
 
@@ -202,6 +204,7 @@ const isMatch = async (req, res, next) => {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 			maxAge: 86400000, // 1 day
+      path: '/'
 		})
 
 		delete user.password
@@ -210,16 +213,16 @@ const isMatch = async (req, res, next) => {
 
 		try {
 			// nonce
-			await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+			await clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
 			try {
 				// user's data
-				await clientRedis.json.SET('users', `$.${username}`, user)
+				await clientRedis.json.set('users', `$.${username}`, user)
 			} catch (err) {
 				if (err.toString() === 'Error: ERR new objects must be created at the root') {
 					try {
-						await clientRedis.json.SET('users', '$', {})
-						await clientRedis.json.SET('users', `$.${username}`, user)
+						await clientRedis.json.set('users', '$', {})
+						await clientRedis.json.set('users', `$.${username}`, user)
 					} catch (err) {
 						console.error('Error set new key')
 					}
@@ -230,7 +233,7 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			await clientRedis.SET(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
@@ -291,7 +294,7 @@ handleUserEndpointRouter.post('/regisUsers', [validateInput, rateLimiterRegistra
 	}
 })
 
-handleUserEndpointRouter.get('/login', [validateInput, rateLimiterLogin, trackSession, isMatch], async (req, res) => {
+handleUserEndpointRouter.get('/login', [rateLimiterLogin, trackSession, isMatch], async (req, res) => {
 	if (req.verified.valid) {
 		const { username } = req.headers
 		const ip = req.ip
@@ -325,14 +328,14 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 	}
 
 	if (action === 'check') {
-		let cacheUser, flag = false
+		let cacheUser = [], flag = false
 
 		try {
 			// check cache key
 			const isKeyExist = await clientRedis.exists('users')
 			if (!isKeyExist) {
 				// create new key
-				await clientRedis.json.SET('users', '$', {})
+				await clientRedis.json.set('users', '$', {})
 			}
 		} catch (err) {
 			console.error(`Error check exist key: ${err}`)
@@ -340,8 +343,12 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 		// get data from cache
 		try {
-			cacheUser = await clientRedis.json.GET('users', { path: `$.${username}` })
+			cacheUser = await clientRedis.json.get('users', { path: `$.${username}` })
 			// in case user not found return empty array []
+      // Upstash/Redis normalize: Ensure it is a valid array and doesn't contain [null]
+			if (!cacheUser || !Array.isArray(cacheUser) || cacheUser.length === 0 || cacheUser[0] === null) {
+				cacheUser = []
+			}
 		} catch (err) {
 			console.error('Error get caching user', err)
 			cacheUser = [] // set default for check
@@ -367,7 +374,14 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 			// get latest status from database instead
 			try {
-				cacheUser[0] = await findOneByUsername(username, projection)
+				const dbUser = await findOneByUsername(username, projection)
+				
+				// ⚠️ CRITICAL: Handle case where user is not found in MongoDB either
+				if (!dbUser) {
+					return res.status(404).json({ valid: false, error: 'User account not found' })
+				}
+				
+				cacheUser[0] = dbUser
 				flag = true
 			} catch (err) {
 				console.error('Error fetching user from database:', err)
@@ -379,7 +393,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		// but user status banned
 		// for users after being recently banned
 		// both login and in app
-		if (cacheUser.length === 1 && cacheUser[0].status === 'banned') {
+		if (cacheUser.length === 1 && cacheUser[0]?.status === 'banned') {
 			// if issue code doesn't exist
 			if (!cacheUser[0].issue.code
 				// or issue code not match to request issue code
@@ -410,7 +424,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		if (flag) {
 			try {
 				// caching new data
-				await clientRedis.json.SET('users', `$.${username}`, cacheUser[0])
+				await clientRedis.json.set('users', `$.${username}`, cacheUser[0])
 			} catch (err) {
 				console.error('Error caching user data:', err)
 			}
@@ -418,12 +432,13 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			flag = false
 		}
 
-		if (cacheUser[0].status === 'banned') {
+		if (cacheUser[0]?.status === 'banned') {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
 				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Allow cross-origin in production
-				maxAge: 86400000
+				maxAge: 86400000,
+        path: '/'
 			})
 
 			return res.status(401).json({
@@ -449,7 +464,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 				const success = await updateUserOneField(user.username, { status: statusName })
 
 				try {
-					await clientRedis.json.SET('users', `$.${user.username}.status`, statusName)
+					await clientRedis.json.set('users', `$.${user.username}.status`, statusName)
 				} catch (err) {
 					console.error(`Error update user's status: ${err}`)
 				}
@@ -545,7 +560,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 				return res.status(429).json({ error: 'Too many logouts, try again later' })
 			}
 
-			await clientRedis.SET(key, now, { EX: 60 }) // Store with expiry (1 min)
+			await clientRedis.set(key, now, { EX: 60 }) // Store with expiry (1 min)
 
 			rateLimiterLogin.resetKey(req.ip)
 			rateLimiterAuthen.resetKey(req.ip)
