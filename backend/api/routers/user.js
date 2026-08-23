@@ -1,6 +1,7 @@
 // package
 const express = require('express')
 const crypto = require('crypto')
+const nodeCrypto = require('node:crypto')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { v4: uuidv4 } = require('uuid')
@@ -173,7 +174,14 @@ const isMatch = async (req, res, next) => {
 		}
 
 		const isRevoked = await clientRedis.get(`revoke:token:${user.token.accessToken}`)
-		const decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
+		let decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
+    // decoded: {
+    //   username: 'rvv',
+    //   role: '301',
+    //   kid: '0df16a9f',
+    //   iat: 1787483451,
+    //   exp: 1787484351
+    // }
 		const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
 
 		if (isRevoked || isExpired || !user.token.accessToken) {
@@ -181,12 +189,19 @@ const isMatch = async (req, res, next) => {
         // delete ttl and use other datas for sign new token 
         delete decoded.iat
         delete decoded.exp
+      } else if (!decoded) {
+        // if access token damanged or invalid or missing
+        // sign new token
+        const newSignToken = await signToken(username, 301, true)
+        user.token = newSignToken
+        // update new refresh token in database
+        await updateUserOneField(username, { 'token.refreshToken': user.token.refreshToken })
       }
-			// Issue a new token only if the current one is invalid
-			user.token.accessToken = await jwt.sign(decoded, process.env.ACCESS_KEY, { expiresIn: 900 })
+      // update new access token in database
+      await updateUserOneField(username, { 'token.accessToken': user.token.accessToken })
 
-			// update in database
-			await updateUserOneField(username, { 'token.accessToken': user.token.accessToken })
+      // assign new decoded
+      decoded = jwt.decode(user.token.accessToken)
 		}
 
 		// credentials passes
