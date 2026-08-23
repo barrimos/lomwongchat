@@ -5,6 +5,7 @@ const nodeCrypto = require('node:crypto')
 const { encrypt } = require('../../plugins/cipher')
 const { findSessionWithProjection } = require('../../plugins/handlerSession')
 const { rateLimiterPreventRefreshLoginPage } = require('../../middlewares/rateLimit')
+const clientRedis = require('../../redis/redisServer')
 
 handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, async (req, res) => {
 	const { action } = req.params
@@ -22,6 +23,7 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 	}
 
 	if (action === 'healthz') {
+    await clientRedis.ping()
 		res.status(200).end()
 	}
 
