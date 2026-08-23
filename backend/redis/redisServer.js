@@ -1,4 +1,4 @@
-const process = require('process')
+require('dotenv').config()
 
 let client
 
