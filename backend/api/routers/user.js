@@ -23,6 +23,8 @@ const getRole = require('../../plugins/getRole')
 
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const validateInput = async (req, res, next) => {
   const { username, password } = await req.body
 	
@@ -59,8 +61,8 @@ const trackSession = async (req, res, next) => {
 			// save in to client-coolie
 			res.cookie('deviceId', deviceId, {
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				secure: isProd,
+				sameSite: isProd ? 'None' : 'Lax',
 				maxAge: 86400000,
 			})
 			req.deviceId = deviceId
@@ -80,16 +82,16 @@ const trackSession = async (req, res, next) => {
 			res.clearCookie('accessToken',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
 			res.clearCookie('ghostKey',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -204,21 +206,21 @@ const isMatch = async (req, res, next) => {
 		}
 
 		// credentials passes
-		// Set token in cookies
-		res.cookie('accessToken', user.token.accessToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-			maxAge: 86400000, // 1 day
-		})
-
 		// // delete cookie captcha, didn't use it anymore
 		// res.clearCookie('captcha', {
 		// 		httpOnly: true,
-		// 		secure: process.env.NODE_ENV === 'production',
-		// 		sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+		// 		secure: isProd,
+		// 		sameSite: isProd ? 'None' : 'Lax',
 		// 		path: '/'
 		// })
+
+    // Set token in cookies
+		res.cookie('accessToken', user.token.accessToken, {
+			httpOnly: true,
+			secure: isProd,
+			sameSite: isProd ? 'None' : 'Lax',
+			maxAge: 86400000, // 1 day
+		})
 
 		delete user.password
 		delete user.token
@@ -226,16 +228,16 @@ const isMatch = async (req, res, next) => {
 
 		try {
 			// nonce
-			await clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+			clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
 			try {
 				// user's data
-				await clientRedis.json.set('users', `$.${username}`, user)
+				clientRedis.json.set('users', `$.${username}`, user)
 			} catch (err) {
 				if (err.toString() === 'Error: ERR new objects must be created at the root') {
 					try {
-						await clientRedis.json.set('users', '$', {})
-						await clientRedis.json.set('users', `$.${username}`, user)
+						clientRedis.json.set('users', '$', {})
+						clientRedis.json.set('users', `$.${username}`, user)
 					} catch (err) {
 						console.error('Error set new key')
 					}
@@ -246,7 +248,7 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
@@ -312,7 +314,7 @@ handleUserEndpointRouter.get('/login', [rateLimiterLogin, trackSession, isMatch]
 		const { username } = req.headers
 		const ip = req.ip
 
-		await updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
+		updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
 
 		res.status(200).json({
 			valid: req.verified.valid,
@@ -448,8 +450,8 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		if (cacheUser[0]?.status === 'banned') {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Allow cross-origin in production
+				secure: isProd, // Use secure cookies in production
+				sameSite: isProd ? 'None' : 'Lax', // Allow cross-origin in production
 				maxAge: 86400000,
 			})
 
@@ -517,16 +519,16 @@ handleUserEndpointRouter.get('/auth/token', [rateLimiterAuthen, verify, heartbea
 		res.clearCookie('accessToken',
 			{
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				secure: isProd,
+				sameSite: isProd ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
 		res.clearCookie('ghostKey',
 			{
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				secure: isProd,
+				sameSite: isProd ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
@@ -550,16 +552,16 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 			res.clearCookie('accessToken',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
 			res.clearCookie('ghostKey',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
