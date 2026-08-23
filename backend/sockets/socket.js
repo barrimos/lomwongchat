@@ -64,7 +64,7 @@ const socket = async (server, options) => {
             )
 
             // Update last index
-            trackingChatIndex[room] = await clientRedis.llen(room) || 0
+            trackingChatIndex[room] = await clientRedis.lLen(room) || 0
             console.log(`[CRON] Chat logs saved for room: ${room}`)
           }
         } catch (err) {
@@ -125,7 +125,7 @@ const socket = async (server, options) => {
         await clientRedis.expire(roomName, 86400) // expire 1 day
 
         // update last index
-        trackingChatIndex[roomName] = await clientRedis.llen(roomName) || 0
+        trackingChatIndex[roomName] = await clientRedis.lLen(roomName) || 0
       }
 
       // broadcast
@@ -434,7 +434,7 @@ const socket = async (server, options) => {
                   )
 
                   // update last index
-                  trackingChatIndex[room] = await clientRedis.llen(room) || 0
+                  trackingChatIndex[room] = await clientRedis.lLen(room) || 0
 
                   // delete flag for next update
                   delete flag[room]
