@@ -53,14 +53,14 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 	if (req.verified.valid) {
 		try {
 			if (topic === 'env' && action === 'fetch') {
-				let channelsNameList = await clientRedis.lrange('channels', 0, -1)
+				let channelsNameList = await clientRedis.lRange('channels', 0, -1)
 				if (channelsNameList.length < 1 || !channelsNameList) {
 					const listsChannel = await channelModel.find({}, { room: 1, _id: 0 })
 					listsChannel.map(async channel => {
-						await clientRedis.rpush('channels', channel.room)
+						await clientRedis.rPush('channels', channel.room)
 					})
 				}
-				channelsNameList = await clientRedis.lrange('channels', 0, -1)
+				channelsNameList = await clientRedis.lRange('channels', 0, -1)
 
 				// for admin role
 				if (handleValidate.access[access] === handleValidate.access.adsysop

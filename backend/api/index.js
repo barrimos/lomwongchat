@@ -25,7 +25,7 @@ const corsOptions = {
     
     // IF ORIGIN IS UNDEFINED: Force it to assign your real frontend URL
     if (!origin) {
-      return callback(null, 'https://lomwongchat.vercel.app')
+      return callback(null, true)
     }
     
     if (allowedOrigins.includes(origin)) {

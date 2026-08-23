@@ -23,7 +23,7 @@ const getRole = require('../../plugins/getRole')
 const blockWords = new RegExp(/(?:admin)|(?:administrator)|(?:moderator)/i)
 
 const validateInput = async (req, res, next) => {
-	const { username, password } = await req.headers
+  const { username, password } = await req.body
 	
 	if (!username || !password) {
 		return res.status(400).json({ error: 'Missing username or password field' })
