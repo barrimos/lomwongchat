@@ -204,24 +204,21 @@ const isMatch = async (req, res, next) => {
 		}
 
 		// credentials passes
-		// delete cookie captcha, didn't use it anymore
-		res.clearCookie('captcha',
-			{
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-				path: '/'
-			}
-		)
-
 		// Set token in cookies
-    console.log('user.token.accessToken', user.token.accessToken)
 		res.cookie('accessToken', user.token.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 			maxAge: 86400000, // 1 day
 		})
+
+		// // delete cookie captcha, didn't use it anymore
+		// res.clearCookie('captcha', {
+		// 		httpOnly: true,
+		// 		secure: process.env.NODE_ENV === 'production',
+		// 		sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+		// 		path: '/'
+		// })
 
 		delete user.password
 		delete user.token
