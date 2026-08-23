@@ -228,16 +228,16 @@ const isMatch = async (req, res, next) => {
 
 		try {
 			// nonce
-			clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+			await clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
 			try {
 				// user's data
-				clientRedis.json.set('users', `$.${username}`, user)
+				await clientRedis.json.set('users', `$.${username}`, user)
 			} catch (err) {
 				if (err.toString() === 'Error: ERR new objects must be created at the root') {
 					try {
-						clientRedis.json.set('users', '$', {})
-						clientRedis.json.set('users', `$.${username}`, user)
+						await clientRedis.json.set('users', '$', {})
+						await clientRedis.json.set('users', `$.${username}`, user)
 					} catch (err) {
 						console.error('Error set new key')
 					}
@@ -248,7 +248,7 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
@@ -314,9 +314,9 @@ handleUserEndpointRouter.get('/login', [rateLimiterLogin, trackSession, isMatch]
 		const { username } = req.headers
 		const ip = req.ip
 
-		updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
+		await updateUserOneField(username, { [`devices.${req.verified.deviceId}`]: ip })
 
-		res.status(200).json({
+		return res.status(200).json({
 			valid: req.verified.valid,
 		})
 	} else {
