@@ -61,6 +61,7 @@ const trackSession = async (req, res, next) => {
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 				maxAge: 86400000,
+        path: '/'
 			})
 			req.deviceId = deviceId
 		}
@@ -203,6 +204,7 @@ const isMatch = async (req, res, next) => {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
 			maxAge: 86400000, // 1 day
+      path: '/'
 		})
 
 		delete user.password
@@ -435,7 +437,8 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
 				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Allow cross-origin in production
-				maxAge: 86400000
+				maxAge: 86400000,
+        path: '/'
 			})
 
 			return res.status(401).json({
