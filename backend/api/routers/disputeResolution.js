@@ -131,7 +131,7 @@ disputeResolution.get('/fetchComment/:code/:username/:user?', [checkOwner, verif
 
 				// Push the first two comments into the topic array if they exist
 				if (comment.length > 0) {
-					topic.push(comment[0], comment[1]);
+					topic.push(comment[0], comment[1])
 				}
 
 				res.status(200).json({

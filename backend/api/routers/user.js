@@ -326,7 +326,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 	}
 
 	if (action === 'check') {
-		let cacheUser, flag = false
+		let cacheUser = [], flag = false
 
 		try {
 			// check cache key
@@ -343,6 +343,10 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		try {
 			cacheUser = await clientRedis.json.get('users', { path: `$.${username}` })
 			// in case user not found return empty array []
+      // Upstash/Redis normalize: Ensure it is a valid array and doesn't contain [null]
+			if (!cacheUser || !Array.isArray(cacheUser) || cacheUser.length === 0 || cacheUser[0] === null) {
+				cacheUser = []
+			}
 		} catch (err) {
 			console.error('Error get caching user', err)
 			cacheUser = [] // set default for check
@@ -368,7 +372,14 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 			// get latest status from database instead
 			try {
-				cacheUser[0] = await findOneByUsername(username, projection)
+				const dbUser = await findOneByUsername(username, projection)
+				
+				// ⚠️ CRITICAL: Handle case where user is not found in MongoDB either
+				if (!dbUser) {
+					return res.status(404).json({ valid: false, error: 'User account not found' })
+				}
+				
+				cacheUser[0] = dbUser
 				flag = true
 			} catch (err) {
 				console.error('Error fetching user from database:', err)
@@ -380,7 +391,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 		// but user status banned
 		// for users after being recently banned
 		// both login and in app
-		if (cacheUser.length === 1 && cacheUser[0].status === 'banned') {
+		if (cacheUser.length === 1 && cacheUser[0]?.status === 'banned') {
 			// if issue code doesn't exist
 			if (!cacheUser[0].issue.code
 				// or issue code not match to request issue code
@@ -419,7 +430,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 			flag = false
 		}
 
-		if (cacheUser[0].status === 'banned') {
+		if (cacheUser[0]?.status === 'banned') {
 			res.cookie('issueCode', cacheUser[0].issue.code, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
