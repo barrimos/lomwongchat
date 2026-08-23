@@ -214,14 +214,6 @@ const isMatch = async (req, res, next) => {
 		// 		path: '/'
 		// })
 
-    // Set token in cookies
-		res.cookie('accessToken', user.token.accessToken, {
-			httpOnly: true,
-			secure: isProd,
-			sameSite: isProd ? 'None' : 'Lax',
-			maxAge: 86400000, // 1 day
-		})
-
 		delete user.password
 		delete user.token
 		user.role === handleValidate.role.admin ? delete user.issue : null
@@ -255,7 +247,7 @@ const isMatch = async (req, res, next) => {
 		}
 
 		// all passes
-		req.verified = { valid: true, deviceId }
+		req.verified = { valid: true, deviceId, accessToken: user.token.accessToken }
 		next()
 	} catch (err) {
 		console.error('Error server:', err)
