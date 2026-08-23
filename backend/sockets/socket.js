@@ -54,7 +54,7 @@ const socket = async (server, options) => {
           }
 
           // Fetch chat logs from Redis
-          const cacheChatLogs = await clientRedis.lRange(room, trackingChatIndex[room], -1)
+          const cacheChatLogs = await clientRedis.lrange(room, trackingChatIndex[room], -1)
 
           // Only update database if there are new logs
           if (cacheChatLogs.length > 0) {
@@ -64,7 +64,7 @@ const socket = async (server, options) => {
             )
 
             // Update last index
-            trackingChatIndex[room] = await clientRedis.lLen(room) || 0
+            trackingChatIndex[room] = await clientRedis.llen(room) || 0
             console.log(`[CRON] Chat logs saved for room: ${room}`)
           }
         } catch (err) {
@@ -95,7 +95,7 @@ const socket = async (server, options) => {
       // when user join channel broadcast old chat logs
       // // 0, -1 is fron index 0 to last index
       // -20 -1 is from index 20 to last index
-      let chatLogs = await clientRedis.lRange(roomName, -20, -1)
+      let chatLogs = await clientRedis.lrange(roomName, -20, -1)
       if (chatLogs.length < 1) {
 
         // find in database if database still empty skip broadcast
@@ -121,11 +121,11 @@ const socket = async (server, options) => {
         chatLogs = chatLogs[0][roomName]
 
         // storing in cache
-        await clientRedis.rPush(roomName, chatLogs)
+        await clientRedis.rpush(roomName, chatLogs)
         await clientRedis.expire(roomName, 86400) // expire 1 day
 
         // update last index
-        trackingChatIndex[roomName] = await clientRedis.lLen(roomName) || 0
+        trackingChatIndex[roomName] = await clientRedis.llen(roomName) || 0
       }
 
       // broadcast
@@ -386,7 +386,7 @@ const socket = async (server, options) => {
       try {
         // save to cache (push right following chat queue)
         // save chat into each room
-        await clientRedis.rPush(rid, JSON.stringify(data))
+        await clientRedis.rpush(rid, JSON.stringify(data))
 
         // save chat log to database when channel is inactive for 30s
 
@@ -425,7 +425,7 @@ const socket = async (server, options) => {
                   }
 
                   // get new chat logs while room locked in cache
-                  const newData = await clientRedis.lRange(room, trackingChatIndex[room] || 0, -1)
+                  const newData = await clientRedis.lrange(room, trackingChatIndex[room] || 0, -1)
                   // save into database
                   await roomModel.updateOne(
                     { room: room },
@@ -434,7 +434,7 @@ const socket = async (server, options) => {
                   )
 
                   // update last index
-                  trackingChatIndex[room] = await clientRedis.lLen(room) || 0
+                  trackingChatIndex[room] = await clientRedis.llen(room) || 0
 
                   // delete flag for next update
                   delete flag[room]
@@ -476,7 +476,7 @@ const socket = async (server, options) => {
       const regexAdmin = /(?:^|[^a-zA-Z])(admini?n?i?s?t?r?a?t?o?r?)(?:[^a-zA-Z0-9]|$)|(?:\W+)/i
       if (!newChannelName.trim() || regexAdmin.test(newChannelName)) return
       channels[newChannelName] = { count: 0, users: [] }
-      await clientRedis.rPush('channels', newChannelName)
+      await clientRedis.rpush('channels', newChannelName)
       io.emit('fetchNewChannel')
     })
 
