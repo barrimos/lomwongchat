@@ -177,9 +177,11 @@ const isMatch = async (req, res, next) => {
 		const isExpired = decoded ? Date.now() >= decoded.exp * 1000 : true
 
 		if (isRevoked || isExpired || !user.token.accessToken) {
-			// delete ttl and use other datas for sign new token 
-			delete decoded.iat
-			delete decoded.exp
+      if (decoded) {
+        // delete ttl and use other datas for sign new token 
+        delete decoded.iat
+        delete decoded.exp
+      }
 			// Issue a new token only if the current one is invalid
 			user.token.accessToken = await jwt.sign(decoded, process.env.ACCESS_KEY, { expiresIn: 900 })
 
