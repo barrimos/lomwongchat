@@ -124,7 +124,7 @@ const isMatch = async (req, res, next) => {
 
 		const userRole = await getRole(username)
 
-		let projection = { password: 1, 'token.accessToken': 1, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
+		let projection = { password: 1, token: { accessToken: 1 }, role: 1, issue: 1, status: 1, dmLists: 1, _id: 0 }
 		// Check if username is 'admin'
 		if (handleValidate.role.admin === userRole && handleValidate.access[access] === handleValidate.access.adsysop) {
 			// for admin role, only need dmLists
