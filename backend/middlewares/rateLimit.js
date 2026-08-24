@@ -3,11 +3,11 @@ const { findSessionWithProjection, logoutSession, updateSessionOneField } = requ
 const { logoutUserByUsername } = require('../plugins/handlerUser')
 const fifteenTime = 1000 * 60 * 15 // 15 mins
 const hourLimitTime = 1000 * 60
-
+const isProd = process.env.NODE_ENV === 'production'
 
 const overRefreshPage = limitTime => {
   const newExpires = new Date().getTime() + limitTime
-  const isProd = process.env.NODE_ENV === 'production'
+
   return async (req, res) => {
     res.clearCookie('captcha',
       {
