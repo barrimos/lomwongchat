@@ -1,6 +1,7 @@
 import { BubbleTypes } from '../../types'
 import ContextMenu from './ContextMenu'
 import React, { useEffect, useRef, useState } from 'react'
+import Timestamp from './Timestamp'
 
 const BubbleChat = ({ yourName, bubble, setIsContextOpen, isContextOpen, setCurrIdContext, currIdContext, contextClick, copyMessage, replyMessage, reportMessage, setContextClick, scrollToReplyRef, isSameSender, closeContext, setCloseContext }: BubbleTypes): JSX.Element => {
   const owner = bubble.username === yourName ? 'you' : 'other'
@@ -201,7 +202,9 @@ const BubbleChat = ({ yourName, bubble, setIsContextOpen, isContextOpen, setCurr
           {bubble.message}
         </div>
         <div className={`timestamp ${owner}`} data-time={bubble.unixTime}>
-          {bubble.timestamp}
+          <Timestamp
+            timestamp={bubble.timestamp}
+          />
         </div>
       </pre>
     </div>

@@ -123,6 +123,10 @@ export interface SessionsDataTypes {
   checked?: boolean
 }
 
+export interface TimestampTypes {
+  timestamp: string
+}
+
 export interface BubbleTypes {
   bubble: {
     bid: string

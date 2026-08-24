@@ -432,7 +432,15 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
   useEffect(() => {
     const receiveMessage = ([newMessage, isDm, dmChannel]: [BubbleTypes['bubble'][], boolean, string]) => {
       const newMsg: BubbleTypes['bubble'][] = newMessage
-      newMsg.map((msg: BubbleTypes['bubble']) => msg.timestamp = new Date(msg.unixTime).toTimeString().slice(0, 5))
+      newMsg.map((msg: BubbleTypes['bubble']) => msg.timestamp = new Date(msg.unixTime).toLocaleString('en-US', {
+        timeZone: 'Asia/Bangkok',
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // Use 24-hour format
+      }))
 
       if (isDm) {
         setBubblesDataDm((prevMessages: { log: { [key: string]: BubbleTypes['bubble'][] } }) => {
