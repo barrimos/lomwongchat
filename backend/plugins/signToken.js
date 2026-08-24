@@ -36,7 +36,7 @@ const signToken = async (username, role, isRefExpired = false, currKid = null) =
 
     // nonce
     try {
-      await clientRedis.SET(`users:${username}:nonce`, kid, { EX: 900 }) // เก็บ Nonce 15 นาที
+      await clientRedis.set(`users:${username}:nonce`, kid, { EX: 900 }) // เก็บ Nonce 15 นาที
     } catch (err) {
       console.error('Error caching signature:', err)
     }

@@ -174,7 +174,7 @@ const isMatch = async (req, res, next) => {
 			return handlerError(handleValidate.error.unauthorized, req, res, next)
 		}
 
-		const isRevoked = await clientRedis.GET(`revoke:token:${user.token.accessToken}`)
+		const isRevoked = await clientRedis.get(`revoke:token:${user.token.accessToken}`)
 		let decoded = user.token.accessToken ? jwt.decode(user.token.accessToken) : null
     // decoded: {
     //   username: 'rvv',
@@ -228,7 +228,7 @@ const isMatch = async (req, res, next) => {
 
 		try {
 			// nonce
-			await clientRedis.SET(`users:${username}:nonce`, decoded.kid, { EX: 900 })
+			await clientRedis.set(`users:${username}:nonce`, decoded.kid, { EX: 900 })
 
 			try {
 				// user's data
@@ -248,7 +248,7 @@ const isMatch = async (req, res, next) => {
 
 			// users session ttl
 			// if not set this ttl login and verify will error
-			await clientRedis.SET(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
+			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {
 			console.error('Error caching signature:', err)
@@ -347,7 +347,7 @@ handleUserEndpointRouter.post('/status/:action', async (req, res) => {
 
 		try {
 			// check cache key
-			const isKeyExist = await clientRedis.EXISTS('users')
+			const isKeyExist = await clientRedis.exists('users')
 			if (!isKeyExist) {
 				// create new key
 				await clientRedis.json.set('users', '$', {})
@@ -545,7 +545,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 	try {
 		if (req.verified.valid) {
 			const key = `logout-attempts:${req.ip}`
-			const lastReset = await clientRedis.GET(key)
+			const lastReset = await clientRedis.get(key)
 			const now = Date.now()
 
 			// Clear accessToken cookie
@@ -574,7 +574,7 @@ handleUserEndpointRouter.delete('/logout', verify, async (req, res) => {
 				return res.status(429).json({ error: 'Too many logouts, try again later' })
 			}
 
-			await clientRedis.SET(key, now, { EX: 60 }) // Store with expiry (1 min)
+			await clientRedis.set(key, now, { EX: 60 }) // Store with expiry (1 min)
 
 			rateLimiterLogin.resetKey(req.ip)
 			rateLimiterAuthen.resetKey(req.ip)

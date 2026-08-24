@@ -53,14 +53,14 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 	if (req.verified.valid) {
 		try {
 			if (topic === 'env' && action === 'fetch') {
-				let channelsNameList = await clientRedis.LRANGE('channels', 0, -1)
+				let channelsNameList = await clientRedis.lrange('channels', 0, -1)
 				if (channelsNameList.length < 1 || !channelsNameList) {
 					const listsChannel = await channelModel.find({}, { room: 1, _id: 0 })
 					listsChannel.map(async channel => {
-						await clientRedis.RPUSH('channels', channel.room)
+						await clientRedis.rpush('channels', channel.room)
 					})
 				}
-				channelsNameList = await clientRedis.LRANGE('channels', 0, -1)
+				channelsNameList = await clientRedis.lrange('channels', 0, -1)
 
 				// for admin role
 				if (handleValidate.access[access] === handleValidate.access.adsysop
@@ -262,7 +262,7 @@ handleDataEndpointRouter.all('/:topic/:action', verify, async (req, res) => {
 
 							// delete session in cache
 							deviceId.forEach(async id => {
-								await clientRedis.DEL(`session:${username}:${id}`)
+								await clientRedis.del(`session:${username}:${id}`)
 							})
 						} else {
 							res.status(204).json({ valid: false, message: 'Delete session id incomplete' })

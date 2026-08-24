@@ -39,7 +39,7 @@ const verify = async (req, res, next) => {
   try {
     if (!deviceId) {
       // get in cache
-      const cacheDeviceId = await clientRedis.GET(`session:${username}:${sessionId}`)
+      const cacheDeviceId = await clientRedis.get(`session:${username}:${sessionId}`)
 
       if (!cacheDeviceId) {
         // check in database
@@ -73,7 +73,7 @@ const verify = async (req, res, next) => {
     const tokenTTL = payload.exp - now // Remaining lifespan of the token in seconds
     if (tokenTTL > 0) {
       // revoke token with Redis TTL after logout
-      await clientRedis.SET(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
+      await clientRedis.set(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
     } else {
       console.error('Token is already expired')
     }
@@ -82,7 +82,7 @@ const verify = async (req, res, next) => {
     return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'unauthorized', true, true)
   }
 
-  const isRevoked = await clientRedis.GET(`revoke:token:${accessToken}`)
+  const isRevoked = await clientRedis.get(`revoke:token:${accessToken}`)
   if (isRevoked === accessToken) {
     console.error(`Token revoked`)
     handleValidate.error.unauthorized.message = 'Token revoked'
@@ -105,7 +105,7 @@ const verify = async (req, res, next) => {
       const tokenTTL = decoded.exp - now // Remaining lifespan of the token in seconds
       if (tokenTTL > 0) {
         // revoke token with Redis TTL after logout
-        await clientRedis.SET(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
+        await clientRedis.set(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
       } else {
         console.error('Token is already expired')
       }
@@ -121,7 +121,7 @@ const verify = async (req, res, next) => {
     try {
       // Replay Attack
       // nonce will set when token create or renew token
-      const nonce = await clientRedis.GET(`users:${username}:nonce`)
+      const nonce = await clientRedis.get(`users:${username}:nonce`)
       // in case nonce in cache doesn't exist
       // that mean you have to wait until jwt token expired
       // to prevent reuse invalid or expired jwt token
@@ -135,7 +135,7 @@ const verify = async (req, res, next) => {
       const lockKey = `users:${username}:lock`
       // prevent race condition and too much refresh page
       // and or user bypass lastVerify logic
-      const isLocked = await clientRedis.SET(lockKey, 'locked', { NX: true, EX: 1 }) // Lock 1 sec
+      const isLocked = await clientRedis.set(lockKey, 'locked', { NX: true, EX: 1 }) // Lock 1 sec
       // if lockKey is Exists response error
       if (!isLocked) {
         return handlerSessionFailed(req, res, next, sessionId, deviceId, username, 'tooMuch')
@@ -233,7 +233,7 @@ const verify = async (req, res, next) => {
 
           // new nonce after re-sign token
           try {
-            await clientRedis.SET(`users:${username}:nonce`, newKid, { EX: 900 }) // เก็บ Nonce 15 นาที
+            await clientRedis.set(`users:${username}:nonce`, newKid, { EX: 900 }) // เก็บ Nonce 15 นาที
           } catch (err) {
             console.error('Error caching signature:', err)
           }
