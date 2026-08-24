@@ -7,6 +7,8 @@ const heartbeat = async (req, res, next) => {
   const { username } = req.headers
   const { deviceId, sessionId } = req.cookies
 
+  const isProd = process.env.NODE_ENV === 'production'
+
   try {
     // if session in database doesn't exist (expires or accident delete) catch Error
     const { isLoggedIn } = await checkIsLoggedIn(sessionId, deviceId, username)
@@ -19,16 +21,16 @@ const heartbeat = async (req, res, next) => {
     res.clearCookie('accessToken',
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         path: '/'
       }
     )
     res.clearCookie('ghostKey',
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         path: '/'
       }
     )
@@ -38,7 +40,7 @@ const heartbeat = async (req, res, next) => {
 
   if (req.verified.extend) {
     try {
-      const isExists = await clientRedis.exists(`session:${username}:${sessionId}`)
+      const isExists = await clientRedis.EXISTS(`session:${username}:${sessionId}`)
       if (!isExists) {
         console.error('Error session doesn\'t exists')
         handleValidate.error.notFound.message = 'Session id not found'
@@ -46,16 +48,16 @@ const heartbeat = async (req, res, next) => {
         res.clearCookie('accessToken',
           {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            secure: isProd,
+            sameSite: isProd ? 'None' : 'Lax',
             path: '/'
           }
         )
         res.clearCookie('ghostKey',
           {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            secure: isProd,
+            sameSite: isProd ? 'None' : 'Lax',
             path: '/'
           }
         )
@@ -64,7 +66,7 @@ const heartbeat = async (req, res, next) => {
 
       // reset session TTL in cache
       console.log(`Session ${username}:${sessionId} TTL in cache reset`)
-      await clientRedis.expire(`session:${username}:${sessionId}`, 1800) // 30 minutes
+      await clientRedis.EXPIRE(`session:${username}:${sessionId}`, 1800) // 30 minutes
 
       // update expire time in database
       const newExpiresAt = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
@@ -82,16 +84,16 @@ const heartbeat = async (req, res, next) => {
       res.clearCookie('accessToken',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
       )
       res.clearCookie('ghostKey',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
       )

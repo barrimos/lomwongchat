@@ -5,7 +5,7 @@ const revokeToken = async accessToken => {
   const tokenTTL = accessToken.split('.')[1].exp - now // Remaining lifespan of the token in seconds
   if (tokenTTL > 0) {
     // revoke token with Redis TTL after logout
-    await clientRedis.set(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
+    await clientRedis.SET(`revoke:token:${accessToken}`, tokenTTL, { NX: true, EX: tokenTTL })
   } else {
     console.error('Token is already expired')
   }

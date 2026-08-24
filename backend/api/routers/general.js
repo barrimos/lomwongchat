@@ -14,6 +14,7 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 	const state = {
 		isStayLoggedIn: false
 	}
+  const isProd = process.env.NODE_ENV === 'production'
 	try {
 		// initial
 		// check uuid that is stay logged in isn't it
@@ -34,8 +35,8 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 			res.cookie('captcha', `${strCaptcha}.${signCaptcha}`,
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -65,8 +66,8 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 		res.clearCookie('captcha',
 			{
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				secure: isProd,
+				sameSite: isProd ? 'None' : 'Lax',
 				path: '/'
 			}
 		)
@@ -89,8 +90,8 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 			const sessionId = encrypt(data, process.env.SESSION_KEY, process.env.SESSION_IV)
 			res.cookie('sessionId', sessionId, {
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+				secure: isProd,
+				sameSite: isProd ? 'None' : 'Lax',
 				maxAge: 86400000
 			})
 		}

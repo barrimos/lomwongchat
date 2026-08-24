@@ -24,6 +24,8 @@ const findSessionWithProjection = async (sessionId, deviceId, username, projecti
   return session
 }
 
+const isProd = process.env.NODE_ENV === 'production'
+
 /**
  * 
  * @param {*} sessionId string
@@ -180,16 +182,16 @@ const handlerSessionFailed = async (req, res, next, sessionId, deviceId, usernam
   res.clearCookie('accessToken',
     {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: isProd,
+      sameSite: isProd ? 'None' : 'Lax',
       path: '/'
     }
   )
   res.clearCookie('ghostKey',
     {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: isProd,
+      sameSite: isProd ? 'None' : 'Lax',
       path: '/'
     }
   )

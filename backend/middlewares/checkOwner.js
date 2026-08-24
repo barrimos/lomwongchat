@@ -16,6 +16,8 @@ const checkOwner = async (req, res, next) => {
 	const { accessToken, deviceId, signature, ghostKey } = req.cookies
 	let cacheIssue
 
+  const isProd = process.env.NODE_ENV === 'production'
+
 	const payload = JSON.parse(atob(accessToken.split('.')[1]))
 
 	// general check
@@ -61,8 +63,8 @@ const checkOwner = async (req, res, next) => {
 			res.clearCookie('accessToken',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)
@@ -97,8 +99,8 @@ const checkOwner = async (req, res, next) => {
 				res.clearCookie('accessToken',
 					{
 						httpOnly: true,
-						secure: process.env.NODE_ENV === 'production',
-						sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+						secure: isProd,
+						sameSite: isProd ? 'None' : 'Lax',
 						path: '/'
 					}
 				)
@@ -117,8 +119,8 @@ const checkOwner = async (req, res, next) => {
 			res.clearCookie('accessToken',
 				{
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
-					sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+					secure: isProd,
+					sameSite: isProd ? 'None' : 'Lax',
 					path: '/'
 				}
 			)

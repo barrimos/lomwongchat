@@ -4,8 +4,9 @@ const config = require('./config')
 const { channelModel } = require('./models/chatLogs.model')
 
 const boot = async () => {
-  const mongoUri = process.env.NODE_ENV === 'production' ? config.mongoUri : 'mongodb://localhost:27017/lomwongchat'
-  const mongoOption = process.env.NODE_ENV === 'production' ? config.mongoOptions : {}
+  const isProd = process.env.NODE_ENV === 'production'
+  const mongoUri = isProd ? config.mongoUri : 'mongodb://localhost:27017/lomwongchat'
+  const mongoOption = isProd ? config.mongoOptions : {}
 
   await mongoose.connect(mongoUri, mongoOption)
   server.listen(config.port, async () => {

@@ -7,28 +7,29 @@ const hourLimitTime = 1000 * 60
 
 const overRefreshPage = limitTime => {
   const newExpires = new Date().getTime() + limitTime
+  const isProd = process.env.NODE_ENV === 'production'
   return async (req, res) => {
     res.clearCookie('captcha',
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         path: '/'
       }
     )
     res.clearCookie('deviceId',
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         path: '/'
       }
     )
     res.clearCookie('sessionId',
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: isProd,
+        sameSite: isProd ? 'None' : 'Lax',
         path: '/'
       }
     )
@@ -70,16 +71,16 @@ const customHandler = limitTime => {
       res.clearCookie('accessToken',
         {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+          secure: isProd,
+          sameSite: isProd ? 'None' : 'Lax',
           path: '/'
         }
       )
       res.clearCookie('ghostKey',
         {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+          secure: isProd,
+          sameSite: isProd ? 'None' : 'Lax',
           path: '/'
         }
       )
