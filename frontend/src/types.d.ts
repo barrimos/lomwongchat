@@ -36,6 +36,10 @@ export interface FeelingsTypes {
   handleSelectFeels: (e: ChangeEventHandler<HTMLSelectElement>) => void
 }
 
+export interface GuideBoxLoginTypes {
+  setInputUsername: Dispatch<SetStateAction<string>>
+  setInputPassword: Dispatch<SetStateAction<string>>
+}
 
 export interface InputTypes {
   type: string
@@ -58,21 +62,6 @@ export interface InputTypes {
   useShowHide?: [boolean, Dispatch<SetStateAction<boolean>>]
   attr?: { [key: string] }[]
   checked?: boolean | undefined
-}
-
-export interface CaptchaTypes {
-  captcha: string
-  setStatusVerified: Dispatch<SetStateAction<string>>
-  value: string
-  useLabel?: boolean
-  reNewCaptcha: boolean
-  inputCaptcha: string
-  setIsCanvas: Dispatch<SetStateAction<HTMLCanvasElement | null>>
-  setInputCaptcha: Dispatch<SetStateAction<string>>
-  setReNewCaptcha: Dispatch<SetStateAction<boolean>>
-  reCaptcha: (e: MouseEvent<HTMLDivElement>) => void
-  readCaptcha: (e: MouseEvent<HTMLDivElement>) => void
-  setStayLoggedIn: Dispatch<SetStateAction<[string, boolean]>>
 }
 
 export interface FormTypes {

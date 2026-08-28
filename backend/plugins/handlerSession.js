@@ -38,6 +38,7 @@ const isProd = process.env.NODE_ENV === 'production'
  */
 const findOrCreateUpdate = async (sessionId, username, deviceId, agent, ip) => {
   if (!sessionId || !deviceId || !username) return Error('Missing query')
+  const createAt = Date.now()
   return await SessionModel.findOneAndUpdate(
     {
       $or: [
@@ -61,8 +62,8 @@ const findOrCreateUpdate = async (sessionId, username, deviceId, agent, ip) => {
       $setOnInsert: {  // only for document insertion
         attempts: 3,
         isLoggedIn: false,
-        createdAt: new Date(),
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000),  // extend session expiry time
+        createdAt: createAt,
+        expiresAt: createAt + (1000 * 60 * 30),  // extend session expiry time
         unlockAt: null
       }
     },
@@ -71,27 +72,6 @@ const findOrCreateUpdate = async (sessionId, username, deviceId, agent, ip) => {
       new: true,      // return the updated document
     }
   )
-}
-
-const checkIsLoggedIn = async (sessionId, deviceId, username) => {
-  try {
-    return await SessionModel.findOne(
-      {
-        $or: [
-          { sessionId },
-          {
-            $and: [
-              { deviceId },
-              { username }
-            ]
-          },
-        ]
-      },
-      { isLoggedIn: 1 }
-    )
-  } catch (err) {
-    return Error(err)
-  }
 }
 
 const updateSessionOneField = async (sessionId, field, value) => {
@@ -211,4 +191,4 @@ const handlerSessionFailed = async (req, res, next, sessionId, deviceId, usernam
   return handlerError(handleValidate.error[errorName], req, res, next)
 }
 
-module.exports = { findSessionWithProjection, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, checkIsLoggedIn, handlerSessionFailed }
+module.exports = { findSessionWithProjection, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, handlerSessionFailed }

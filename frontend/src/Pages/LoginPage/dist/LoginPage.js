@@ -255,7 +255,7 @@ var LoginPage = function () {
                                         var _a;
                                         sweetalert2_react_content_1["default"](sweetalert2_1["default"]).fire({
                                             title: 'Registration Error try again',
-                                            text: (_a = err.messagge) !== null && _a !== void 0 ? _a : err.response.data.error
+                                            text: (_a = err.message) !== null && _a !== void 0 ? _a : err.response.data.error
                                         });
                                         resetState();
                                     })];

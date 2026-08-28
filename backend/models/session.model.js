@@ -32,11 +32,11 @@ const sessionSchema = new Schema({
     required: true
   },
   createdAt: {
-    type: Date,
+    type: Number,
     required: true
   },
   expiresAt: {
-    type: Date,
+    type: Number,
     required: true
   },
   unlockAt: {

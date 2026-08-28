@@ -25,6 +25,7 @@ input::-ms-clear {
   max-width: 400px;
   width: 100%;
   margin: 0 15px;
+  position: relative;
 }
 #loginPageBody #loginForm #titleForm {
   margin-bottom: 25px;
@@ -82,7 +83,7 @@ input::-ms-clear {
 }
 #loginPageBody #loginForm .inputWrapper #inpUsername:not(:focus) + #labelUsername,
 #loginPageBody #loginForm .inputWrapper #inpPassword:not(:focus) + #labelPassword {
-  transform: translate(5px, -29px);
+  transform: translate(10px, -29px);
   color: #b3b3b3;
 }
 #loginPageBody #loginForm .inputWrapper #inpUsername + #labelUsername,

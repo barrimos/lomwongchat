@@ -64,16 +64,15 @@ const heartbeat = async (req, res, next) => {
         return handlerError(handleValidate.error.notFound, req, res, next)
       }
 
-      // reset session TTL in cache
-      console.log(`Session ${username}:${sessionId} TTL in cache reset`)
+      // extended session TTL in cache
       await clientRedis.expire(`session:${username}:${sessionId}`, 1800) // 30 minutes
 
-      // update expire time in database
-      const newExpiresAt = new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
+      // extended expire time in database
+      const newExpiresAt = Date.now() + (1000 * 60 * 30) // 30 minutes
       await updateSessionOneField(sessionId, 'expiresAt', newExpiresAt)
-      console.log(`Session ${username}:${sessionId} TTL in database reset`)
+      console.log(`Session ${username}:${sessionId} TTL in all extended`)
 
-      // update expire time in cookies
+      // extended expire time in cookies
       res.cookie('sessionId', sessionId, {
         maxAge: newExpiresAt
       })

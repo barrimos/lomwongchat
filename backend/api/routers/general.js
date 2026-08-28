@@ -1,7 +1,6 @@
-const genNonce = require('../../plugins/genNonce')
 const express = require('express')
+const { randomUUID } = require('crypto')
 const handleGeneralEndpointRouter = express.Router()
-const nodeCrypto = require('node:crypto')
 const { encrypt } = require('../../plugins/cipher')
 const { findSessionWithProjection } = require('../../plugins/handlerSession')
 const { rateLimiterPreventRefreshLoginPage } = require('../../middlewares/rateLimit')
@@ -10,67 +9,15 @@ const clientRedis = require('../../redis/redisServer')
 handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, async (req, res) => {
 	const { action } = req.params
 	const { username } = req.headers
-	const { deviceId, sessionId, captcha } = req.cookies
-	const state = {
-		isStayLoggedIn: false
-	}
+	const { deviceId, sessionId } = req.cookies
   const isProd = process.env.NODE_ENV === 'production'
-	try {
-		// initial
-		// check uuid that is stay logged in isn't it
-		state.isStayLoggedIn = await findSessionWithProjection(sessionId, deviceId, username, { username: 1, isLoggedIn: 1 })
-	} catch (err) {
-		console.error(`Error get login state: ${err}`)
-	}
 
 	if (action === 'healthz') {
     const awakeRedis = await clientRedis.ping()
 		res.status(200).json(awakeRedis)
 	}
 
-	if (action === 'gen') {
-		try {
-			const strCaptcha = genNonce(6)
-			const signCaptcha = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(strCaptcha).digest('hex')
-			res.cookie('captcha', `${strCaptcha}.${signCaptcha}`,
-				{
-					httpOnly: true,
-					secure: isProd,
-					sameSite: isProd ? 'None' : 'Lax',
-					path: '/'
-				}
-			)
-
-			return res.status(200).json({ captcha: strCaptcha, state: state.isStayLoggedIn || false })
-		} catch (err) {
-			console.error(`Generate captcha error: ${err}`)
-			return res.status(400).json({ error: 'Generate captcha error' })
-		}
-	}
-
-	if (action === 'verifyCaptcha') {
-		const { inputcaptcha } = req.headers
-		if (!captcha || !inputcaptcha) return
-		const [stringCaptcha, signature] = captcha.split('.')
-		const validateSignature = nodeCrypto.createHmac('sha256', process.env.CAPTCHA_KEY).update(stringCaptcha).digest('hex')
-
-		if (inputcaptcha === stringCaptcha && validateSignature === signature) {
-			return res.status(200).json({ verified: true })
-		} else {
-			console.error('Verification captcha error')
-			return res.status(401).json({ verified: false })
-		}
-	}
-
 	if (action === 'getRemainsAttempts') {
-		res.clearCookie('captcha',
-			{
-				httpOnly: true,
-				secure: isProd,
-				sameSite: isProd ? 'None' : 'Lax',
-				path: '/'
-			}
-		)
 		try {
 			// get attempts
 			const session = await findSessionWithProjection(sessionId, deviceId, username, { attempts: 1 })
@@ -84,10 +31,36 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 		}
 	}
 
+  if (action === 'stayCheck') {
+    try {
+      // read cache first
+      const cacheSession = await clientRedis.json.get('users', {
+        path: `$.${username}.sessionAlive.expiresAt`
+      })
+
+      if (!cacheSession || !cacheSession.length) {
+        return res.status(200).end()
+      }
+
+      // if found session that mean client was leaving without logged out
+      // calc remaining session
+      const remainingSession = cacheSession?.[0] - Date.now()
+      // if session less than 1 min let client make login again
+      if (remainingSession < 60000) {
+        await clientRedis.json.del('users', `$.${username}.sessionAlive`)
+        return res.status(200).end()
+      }
+
+      // if session remaining more than 1 min do auto login
+      return res.status(200).json({ remainingSession })
+    } catch (err) {
+      return res.status(400).json({ error: 'Checking session error' })
+    }
+  }
+
 	if (action === 'session') {
 		if (!req.cookies.sessionId) {
-			const data = nodeCrypto.randomBytes(32).toString('hex').slice(0, 16)
-			const sessionId = encrypt(data, process.env.SESSION_KEY, process.env.SESSION_IV)
+			const sessionId = encrypt(randomUUID(), process.env.SESSION_KEY, process.env.SESSION_IV)
 			res.cookie('sessionId', sessionId, {
 				httpOnly: true,
 				secure: isProd,
@@ -95,7 +68,7 @@ handleGeneralEndpointRouter.get('/:action', rateLimiterPreventRefreshLoginPage, 
 				maxAge: 86400000
 			})
 		}
-		return res.status(201).end()
+    return res.status(200).end()
 	}
 })
 

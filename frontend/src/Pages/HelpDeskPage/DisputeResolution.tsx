@@ -156,7 +156,7 @@ const DisputeResolution = () => {
     e.preventDefault()
 
     const outputString: string = inputComment.replace(patternUrl, (url: string) => `<a href="${url}" class="urlComment" target="_blank">${url}</a>`)
-    const unixTime: number = new Date().getTime()
+    const unixTime: number = Date.now()
 
     let formData: FormData = new FormData()
     if (image && image.file) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from 'react'
-import axios, { AxiosResponse } from 'axios'
-import { useNavigate } from 'react-router-dom'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import { ErrorResponse, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
@@ -12,6 +12,7 @@ import './dist/LoginPage.css'
 
 import { getInputValue } from '../../utils/getInputValue'
 import { VerifiedTypes } from '../../types'
+import GuideBoxLogin from '../../Components/GuideBoxLogin/GuideBoxLogin'
 
 const isProduction = process.env.REACT_APP_NODE_ENV === 'production'
 const protocol = isProduction ? 'https://' : 'http://'
@@ -27,6 +28,9 @@ const LoginPage = (): JSX.Element => {
   const [inputUsername, setInputUsername] = useState<string>('')
   const [inputPassword, setInputPassword] = useState<string>('')
 
+  const [isLoginBtnClick, setIsLoginBtnClick] = useState<boolean>(false)
+  const [isRegisterBtnClick, setIsRegisterBtnClick] = useState<boolean>(false)
+
   const [usernameValidatedChecked, setUsernameValidatedChecked] = useState<boolean>(false)
   const [passwordValidatedChecked, setPasswordValidatedChecked] = useState<boolean>(false)
 
@@ -38,6 +42,8 @@ const LoginPage = (): JSX.Element => {
     setInputUsername('')
     setInputPassword('')
     setChecking(false)
+    setIsLoginBtnClick(false)
+    setIsRegisterBtnClick(false)
   }
 
   const handleLogin = async (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>): Promise<void> => {
@@ -45,6 +51,9 @@ const LoginPage = (): JSX.Element => {
     e.preventDefault()
     const button = e.currentTarget as HTMLButtonElement;
     button.disabled = true // disable the button to prevent multiple clicks
+    if (isLoginBtnClick) return
+    setChecking(true)
+    setIsLoginBtnClick(true)
 
     try {
       if (inputUsername.length < 3 || inputPassword.length < 3) {
@@ -81,8 +90,12 @@ const LoginPage = (): JSX.Element => {
           // normal status
           sessionStorage.setItem('username', inputUsername)
 
+          // set sessionId in client cookie
+          await axios.get(`${server}/general/session`, { withCredentials: true })
+
+          setIsLoginBtnClick(false)
+          setIsLoading(true)
           setTimeout(() => {
-            setIsLoading(true)
             navigate(`lomwong/${inputUsername}/lobby`)
           }, 1000)
         }
@@ -168,6 +181,7 @@ const LoginPage = (): JSX.Element => {
       }
       // reset all state
       setIsLoading(false)
+      setIsLoginBtnClick(false)
       resetState()
       button.disabled = false
     }
@@ -178,6 +192,8 @@ const LoginPage = (): JSX.Element => {
     e.preventDefault()
     const button = e.currentTarget as HTMLButtonElement;
     button.disabled = true // disable the button to prevent multiple clicks
+    if (isRegisterBtnClick) return
+    setIsRegisterBtnClick(true)
 
     if (pattern.test(inputUsername) || /\s+/g.test(inputPassword)) {
       withReactContent(Swal).fire('Username or Password is wrong condition')
@@ -206,7 +222,7 @@ const LoginPage = (): JSX.Element => {
                 .catch(err => {
                   withReactContent(Swal).fire({
                     title: 'Registration Error try again',
-                    text: err.messagge ?? err.response.data.error
+                    text: err.message ?? err.response.data.error
                   })
                   resetState()
                 })
@@ -218,17 +234,38 @@ const LoginPage = (): JSX.Element => {
           }
         })
     }
+    setIsRegisterBtnClick(false)
     button.disabled = false
   }
 
   useEffect(() => {
-    const getSession = async () => {
-      await axios.get(`${server}/general/session`, { withCredentials: true })
+    const stayCheck = async () => {
+      try {
+        const res: AxiosResponse = await axios.get(`${server}/general/stayCheck`, { withCredentials: true })
+        // buffer time 1 min
+        // if remaining more than 2 mins
+        if (res.data.remainingSession > 120000) {
+          // normal status
+          sessionStorage.setItem('username', inputUsername)
+
+          // set sessionId in client cookie
+          await axios.get(`${server}/general/session`, { withCredentials: true })
+
+          setIsLoading(true)
+          setTimeout(() => {
+            navigate(`lomwong/${inputUsername}/lobby`)
+          }, 1000)
+        } else {
+          // if less than 2 mins let client make another login instead auto login
+        }
+      } catch (err: any) {
+        withReactContent(Swal).fire({
+          text: err.message ?? err.response.data.error,
+        })
+      }
     }
-    getSession()
-    return () => {
-      console.log('Session had set')
-    }
+
+    stayCheck()
   }, [])
 
   useEffect(() => {
@@ -253,6 +290,10 @@ const LoginPage = (): JSX.Element => {
           <div id='loginPageBody' className='d-flex justify-content-center align-items-center w-100'>
             {
               <Form action='#' method='POST' className='form p-15 p-md-20' id='loginForm' head='LomWongChat' headClass='titleHead' subHead='Keep the chat on fire!' subHeadClass='subHead' target='_self' autoComplete='on'>
+                <GuideBoxLogin
+                  setInputUsername={setInputUsername}
+                  setInputPassword={setInputPassword}
+                />
                 <div className='inputWrapper'>
                   <Input
                     onChange={(e: ChangeEvent<HTMLInputElement>) => getInputValue(e, setInputUsername, 15)}

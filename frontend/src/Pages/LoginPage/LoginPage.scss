@@ -24,6 +24,7 @@ input::-ms-clear {
         max-width: 400px;
         width: 100%;
         margin: 0 15px;
+        position: relative;
         #titleForm{
             margin-bottom: 25px;
             text-align: center;
@@ -82,7 +83,7 @@ input::-ms-clear {
             // when focus on input translate label up
             #inpUsername:not(:focus) + #labelUsername,
             #inpPassword:not(:focus) + #labelPassword{
-                transform: translate(5px, -29px);
+                transform: translate(10px, -29px);
                 color: hsl(0, 0%, 70%);
             }
             // when input onblur move labe back

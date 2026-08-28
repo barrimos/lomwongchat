@@ -1,22 +1,13 @@
 const setRateLimit = require('express-rate-limit')
-const { findSessionWithProjection, logoutSession, updateSessionOneField } = require('../plugins/handlerSession')
-const { logoutUserByUsername } = require('../plugins/handlerUser')
+const { findSessionWithProjection, updateSessionOneField } = require('../plugins/handlerSession')
 const fifteenTime = 1000 * 60 * 15 // 15 mins
 const hourLimitTime = 1000 * 60
 const isProd = process.env.NODE_ENV === 'production'
 
 const overRefreshPage = limitTime => {
-  const newExpires = new Date().getTime() + limitTime
+  const newExpires = Date.now() + limitTime
 
   return async (req, res) => {
-    res.clearCookie('captcha',
-      {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? 'None' : 'Lax',
-        path: '/'
-      }
-    )
     res.clearCookie('deviceId',
       {
         httpOnly: true,
@@ -53,42 +44,19 @@ const customHandler = limitTime => {
       const session = await findSessionWithProjection(sessionId, deviceId, username, { expiresAt: 1, unlockAt: 1 })
       if (!session.unlockAt) {
         // set new TTL
-        newExpires = new Date().getTime() + limitTime
+        newExpires = Date.now() + limitTime
         await updateSessionOneField(sessionId, 'unlockAt', newExpires)
         console.log(`Set limit for session id: ${sessionId} success`)
-
-        // Schedule reset of unlockAt after rate limit window ends
-        setTimeout(async () => {
-          await updateSessionOneField(sessionId, 'unlockAt', null)
-          console.log(`unlockAt reset for session: ${sessionId}`)
-        }, limitTime)
       } else {
         // for alert user
-        newExpires = session.unlockAt
+        newExpires = Date.now() + limitTime
       }
-      // log out session
-      await logoutSession(sessionId, deviceId, username)
-      res.clearCookie('accessToken',
-        {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: isProd ? 'None' : 'Lax',
-          path: '/'
-        }
-      )
-      res.clearCookie('ghostKey',
-        {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: isProd ? 'None' : 'Lax',
-          path: '/'
-        }
-      )
-      await logoutUserByUsername(username, deviceId)
 
       // Send a custom response and stop further middleware
       res.status(429).json({
         valid: false,
+        isLocked: true,
+        unlockAt: newExpires,
         error: `Maximum request limit. Try again at ${new Date(newExpires).toLocaleTimeString()}`,
       })
     } catch (err) {
@@ -109,7 +77,7 @@ const rateLimiterLogin = setRateLimit({
 
 const rateLimiterAuthen = setRateLimit({
   windowMs: fifteenTime,
-  max: 5,
+  max: 10,
   headers: true,
   keyGenerator: req => req.headers['x-forwarded-for'] || req.ip,
   handler: customHandler(fifteenTime)

@@ -68,7 +68,7 @@ const verify = async (req, res, next) => {
     console.error(`Error verify session: ${err.message ?? err}`)
 
     // force logout when catch error
-    const now = Math.floor(new Date().getTime() / 1000) // Current time in seconds
+    const now = Math.floor(Date.now() / 1000) // Current time in seconds
     const payload = JSON.parse(atob(accessToken.split('.')[1]))
     const tokenTTL = payload.exp - now // Remaining lifespan of the token in seconds
     if (tokenTTL > 0) {
@@ -101,7 +101,7 @@ const verify = async (req, res, next) => {
     }
 
     if (req.path === '/logout') {
-      const now = Math.floor(new Date().getTime() / 1000) // Current time in seconds
+      const now = Math.floor(Date.now() / 1000) // Current time in seconds
       const tokenTTL = decoded.exp - now // Remaining lifespan of the token in seconds
       if (tokenTTL > 0) {
         // revoke token with Redis TTL after logout
@@ -186,7 +186,7 @@ const verify = async (req, res, next) => {
 
       const refPayload = ref.token.refreshToken.split('.')[1]
       const { kid: refKid, username: refName, exp: refExp } = JSON.parse(atob(refPayload))
-      const isRefExpired = new Date().getTime() / 1000 > refExp
+      const isRefExpired = Date.now() / 1000 > refExp
 
       const currPayload = accessToken.split('.')[1]
       const { kid: currKid, role: currRole } = JSON.parse(atob(currPayload))

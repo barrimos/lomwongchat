@@ -17,7 +17,7 @@ const handlerError = require('../../middlewares/handlerError')
 // plugins
 const signToken = require('../../plugins/signToken')
 const handleValidate = require('../../plugins/handleValidate')
-const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts, findOrCreateUpdate } = require('../../plugins/handlerSession')
+const { deleteSession, logoutSession, loggedInSession, updateSessionAttempts, findOrCreateUpdate, updateSessionOneField } = require('../../plugins/handlerSession')
 const { findOneByUsername, updateUserOneField, insertNewUser } = require('../../plugins/handlerUser')
 const getRole = require('../../plugins/getRole')
 
@@ -95,7 +95,12 @@ const trackSession = async (req, res, next) => {
 					path: '/'
 				}
 			)
-			handleValidate.error.forbidden.message = 'Session locked. Contact supervisor'
+
+      if (session.unlockAt - Date.now() <= 0) {
+        await updateSessionOneField(sessionId, 'unlockAt', null)
+        return next()
+      }
+			handleValidate.error.forbidden.message = `Session locked. Until ${new Date(session.unlockAt).toLocaleString()}`
 			return handlerError(handleValidate.error.forbidden, req, res, next)
 		}
 
@@ -206,14 +211,6 @@ const isMatch = async (req, res, next) => {
 		}
 
 		// credentials passes
-		// // delete cookie captcha, didn't use it anymore
-		// res.clearCookie('captcha', {
-		// 		httpOnly: true,
-		// 		secure: isProd,
-		// 		sameSite: isProd ? 'None' : 'Lax',
-		// 		path: '/'
-		// })
-
     // Set token in cookies
 		res.cookie('accessToken', user.token.accessToken, {
 			httpOnly: true,
@@ -247,7 +244,7 @@ const isMatch = async (req, res, next) => {
 			}
 
 			// users session ttl
-			// if not set this ttl login and verify will error
+			// if not set this ttl, login and verify will error
 			await clientRedis.set(`session:${username}:${sessionId}`, deviceId, { EX: 1800 }) // expires 30 mins
 
 		} catch (err) {

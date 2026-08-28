@@ -529,7 +529,7 @@ const Chat = ({ yourName, socket, id, joinNewChannel, setJoinNewChannel, currCha
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => getInputValue(e, setInpMessage)}
           value={inpMessage}
           onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => handleKeyPress(e)}
-          placeHolder={`Send message ${isMobileSupported ? '' : 'shift + enter : new line'}`}
+          placeHolder={`Write a message ${isMobileSupported ? '' : '/ shift + enter : new line'}`}
           resizer={null}
           autoFocus={autoFocus!}
         />

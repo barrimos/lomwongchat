@@ -3,13 +3,15 @@
   - [Describe](#describe)
   - [Disclaimer](#disclaimer)
   - [Concept](#concept)
-  - [Versions 1.0.6a](#versions-106a)
+  - [Versions 1.0.7a](#versions-107a)
   - [Stacks](#stacks)
   - [Libraries](#libraries)
   - [Mechanism](#mechanism)
   - [Testing chat](#testing-chat)
   - [Features](#features)
-  - [TTL](#ttl)
+  - [Cache TTL](#cache-ttl)
+  - [Client cookie TTL](#client-cookie-ttl)
+  - [Heartbeat](#heartbeat)
   - [Endpoint](#endpoint)
   - [Problem and Resolve](#problem-and-resolve)
   - [Contributing](#contributing)
@@ -27,7 +29,19 @@ Since this web application is my `practice project`, so I've use many machanism 
 __Gather 'round, folks! I've got a story to tell__
 `Lomwong Chat` in Thai, which translates to `Campfire Chat` in English, evokes a warm and cozy atmosphere where people `gather around` a campfire to share stories, ideas, and experiences and mysteries stories.
 
-## Versions 1.0.6a
+## Versions 1.0.7a
+- **1.0.7a - 08/24/2026**:
+  - Fixed response not set cookie to client browser.
+  - Fixed critical cache decoded in middleWare.
+  - Edited health endpoint for awake server.
+  - Adding date in timestamp at bubble chat.
+  - Fine-tune rate-limit.
+  - Adding guide box fast input test account at login page.
+  - Adding state for prevent multiple click at login page.
+  - Clear all captcha system.
+  - Adding condition check to unlock session that locked timeout.
+  - Replace optimize code to get unix time from new Date().getTime() with Date.now() at heartbeat.
+  - Adding stayCheck endpoint automatic login if session still alive.
 - **1.0.6a - 05/27/2026**: Fixed type button login/register, add function for validate input credential field.
 - **1.0.5a - 05/24/2026**: Fixed login/registration page system prevent nultiple click button. And adding new endpoint for awake server.
 - **1.0.4a - 05/20/2026**: Revised the login system to remove the CAPTCHA from the login page. When the server is inactive, generating and rendering the CAPTCHA image takes too long.
@@ -38,8 +52,7 @@ __Gather 'round, folks! I've got a story to tell__
 **Note**: This web application is a `programming practice project.`
 The code may not follow best practices,
 but efforts will be made to improve and refine it over time.</br>
-**Duration development** 7 ~ 8 months (or more than that + 1) 😭
-  - Start May 2024
+**Duration development** 7 ~ 8 months for first version deployed and development is going on.
 
 ## Stacks
 - **MongoDB**: A NoSQL database for storing user data and chat messages.
@@ -53,7 +66,7 @@ but efforts will be made to improve and refine it over time.</br>
   - **Styling**: Bootstrap framework.
 
 ## Mechanism
-  - **Nonce**: 15 mins A unique number or value that is used only once in a cryptographic communication to prevent replay attacks.
+  - **Nonce**: 15 mins a unique number or value that is used only once in a cryptographic communication to prevent replay attacks.
   - **Locked**: 1 sec Prevent users too much request or refresh page
   - **Last verify**: 15 mins The timestamp or record of the last verification or authentication check.
   - **Heartbeat**: 30 mins extend
@@ -75,9 +88,6 @@ version _1.0.0a_
 - **Responsive design**: This website supports responsive design, ensuring a seamless experience across various devices and screen
 - **Token-based authentication**: Ensure secure your account.
 - **Session-based authentication**: A method of identifying logged in users.
-- **Captcha login verification**
-  - **Read out loud**: A friendly website tool for everyone
-  - **Renew captcha**: A friendly website tool for everyone
 - **Multi-Device Login**: Allows log in on up to `three devices simultaneously`, ensuring seamless access and synchronization across all their devices.
 - **Global room one to many**: Create and join chat rooms where multiple users can communicate simultaneously.
 - **Private room one to one**: Engage in private conversations with individual users.
@@ -106,13 +116,19 @@ version _1.0.0a_
   - **Chatting**: A communication tool that allows administrators to interact with users for quick resolution of issues and enhances collaboration.
   - **Manipulate session**: Manipulate session's ID involves managing unique identifiers, such as deleting session logins, within a system.
 
-## TTL
-  - **Access token** 15 mins, stays in cookie 1 day
-  - **Refresh token** 7 days
+## Cache TTL
+  - **Access token** 15 mins
   - **Rate limit** 3 times, limit time 15 mins
   - **Session id** 1 day, after login reduce to 30 mins
+
+## Client cookie TTL
+  - **Session id** 1 day
   - **UUID** 1 day
-  - **Heartbeat** 15 mins, extends session lifespan (client-cookie, server-cache and database) 30 mins relate to jwt token renewal
+  - **Access token** 1 day
+  - **Refresh token** 7 days
+
+## Heartbeat
+  - 15 mins, extends session lifespan (client-cookie, server-cache and database) 30 mins relate to jwt token renewal
     - `reason why 30 mins`
       - Token Expiry: Tokens remain in cookies for 1 day after expiration.
       - Session Validity: Sessions remain valid for 15 mins post-token-expiry, allowing users to re-sign tokens (excetps 15 mins first half).
