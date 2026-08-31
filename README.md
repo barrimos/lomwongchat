@@ -31,6 +31,9 @@ __Gather 'round, folks! I've got a story to tell__
 
 ## Versions 1.0.7a
 - **1.0.7a - 08/24/2026**:
+  - Fixed login logic order.
+  - Roll back handle session function checking login.
+- **1.0.7a - 08/24/2026**:
   - Fixed response not set cookie to client browser.
   - Fixed critical cache decoded in middleWare.
   - Edited health endpoint for awake server.

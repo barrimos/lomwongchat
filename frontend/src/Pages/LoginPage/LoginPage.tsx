@@ -61,6 +61,9 @@ const LoginPage = (): JSX.Element => {
         throw Error('Username and Password should be at least 3 characters')
       }
 
+          // set sessionId in client cookie
+          await axios.get(`${server}/general/session`, { withCredentials: true })
+
       // middleware trackSession > isMatch
       const verified: { data: VerifiedTypes } = await axios.get(`${server}/user/login`,
         {
@@ -89,9 +92,6 @@ const LoginPage = (): JSX.Element => {
 
           // normal status
           sessionStorage.setItem('username', inputUsername)
-
-          // set sessionId in client cookie
-          await axios.get(`${server}/general/session`, { withCredentials: true })
 
           setIsLoginBtnClick(false)
           setIsLoading(true)

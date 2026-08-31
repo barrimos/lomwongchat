@@ -74,6 +74,27 @@ const findOrCreateUpdate = async (sessionId, username, deviceId, agent, ip) => {
   )
 }
 
+const checkIsLoggedIn = async (sessionId, deviceId, username) => {
+  try {
+    return await SessionModel.findOne(
+      {
+        $or: [
+          { sessionId },
+          {
+            $and: [
+              { deviceId },
+              { username }
+            ]
+          },
+        ]
+      },
+      { isLoggedIn: 1 }
+    )
+  } catch (err) {
+    return Error(err)
+  }
+}
+
 const updateSessionOneField = async (sessionId, field, value) => {
   try {
     await SessionModel.updateOne(
@@ -191,4 +212,4 @@ const handlerSessionFailed = async (req, res, next, sessionId, deviceId, usernam
   return handlerError(handleValidate.error[errorName], req, res, next)
 }
 
-module.exports = { findSessionWithProjection, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, handlerSessionFailed }
+module.exports = { findSessionWithProjection, findOrCreateUpdate, updateSessionAttempts, updateSessionOneField, loggedInSession, logoutSession, deleteSession, checkIsLoggedIn, handlerSessionFailed }
